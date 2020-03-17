@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from main import client
 from database_classes.teams import Team
-from google.cloud.firestore import DocumentReference, CollectionReference
+from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion
 
 
 class DatabaseError(Exception):
@@ -18,8 +18,12 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
     @commands.command()
     @commands.has_role('Global Staff')
     async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji):
-        """Adds a new team with the provided name and emoji. Checks for duplicate names"""
-        await ctx.send("pong")
+        """Adds a new team with the provided name and emoji.
+            Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
+            adds the team to the firebase thing for future reference.
+            Does not add any team members, they must add themselves or be manually added separately
+        """
+        await ctx.send("Starting team creation...")
         collection_ref: CollectionReference = client.collection("teams")
 
         duplicate_name = collection_ref.where("name", "==", team_name).stream()
@@ -59,17 +63,27 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             raise DatabaseError
 
+        await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
+
     @commands.command()
+    @commands.has_role('Global Staff')
     async def get_teams(self, ctx):
+        """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
         teams = client.collection("teams")
+        long_message_string = "Teams:"
         for i in teams.stream():
-            print(i)
-        await ctx.send(f"{'lol'}")
+            long_message_string = long_message_string + f"\n {i.to_dict()}"
+        await ctx.send(long_message_string)
 
-    # @commands.Cog.listener()
-    # async def on_message(self, message: discord.Message):
-    #     print("test")
-
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        if payload.event_type == "REACTION_ADD" and payload.emoji.name == 'CODEDAY' and payload.channel_id == 689559218679840887:
+            collection_ref: CollectionReference = client.collection("teams")
+            team = list(collection_ref.where("join_message_id", "==", payload.message_id).stream())[0].reference
+            team.update({"members": ArrayUnion([payload.user_id])})
+            team_dict = team.get().to_dict()
+            await payload.member.guild.get_channel(team_dict['tc_id']).set_permissions(payload.member, read_messages=True)
+            await payload.member.guild.get_channel(team_dict['vc_id']).set_permissions(payload.member, read_messages=True)
 
 def setup(bot):
     bot.add_cog(TeamBuilderCog(bot))
