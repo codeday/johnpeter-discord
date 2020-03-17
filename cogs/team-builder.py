@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from main import client
 from database_classes.teams import Team
-from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion
+from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion, ArrayRemove
 
 
 class DatabaseError(Exception):
@@ -47,6 +47,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
                                                   overwrites=overwrites,
                                                   category=ctx.guild.get_channel(689598417063772226),
                                                   topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+        await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
 
         # Creates and sends the join message
         join_message: discord.Message = await ctx.guild.get_channel(689559218679840887).send(
@@ -82,8 +83,23 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             team = list(collection_ref.where("join_message_id", "==", payload.message_id).stream())[0].reference
             team.update({"members": ArrayUnion([payload.user_id])})
             team_dict = team.get().to_dict()
-            await payload.member.guild.get_channel(team_dict['tc_id']).set_permissions(payload.member, read_messages=True)
-            await payload.member.guild.get_channel(team_dict['vc_id']).set_permissions(payload.member, read_messages=True)
+            await payload.member.guild.get_channel(team_dict['tc_id']).set_permissions(payload.member,
+                                                                                       read_messages=True)
+            await payload.member.guild.get_channel(team_dict['vc_id']).set_permissions(payload.member,
+                                                                                       read_messages=True)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
+        if payload.event_type == "REACTION_REMOVE" and payload.emoji.name == 'CODEDAY' and payload.channel_id == 689559218679840887:
+            collection_ref: CollectionReference = client.collection("teams")
+            team = list(collection_ref.where("join_message_id", "==", payload.message_id).stream())[0].reference
+            team.update({"members": ArrayRemove([payload.user_id])})
+            team_dict = team.get().to_dict()
+            guild = self.bot.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
+            await guild.get_channel(team_dict['tc_id']).set_permissions(member, read_messages=False)
+            await guild.get_channel(team_dict['vc_id']).set_permissions(member, read_messages=False)
+
 
 def setup(bot):
     bot.add_cog(TeamBuilderCog(bot))
