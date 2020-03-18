@@ -71,6 +71,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         collection_ref: CollectionReference = client.collection("teams")
         team = list(collection_ref.where("name", "==", name).stream())[0].reference
         team.update({"project": project})
+        team_dict = team.get().to_dict()
+        await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
         await ctx.send("Project updated!")
 
     @commands.command()
