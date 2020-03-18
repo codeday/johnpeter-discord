@@ -7,9 +7,6 @@ from google.cloud import firestore
 import time
 
 BOT_TOKEN = environ['BOT_TOKEN']
-print(environ['GOOGLE_APPLICATION_CREDENTIALS'])
-
-time.sleep(100)
 
 bot = commands.Bot(command_prefix='j!', command_not_found="Heck! That command doesn't exist!!",
                    description="I am 100% authentic object:human")
