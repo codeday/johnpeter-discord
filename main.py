@@ -7,6 +7,7 @@ from google.cloud import firestore
 import time
 
 BOT_TOKEN = environ['BOT_TOKEN']
+print(environ['GOOGLE_APPLICATION_CREDENTIALS'])
 
 time.sleep(100)
 
