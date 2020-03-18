@@ -6,7 +6,6 @@ RUN pip install -r /requirements.txt
 
 COPY cogs/ /app/cogs/
 COPY database_classes/ /app/database_classes/
-COPY secrets/ /app/secrets/
 COPY main.py /app
 
 WORKDIR /app
