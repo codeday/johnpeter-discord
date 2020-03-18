@@ -68,6 +68,14 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
     @commands.command()
     @commands.has_role('Global Staff')
+    async def set_team_project(self, ctx, name, project):
+        collection_ref: CollectionReference = client.collection("teams")
+        team = list(collection_ref.where("name", "==", name).stream())[0].reference
+        team.update({"project": project})
+        await ctx.send("Project updated!")
+
+    @commands.command()
+    @commands.has_role('Global Staff')
     async def get_teams(self, ctx):
         """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
         teams = client.collection("teams")
