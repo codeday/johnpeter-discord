@@ -16,7 +16,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         self.bot: commands.Bot = bot
 
     @commands.command()
-    @commands.has_role('Global Staff')
+    @commands.has_any_role('Global Staff', 'Staff')
     async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
@@ -66,17 +66,20 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
     @commands.command()
-    @commands.has_role('Global Staff')
+    @commands.has_any_role('Global Staff', 'Staff')
     async def set_team_project(self, ctx, name, project):
         collection_ref: CollectionReference = client.collection("teams")
         team = list(collection_ref.where("name", "==", name).stream())[0].reference
         team.update({"project": project})
         team_dict = team.get().to_dict()
+        message = await ctx.guild.get_channel(689559218679840887).fetch_message((team_dict["join_message_id"]))
+        message_content = message.content.split("\nProject:")
+        await message.edit(content=message_content[0] + "\nProject: " + project)
         await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
         await ctx.send("Project updated!")
 
     @commands.command()
-    @commands.has_role('Global Staff')
+    @commands.has_any_role('Global Staff', 'Staff')
     async def get_teams(self, ctx):
         """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
         teams = client.collection("teams")
