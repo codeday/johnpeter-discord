@@ -73,7 +73,9 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         team = list(collection_ref.where("name", "==", name).stream())[0].reference
         team.update({"project": project})
         team_dict = team.get().to_dict()
-        await ctx.guild.get_channel(689559218679840887).fetch_message((team_dict["join_message_id"]))
+        message = await ctx.guild.get_channel(689559218679840887).fetch_message((team_dict["join_message_id"]))
+        message_content = message.content.split("\nProject:")
+        await message.edit(content=message_content[0] + "\nProject: " + project)
         await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
         await ctx.send("Project updated!")
 
