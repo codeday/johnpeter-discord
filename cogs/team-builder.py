@@ -54,7 +54,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             f"Who wants to join team {team_name}? If I were real, I know I would!\nReact with {team_emoji} if you "
             f"want to join!")
         await join_message.add_reaction(team_emoji)
-
         # Creates a new document for the new team
         document_ref: DocumentReference = client.collection("teams").document(team_name)
 
