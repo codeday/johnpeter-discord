@@ -45,48 +45,54 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
     @commands.command()
     @commands.has_any_role('Global Staff', 'Staff')
-    async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji):
+    async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
             adds the team to the firebase thing for future reference.
             Does not add any team members, they must add themselves or be manually added separately
         """
-        await ctx.send("Starting team creation...")
-        collection_ref: CollectionReference = client.collection("teams")
 
-        duplicate_name = collection_ref.where("name", "==", team_name).stream()
+        if team_emoji == None:
+            await ctx.send("Starting team creation...")
+            await ctx.send("Please add an emoji!")
+        else:
 
-        # Checks if any teams with this name already exist, and fails if they do
-        if sum(1 for _ in duplicate_name) > 0:
-            await ctx.send("A team with that name already exists! Please try again, human!")
-            return
+            await ctx.send("Starting team creation...")
+            collection_ref: CollectionReference = client.collection("teams")
 
-        # Creates a new channel for the new team
-        overwrites = {
-            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
-        }
-        tc = await ctx.guild.create_text_channel(name=f"{team_name.replace(' ', '-')}-📋",
-                                                 overwrites=overwrites,
-                                                 category=ctx.guild.get_channel(self.category),
-                                                 topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
-        vc = await ctx.guild.create_voice_channel(name=f"{team_name.replace(' ', '-')}-🔊",
-                                                  overwrites=overwrites,
-                                                  category=ctx.guild.get_channel(self.category),
-                                                  topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
-        await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
+            duplicate_name = collection_ref.where("name", "==", team_name).stream()
 
-        # Creates and sends the join message
-        join_message: discord.Message = await ctx.guild.get_channel(self.channel_gallery).send(
-            f"Who wants to join team {team_name}? If I were real, I know I would!\nReact with {team_emoji} if you "
-            f"want to join!")
-        await join_message.add_reaction(team_emoji)
+            # Checks if any teams with this name already exist, and fails if they do
+            if sum(1 for _ in duplicate_name) > 0:
+                await ctx.send("A team with that name already exists! Please try again, human!")
+                return
 
-        team = Team(team_name, team_emoji.__str__(), vc.id, tc.id, join_message.id)
-        team_service.add_team(team)
+            # Creates a new channel for the new team
+            overwrites = {
+                ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(read_messages=False),
+                ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
+            }
+            tc = await ctx.guild.create_text_channel(name=f"{team_name.replace(' ', '-')}-📋",
+                                                     overwrites=overwrites,
+                                                     category=ctx.guild.get_channel(self.category),
+                                                     topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+            vc = await ctx.guild.create_voice_channel(name=f"{team_name.replace(' ', '-')}-🔊",
+                                                      overwrites=overwrites,
+                                                      category=ctx.guild.get_channel(self.category),
+                                                      topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+            await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
 
-        await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
+            # Creates and sends the join message
+            join_message: discord.Message = await ctx.guild.get_channel(self.channel_gallery).send(
+                f"Who wants to join team {team_name}? If I were real, I know I would!\nReact with {team_emoji} if you "
+                f"want to join!")
+            await join_message.add_reaction(team_emoji)
+
+            team = Team(team_name, team_emoji.__str__(), vc.id, tc.id, join_message.id)
+            team_service.add_team(team)
+
+            await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
     @commands.command()
     @commands.has_any_role('Global Staff', 'Staff')
@@ -123,8 +129,9 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             message = await ctx.guild.get_channel(self.channel_gallery).fetch_message(team.join_message_id)
             await message.delete()
             team_service.delete_team(name)
+            await ctx.send("Deleted team: " + name)
         else:
-            await ctx.send("Could not find guild with the name: " + name)
+            await ctx.send("Could not find team with the name: " + name)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
