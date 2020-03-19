@@ -14,6 +14,7 @@ class TeamService:
         for doc in self.documents:
             self.teams.append(Team.from_dict(doc.to_dict()))
 
+    # updates local list
     def __update__(self):
         self.collection = client.collection('teams')
         self.documents = self.collection.stream()
@@ -21,6 +22,7 @@ class TeamService:
         for doc in self.documents:
             self.teams.append(Team.from_dict(doc.to_dict()))
 
+    # allows editing of specific attribute
     def edit_team(self, name="", attribute="", value=""):
         try:
             team = self.get_by_name(name)
@@ -39,6 +41,7 @@ class TeamService:
             # return false if attribute/team doesn't exist
             return False
 
+    # returns team if team exists, if not returns False
     def get_by_name(self, name):
         to_return = False
         for team in self.teams:
@@ -47,14 +50,17 @@ class TeamService:
                 break
         return to_return
 
+    # deletes team with given name
     def delete_team(self, name):
         document = list(self.collection.where("name", "==", name).stream())[0].reference
         document.delete()
-        # self.teams.pop(self.get_by_name(name))
+        self.teams.remove(self.get_by_name(name))
 
+    # returns list of team objects
     def get_teams(self):
         return self.teams
 
+    # adds a team
     def add_team(self, name, emoji, vc, tc, join_message):
         team = Team(name, emoji.__str__(), vc.id, tc.id, join_message.id)
         self.teams.append(team)
@@ -66,6 +72,7 @@ class TeamService:
         else:
             raise DatabaseError
 
+    # adds a team
     def add_team(self, name, emoji, vcid, tcid, join_message_id):
         team = Team(name, emoji.__str__(), vcid, tcid, join_message_id)
         self.teams.append(team)
@@ -77,6 +84,7 @@ class TeamService:
         else:
             raise DatabaseError
 
+    # adds a team
     def add_team(self, team):
         self.teams.append(team)
         name = team.name

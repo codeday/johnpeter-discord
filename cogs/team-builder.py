@@ -5,7 +5,9 @@ from main import client
 from database_classes.teams import Team
 from service_classes.teamservice import TeamService
 from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion, ArrayRemove
+
 team_service = TeamService()
+
 
 class DatabaseError(Exception):
     pass
@@ -13,7 +15,6 @@ class DatabaseError(Exception):
 
 class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
     """Creates Teams!"""
-
 
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -90,6 +91,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
     @commands.command()
     @commands.has_any_role('Global Staff', 'Staff')
     async def set_team_project(self, ctx, name, project):
+        # Sets team project
         team = team_service.edit_team(name, "project", project)
         if team is True:
             team_dict = team_service.get_by_name(name).to_dict()
@@ -123,6 +125,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             team_service.delete_team(name)
         else:
             await ctx.send("Could not find guild with the name: " + name)
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         if payload.event_type == "REACTION_ADD" and payload.emoji.name == 'CODEDAY' and payload.channel_id == self.channel_gallery:

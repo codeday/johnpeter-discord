@@ -14,10 +14,6 @@ logging.basicConfig(level=logging.INFO)
 
 client = firestore.Client()
 collection = client.collection('teams')
-# documents = list(collection.stream())
-documents = collection.stream()
-for doc in documents:
-    print(u'{} => {}'.format(doc.id, doc.to_dict()))
 
 initial_cogs = ['cogs.team-builder']
 
