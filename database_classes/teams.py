@@ -1,8 +1,8 @@
 class Team(object):
-    def __init__(self, name, emoij, vc_id, tc_id, join_message_id, members=[], project=""):
+    def __init__(self, name, emoji, vc_id, tc_id, join_message_id, members=[], project=""):
         """
         :param name: The team name
-        :param emoij: The team's emoji
+        :param emoji: The team's emoji
         :param vc_id: The ID of the team's voice channel
         :param tc_id: The ID of the team's text channel
         :param join_message_id: The ID of the join message that users react to to join the team
@@ -10,7 +10,7 @@ class Team(object):
         :param project: A description of the team's project
         """
         self.name = name
-        self.emoji = emoij
+        self.emoji = emoji
         self.members = members
         self.vc_id = vc_id
         self.tc_id = tc_id
@@ -19,7 +19,7 @@ class Team(object):
 
     @staticmethod
     def from_dict(source):
-        team = Team(source['name'], source['emoij'], source["vc_id"], source["tc_id"], source["join_message_id"])
+        team = Team(source['name'], source['emoji'], source["vc_id"], source["tc_id"], source["join_message_id"])
 
         if 'members' in source:
             team.members = source["members"]

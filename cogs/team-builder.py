@@ -1,9 +1,11 @@
+from os import environ
 import discord
 from discord.ext import commands
 from main import client
 from database_classes.teams import Team
+from service_classes.teamservice import TeamService
 from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion, ArrayRemove
-
+team_service = TeamService()
 
 class DatabaseError(Exception):
     pass
@@ -12,8 +14,33 @@ class DatabaseError(Exception):
 class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
     """Creates Teams!"""
 
+
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        # not used
+        if environ.get('CHANNEL_COMMAND') is not None:
+            self.channel_command = int(environ['CHANNEL_COMMAND'])
+        else:
+            self.channel_command = 689601755406663711
+        # channel to show teams
+        if environ.get('CHANNEL_GALLERY') is not None:
+            self.channel_gallery = int(environ['CHANNEL_GALLERY'])
+        else:
+            self.channel_gallery = 689559218679840887
+        # staff role also not used
+        if environ.get('ROLE_STAFF') is not None:
+            self.role_staff = int(environ['ROLE_STAFF'])
+        else:
+            self.role_staff = 689215241996730417
+        # student role
+        if environ.get('ROLE_STUDENT') is not None:
+            self.role_student = int(environ['ROLE_STUDENT'])
+        else:
+            self.role_student = 689214914010808359
+        if environ.get('CATEGORY') is not None:
+            self.category = int(environ['CATEGORY'])
+        else:
+            self.category = 689598417063772226
 
     @commands.command()
     @commands.has_any_role('Global Staff', 'Staff')
@@ -36,47 +63,43 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         # Creates a new channel for the new team
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.get_role(689214914010808359): discord.PermissionOverwrite(read_messages=False),
+            ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(read_messages=False),
             ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
         }
         tc = await ctx.guild.create_text_channel(name=f"{team_name.replace(' ', '-')}-📋",
                                                  overwrites=overwrites,
-                                                 category=ctx.guild.get_channel(689598417063772226),
+                                                 category=ctx.guild.get_channel(self.category),
                                                  topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
         vc = await ctx.guild.create_voice_channel(name=f"{team_name.replace(' ', '-')}-🔊",
                                                   overwrites=overwrites,
-                                                  category=ctx.guild.get_channel(689598417063772226),
+                                                  category=ctx.guild.get_channel(self.category),
                                                   topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
         await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
 
         # Creates and sends the join message
-        join_message: discord.Message = await ctx.guild.get_channel(689559218679840887).send(
+        join_message: discord.Message = await ctx.guild.get_channel(self.channel_gallery).send(
             f"Who wants to join team {team_name}? If I were real, I know I would!\nReact with {team_emoji} if you "
             f"want to join!")
         await join_message.add_reaction(team_emoji)
-        # Creates a new document for the new team
-        document_ref: DocumentReference = client.collection("teams").document(team_name)
 
-        result = document_ref.set(Team(team_name, team_emoji.__str__(), vc.id, tc.id, join_message.id).to_dict())
-        if result:
-            print("Successfully added!")
-        else:
-            raise DatabaseError
+        team = Team(team_name, team_emoji.__str__(), vc.id, tc.id, join_message.id)
+        team_service.add_team(team)
 
         await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
     @commands.command()
     @commands.has_any_role('Global Staff', 'Staff')
     async def set_team_project(self, ctx, name, project):
-        collection_ref: CollectionReference = client.collection("teams")
-        team = list(collection_ref.where("name", "==", name).stream())[0].reference
-        team.update({"project": project})
-        team_dict = team.get().to_dict()
-        message = await ctx.guild.get_channel(689559218679840887).fetch_message((team_dict["join_message_id"]))
-        message_content = message.content.split("\nProject:")
-        await message.edit(content=message_content[0] + "\nProject: " + project)
-        await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
-        await ctx.send("Project updated!")
+        team = team_service.edit_team(name, "project", project)
+        if team is True:
+            team_dict = team_service.get_by_name(name).to_dict()
+            message = await ctx.guild.get_channel(self.channel_gallery).fetch_message((team_dict["join_message_id"]))
+            message_content = message.content.split("\nProject:")
+            await message.edit(content=message_content[0] + "\nProject: " + project)
+            await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
+            await ctx.send("Project updated!")
+        else:
+            await ctx.send("Could not find guild with the name: " + name)
 
     @commands.command()
     @commands.has_any_role('Global Staff', 'Staff')
@@ -88,9 +111,21 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             long_message_string = long_message_string + f"\n {i.to_dict()}"
         await ctx.send(long_message_string)
 
+    @commands.command()
+    @commands.has_any_role('Global Staff', 'Staff')
+    async def delete_team(self, ctx, name):
+        team = team_service.get_by_name(name)
+        if team is not False:
+            await ctx.guild.get_channel(team.vc_id).delete()
+            await ctx.guild.get_channel(team.tc_id).delete()
+            message = await ctx.guild.get_channel(self.channel_gallery).fetch_message(team.join_message_id)
+            await message.delete()
+            team_service.delete_team(name)
+        else:
+            await ctx.send("Could not find guild with the name: " + name)
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        if payload.event_type == "REACTION_ADD" and payload.emoji.name == 'CODEDAY' and payload.channel_id == 689559218679840887:
+        if payload.event_type == "REACTION_ADD" and payload.emoji.name == 'CODEDAY' and payload.channel_id == self.channel_gallery:
             collection_ref: CollectionReference = client.collection("teams")
             team = list(collection_ref.where("join_message_id", "==", payload.message_id).stream())[0].reference
             team.update({"members": ArrayUnion([payload.user_id])})
@@ -102,7 +137,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
-        if payload.event_type == "REACTION_REMOVE" and payload.emoji.name == 'CODEDAY' and payload.channel_id == 689559218679840887:
+        if payload.event_type == "REACTION_REMOVE" and payload.emoji.name == 'CODEDAY' and payload.channel_id == self.channel_gallery:
             collection_ref: CollectionReference = client.collection("teams")
             team = list(collection_ref.where("join_message_id", "==", payload.message_id).stream())[0].reference
             team.update({"members": ArrayRemove([payload.user_id])})
