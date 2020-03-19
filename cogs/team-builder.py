@@ -43,7 +43,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             self.category = 689598417063772226
 
-    @commands.command()
+    @commands.command(pass_context=True, aliases=['create', 'createteam', 'addteam', 'add'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
@@ -94,7 +94,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
-    @commands.command()
+    @commands.command(pass_context=True, aliases=['setproject', 'setteamproject'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def set_team_project(self, ctx, name, project):
         # Sets team project
@@ -109,7 +109,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             await ctx.send("Could not find guild with the name: " + name)
 
-    @commands.command()
+    @commands.command(pass_context=True, aliases=['getteams', 'get'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def get_teams(self, ctx):
         """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
@@ -119,7 +119,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             long_message_string = long_message_string + f"\n {i.to_dict()}"
         await ctx.send(long_message_string)
 
-    @commands.command()
+    @commands.command(pass_context=True, aliases=['purge', 'clean', 'delete', 'deleteteam'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def delete_team(self, ctx, name):
         team = team_service.get_by_name(name)
