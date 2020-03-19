@@ -1,4 +1,5 @@
 from os import environ
+from random import choice
 import discord
 from discord.ext import commands
 from main import client
@@ -7,6 +8,15 @@ from service_classes.teamservice import TeamService
 from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion, ArrayRemove
 
 team_service = TeamService()
+
+teamCreateMessages = [
+    "Yeehaw! Looks like team **{0}** has joined CodeDay!",
+    "Team **{0}** has entered the chat!",
+    "Hello, team **{0}**.",
+    "Everyone, let's welcome team **{0}**!, team {0}, I hope you brought fish!"
+    "Don't panic! team {0} is here!"
+    "What's this? team **{0}** is here!"
+]
 
 
 class DatabaseError(Exception):
@@ -85,7 +95,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
             # Creates and sends the join message
             join_message: discord.Message = await ctx.guild.get_channel(self.channel_gallery).send(
-                f"Who wants to join team {team_name}? If I were real, I know I would!\nReact with {team_emoji} if you "
+                choice(teamCreateMessages).format(team_name) +
+                f"\nReact with {team_emoji} if you "
                 f"want to join!")
             await join_message.add_reaction(team_emoji)
 
