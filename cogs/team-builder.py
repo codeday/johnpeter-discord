@@ -13,9 +13,9 @@ teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
     "Team **{0}** has entered the chat!",
     "Hello, team **{0}**.",
-    "Everyone, let's welcome team **{0}**!, team {0}, I hope you brought fish!"
-    "Don't panic! team {0} is here!"
-    "What's this? team **{0}** is here!"
+    "Everyone, let's welcome team **{0}**!, team {0}, I hope you brought fish!",
+    "Don't panic! team {0} is here!",
+    "What's this? team **{0}** is here!",
 ]
 
 
