@@ -7,7 +7,6 @@ from discord.ext import commands
 from google.cloud import firestore
 
 BOT_TOKEN = environ['BOT_TOKEN']
-print(BOT_TOKEN)
 
 bot = commands.Bot(command_prefix='j!', command_not_found="Heck! That command doesn't exist!!",
                    description="I am 100% authentic object:human")
