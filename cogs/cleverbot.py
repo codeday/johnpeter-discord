@@ -1,6 +1,5 @@
 import json
 import os
-import re
 
 import requests
 from discord.ext import commands
@@ -15,15 +14,13 @@ class CleverbotCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if str(type(message.channel)) is 'TextChannel' and message.channel.name is 'random' and re.search('^john (.+)$',
-                                                                                                          message.text,
-                                                                                                          flags=re.IGNORECASE):
+        if str(type(message.channel)) == 'TextChannel' and message.channel.name == 'random' and message.text.lower.startswith('john'):
             state_id = str(message.author.id) + str(
                 message.channel.name)  # each user/channel combo has unique statere.IGNORECASE
 
             if state_id not in self.states:
                 self.states[state_id] = None
-
+            input =  message.text.split(' ', 1)[1]
             r = requests.get(
                 url='http://www.cleverbot.com/getreply?key={}&input={}&cs={}'.format(API_KEY, input,
                                                                                      self.states[state_id]),
