@@ -7,6 +7,7 @@ from discord.ext import commands
 
 API_KEY = os.getenv('CLEVERBOT_API_KEY')
 
+
 class CleverbotCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -14,15 +15,18 @@ class CleverbotCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if str(type(message.channel)) is 'TextChannel' and message.channel.name is 'random' and re.search('^john (.+)$', re.IGNORECASE, message.text):
+        if str(type(message.channel)) is 'TextChannel' and message.channel.name is 'random' and re.search('^john (.+)$',
+                                                                                                          message.text,
+                                                                                                          flags=re.IGNORECASE):
             state_id = str(message.author.id) + str(
-                message.channel.name)  # each user/channel combo has unique state
+                message.channel.name)  # each user/channel combo has unique statere.IGNORECASE
 
             if state_id not in self.states:
                 self.states[state_id] = None
 
             r = requests.get(
-                url='http://www.cleverbot.com/getreply?key={}&input={}&cs={}'.format(API_KEY, input, self.states[state_id]),
+                url='http://www.cleverbot.com/getreply?key={}&input={}&cs={}'.format(API_KEY, input,
+                                                                                     self.states[state_id]),
                 verify=False)
             msg_out = json.loads(r.text)['output']
             self.states[state_id] = json.loads(r.text)['cs']
