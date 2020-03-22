@@ -1,10 +1,10 @@
-import discord
-from os import environ
-from discord.ext import commands
 import logging
 import traceback
+from os import environ
+
+import discord
+from discord.ext import commands
 from google.cloud import firestore
-import time
 
 BOT_TOKEN = environ['BOT_TOKEN']
 
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 client = firestore.Client()
 collection = client.collection('teams')
 
-initial_cogs = ['cogs.team-builder']
+initial_cogs = ['cogs.team-builder','cogs.cleverbot']
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 for cog in initial_cogs:
