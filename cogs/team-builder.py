@@ -1,11 +1,14 @@
+import logging
 from os import environ
 from random import choice
+
 import discord
 from discord.ext import commands
-from main import client
+from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
+
 from database_classes.teams import Team
+from main import client
 from service_classes.teamservice import TeamService
-from google.cloud.firestore import DocumentReference, CollectionReference, ArrayUnion, ArrayRemove
 
 team_service = TeamService()
 
@@ -62,11 +65,10 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         """
 
         if team_emoji == None:
-            await ctx.send("Starting team creation...")
+            logging.DEBUG("Starting team creation...")
             await ctx.send("Please add an emoji!")
         else:
-
-            await ctx.send("Starting team creation...")
+            logging.DEBUG("Starting team creation...")
             collection_ref: CollectionReference = client.collection("teams")
 
             duplicate_name = collection_ref.where("name", "==", team_name).stream()
