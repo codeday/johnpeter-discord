@@ -7,6 +7,8 @@ workflows:
             branches:
               only: master
           context: Docker Hub
+  build_test:
+    jobs:
       - build_test:
           filters:
             branches:
