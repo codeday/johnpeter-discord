@@ -1,12 +1,26 @@
 import logging
 import traceback
-from os import environ
+from os import environ, getenv
 
 import discord
 from discord.ext import commands
 from google.cloud import firestore
+from service_classes.randomservice import RandomFuncs
+import sys
+from raygun4py import raygunprovider
 
 BOT_TOKEN = environ['BOT_TOKEN']
+error_channel = int(getenv('CHANNEL_ERRORS', 689601755406663711))  # Where errors go when reported
+raygun_key = getenv('RAYGUN_KEY', None)
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    cl = raygunprovider.RaygunSender(raygun_key)
+    cl.send_exception(exc_info=(exc_type, exc_value, exc_traceback))
+    sys.__excepthook__(type, exc_value, traceback)
+
+
+sys.excepthook = handle_exception
 
 bot = commands.Bot(command_prefix='j!', command_not_found="Heck! That command doesn't exist!!",
                    description="I am 100% authentic object:human")
@@ -15,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 client = firestore.Client()
 collection = client.collection('teams')
 
-initial_cogs = ['cogs.team-builder','cogs.cleverbot']
+initial_cogs = ['cogs.team-builder', 'cogs.cleverbot', 'cogs.admin-commands']
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 for cog in initial_cogs:
@@ -45,11 +59,21 @@ async def on_ready():
 
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(ctx, error: commands.CommandError):
+    """Specially handles some errors, all others take the unhandled route"""
     if isinstance(error, commands.CommandNotFound):
         await ctx.send('That command doesn\'t seem to exist! Please try again, and type `'
                        'help` to view the help documentation.')
     else:
+        error_message_list = list(RandomFuncs.paginate(
+            ''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__))), 1900))
+        await ctx.send("Hmm, that's weird! You just hit an unhandled error! It has been reported.")
+        await bot.get_channel(error_channel).send(
+            f"New error! Yikes! \n\n```{error_message_list[0]}```")
+        if len(error_message_list) > 1:
+            for i in error_message_list[1:]:
+                await bot.get_channel(error_channel).send(f"```{i}```")
+        handle_exception(type(error), error, error.__traceback__)
         raise error
 
 

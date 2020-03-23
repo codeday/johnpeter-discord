@@ -1,5 +1,5 @@
 import logging
-from os import environ
+from os import getenv
 from random import choice
 
 import discord
@@ -30,32 +30,13 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        # not used
-        if environ.get('CHANNEL_COMMAND') is not None:
-            self.channel_command = int(environ['CHANNEL_COMMAND'])
-        else:
-            self.channel_command = 689601755406663711
-        # channel to show teams
-        if environ.get('CHANNEL_GALLERY') is not None:
-            self.channel_gallery = int(environ['CHANNEL_GALLERY'])
-        else:
-            self.channel_gallery = 689559218679840887
-        # staff role also not used
-        if environ.get('ROLE_STAFF') is not None:
-            self.role_staff = int(environ['ROLE_STAFF'])
-        else:
-            self.role_staff = 689215241996730417
-        # student role
-        if environ.get('ROLE_STUDENT') is not None:
-            self.role_student = int(environ['ROLE_STUDENT'])
-        else:
-            self.role_student = 689214914010808359
-        if environ.get('CATEGORY') is not None:
-            self.category = int(environ['CATEGORY'])
-        else:
-            self.category = 689598417063772226
+        self.channel_command = int(getenv("CHANNEL_COMMAND", 689601755406663711))  # not used
+        self.channel_gallery = int(getenv("CHANNEL_GALLERY", 689559218679840887))  # channel to show teams
+        self.role_staff = int(getenv('ROLE_STAFF', 689215241996730417))  # staff role also not used
+        self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
+        self.category = int(getenv("CATEGORY", 689598417063772226))
 
-    @commands.command(pass_context=True, aliases=['create', 'createteam', 'addteam', 'add'])
+    @commands.command(aliases=['create', 'createteam', 'addteam', 'add'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
@@ -64,11 +45,11 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             Does not add any team members, they must add themselves or be manually added separately
         """
 
-        if team_emoji == None:
-            logging.DEBUG("Starting team creation...")
+        if team_emoji is None:
+            logging.debug("Starting team creation...")
             await ctx.send("Please add an emoji!")
         else:
-            logging.DEBUG("Starting team creation...")
+            logging.debug("Starting team creation...")
             collection_ref: CollectionReference = client.collection("teams")
 
             duplicate_name = collection_ref.where("name", "==", team_name).stream()
@@ -85,13 +66,13 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
                 ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
             }
             tc = await ctx.guild.create_text_channel(name=f"{team_name.replace(' ', '-')}-📋",
-                                                     overwrites=overwrites,
-                                                     category=ctx.guild.get_channel(self.category),
-                                                     topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+                                          overwrites=overwrites,
+                                          category=ctx.guild.get_channel(self.category),
+                                          topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
             vc = await ctx.guild.create_voice_channel(name=f"{team_name.replace(' ', '-')}-🔊",
-                                                      overwrites=overwrites,
-                                                      category=ctx.guild.get_channel(self.category),
-                                                      topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+                                           overwrites=overwrites,
+                                           category=ctx.guild.get_channel(self.category),
+                                           topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
             await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
 
             # Creates and sends the join message
@@ -106,7 +87,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
-    @commands.command(pass_context=True, aliases=['setproject', 'setteamproject'])
+    @commands.command(aliases=['setproject', 'setteamproject'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def set_team_project(self, ctx, name, project):
         # Sets team project
@@ -121,7 +102,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             await ctx.send("Could not find guild with the name: " + name)
 
-    @commands.command(pass_context=True, aliases=['getteams', 'get'])
+    @commands.command(aliases=['getteams', 'get'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def get_teams(self, ctx):
         """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
@@ -153,7 +134,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             team.update({"members": ArrayUnion([payload.user_id])})
             team_dict = team.get().to_dict()
             await payload.member.guild.get_channel(team_dict['tc_id']).set_permissions(payload.member,
-                                                                                       read_messages=True)
+                                                                                       read_messages=True,
+                                                                                       manage_messages=True)
             await payload.member.guild.get_channel(team_dict['vc_id']).set_permissions(payload.member,
                                                                                        read_messages=True)
 
