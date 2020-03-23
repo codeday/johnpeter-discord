@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 client = firestore.Client()
 collection = client.collection('teams')
 
-initial_cogs = ['cogs.team-builder','cogs.cleverbot']
+initial_cogs = ['cogs.team-builder', 'cogs.cleverbot', 'cogs.admin-commands']
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 for cog in initial_cogs:

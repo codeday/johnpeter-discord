@@ -36,7 +36,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.category = int(getenv("CATEGORY", 689598417063772226))
 
-    @commands.command(pass_context=True, aliases=['create', 'createteam', 'addteam', 'add'])
+    @commands.command(aliases=['create', 'createteam', 'addteam', 'add'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
@@ -87,7 +87,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
-    @commands.command(pass_context=True, aliases=['setproject', 'setteamproject'])
+    @commands.command(aliases=['setproject', 'setteamproject'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def set_team_project(self, ctx, name, project):
         # Sets team project
@@ -102,7 +102,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             await ctx.send("Could not find guild with the name: " + name)
 
-    @commands.command(pass_context=True, aliases=['getteams', 'get'])
+    @commands.command(aliases=['getteams', 'get'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def get_teams(self, ctx):
         """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
