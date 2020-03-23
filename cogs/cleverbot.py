@@ -16,8 +16,7 @@ class CleverbotCog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if type(message.channel) == discord.channel.TextChannel and message.channel.name == 'random' and message.content.lower().startswith('john '):
-            state_id = str(message.author.id) + str(
-                   message.channel.name)  # each user/channel combo has unique state
+            state_id = str(message.channel.name)  # each channel has unique state
 
             if state_id not in self.states:
                 self.states[state_id] = None
