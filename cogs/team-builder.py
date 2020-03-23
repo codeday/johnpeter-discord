@@ -46,10 +46,10 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         """
 
         if team_emoji is None:
-            logging.DEBUG("Starting team creation...")
+            logging.debug("Starting team creation...")
             await ctx.send("Please add an emoji!")
         else:
-            logging.DEBUG("Starting team creation...")
+            logging.debug("Starting team creation...")
             collection_ref: CollectionReference = client.collection("teams")
 
             duplicate_name = collection_ref.where("name", "==", team_name).stream()
@@ -135,7 +135,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             team_dict = team.get().to_dict()
             await payload.member.guild.get_channel(team_dict['tc_id']).set_permissions(payload.member,
                                                                                        read_messages=True,
-                                                                                       pin_messages=True)
+                                                                                       manage_messages=True)
             await payload.member.guild.get_channel(team_dict['vc_id']).set_permissions(payload.member,
                                                                                        read_messages=True)
 
