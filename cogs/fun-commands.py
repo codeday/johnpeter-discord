@@ -5,12 +5,11 @@ from discord.ext import commands
 from urllib import parse
 
 
-class FunCommands(commands.Cog, name="Crab Rave Commands"):
+class FunCommands(commands.Cog, name="Fun Commands"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    @commands.command(pass_context=True, aliases=['crabrave', 'crab_rave', 'crab-rave'])
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.command(aliases=['crabrave', 'crab_rave', 'crab-rave'], hidden=True)
     async def crab(self, ctx, *, text):
         url = f'https://adventurous-damselfly.glitch.me/video/{parse.quote(text)}.mp4?style=classic'
         async with ctx.channel.typing():
