@@ -11,6 +11,7 @@ class FunCommands(commands.Cog, name="Fun Commands"):
 
     @commands.command(aliases=['crabrave', 'crab_rave', 'crab-rave'], hidden=True)
     async def crab(self, ctx, *, text):
+        await ctx.message.delete()
         url = f'https://adventurous-damselfly.glitch.me/video/{parse.quote(text)}.mp4?style=classic'
         async with ctx.channel.typing():
             async with aiohttp.ClientSession() as session:
