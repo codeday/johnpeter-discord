@@ -1,3 +1,5 @@
+import sys
+
 from discord.ext import commands
 import discord
 from service_classes.teamservice import TeamService
@@ -44,6 +46,13 @@ class AdminCommands(commands.Cog):
                 # await ctx.send(choice(title_options) + " " + choice(message_options), embed=embed)
             except Exception as ex:
                 print("I have an exception!" + ex.__str__())
+
+    @commands.command()
+    @commands.has_any_role('Global Staff', 'Staff')
+    async def kill(self, ctx):
+        await \
+            ctx.send("goodbye :(")
+        sys.exit()
 
 
 def setup(bot):

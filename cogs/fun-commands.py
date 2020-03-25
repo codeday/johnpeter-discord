@@ -17,8 +17,9 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
         try:
-            with open(self.cache_index, "w+") as file:
+            with open(self.cache_index) as file:
                 self.cache_data = json.load(file)
+                print("Cache Found!")
         except:
             self.cache_data = {}
             print("Cache data not found!")
@@ -38,6 +39,13 @@ class FunCommands(commands.Cog, name="Fun Commands"):
             await ctx.send("Sorry, please do that in #random")
 
         # save cache to disk here https://docs.python.org/3/library/functions.html#open w+
+        # cache = json.dumps(self.cache_index)
+        # f = open("dict.json", "w")
+        # f.write(cache)
+        # f.close()
+        with open(self.cache_index, 'w') as fp:
+            json.dump(self.cache_data, fp)
+
 
     async def get_with_cache(self, string) -> typing.Union[io.BytesIO, bool]:
         """
@@ -63,7 +71,7 @@ class FunCommands(commands.Cog, name="Fun Commands"):
                         output_file.write(await resp.read())
                         self.cache_data[string] = {
                             "file": f"{self.cache_folder}{string}.mp4",
-                            "usages": self.cache_data[string]["usages"] + 1
+                            "usages": 1
                         }
                     return io.BytesIO(await resp.read())
 
