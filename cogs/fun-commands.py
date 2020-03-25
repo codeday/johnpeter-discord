@@ -14,8 +14,8 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
 
     @commands.command(aliases=['crabrave', 'crab_rave', 'crab-rave'], hidden=True)
-    async def crab(self, ctx, *, text = None):
-        if text == None:
+    async def crab(self, ctx, *, text=None):
+        if text is None:
             await ctx.send("Please add arguments!")
         else:
             if ctx.channel.id == self.random_channel:
@@ -28,7 +28,8 @@ class FunCommands(commands.Cog, name="Fun Commands"):
                                 return await ctx.send('Could not download file...')
                             data = io.BytesIO(await resp.read())
                             await ctx.send(file=discord.File(data, f'{text}.mp4'))
-                await self.bot.get_channel(self.mod_log).send(f"{ctx.author.mention} did crab rave with arguments '{text}'")
+                await self.bot.get_channel(self.mod_log).send(
+                    f"{ctx.author.mention} did crab rave with arguments '{text}'")
             else:
                 await ctx.send("Sorry, please do that in #random")
 
