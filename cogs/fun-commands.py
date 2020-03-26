@@ -34,7 +34,7 @@ class FunCommands(commands.Cog, name="Fun Commands"):
                 if not resp:
                     return await ctx.send('Could not download file...')
                 await ctx.send(file=discord.File(resp, f'{text}.mp4'))
-            await self.bot.get_channel(self.mod_log).send(f"{ctx.author.mention} did crab rave with arguments '{text}'")
+            # await self.bot.get_channel(self.mod_log).send(f"{ctx.author.mention} did crab rave with arguments '{text}'")
         else:
             await ctx.send("Sorry, please do that in #random")
 
