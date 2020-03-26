@@ -73,6 +73,11 @@ class FunCommands(commands.Cog, name="Fun Commands"):
                         }
                     return io.BytesIO(await resp.read())
 
+    @commands.command(hidden=True)
+    async def owo(self, ctx):
+        if ctx.channel.id == self.random_channel:
+            await ctx.send("owo what's this")
+
 
 def setup(bot):
     bot.add_cog(FunCommands(bot))
