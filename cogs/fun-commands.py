@@ -38,14 +38,8 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         else:
             await ctx.send("Sorry, please do that in #random")
 
-        # save cache to disk here https://docs.python.org/3/library/functions.html#open w+
-        # cache = json.dumps(self.cache_index)
-        # f = open("dict.json", "w")
-        # f.write(cache)
-        # f.close()
         with open(self.cache_index, 'w') as fp:
             json.dump(self.cache_data, fp)
-
 
     async def get_with_cache(self, string) -> typing.Union[io.BytesIO, bool]:
         """
