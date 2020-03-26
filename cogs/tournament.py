@@ -15,9 +15,9 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.join_message = None
 
-    @commands.command(aliases=['create_tournament', 'createtournament', 'tournament', 'tourney'])
+    @commands.command(aliases=['createtournament', 'tournament', 'tourney'])
     @commands.has_any_role('Global Staff', 'Staff')
-    async def add_team(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
+    async def create_tournament(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
         """Creates a new tournament with the provided game name
             creates a VC and TC for the team as well as an invite message
             Does not use firebase, because tournaments will be short and I'm lazy
