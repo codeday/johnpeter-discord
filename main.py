@@ -30,7 +30,7 @@ def command_prefix(bot, message):
         return 'j!'
 
 
-bot = commands.Bot(command_prefix='command_prefix', command_not_found="Heck! That command doesn't exist!!",
+bot = commands.Bot(command_prefix=command_prefix, command_not_found="Heck! That command doesn't exist!!",
                    description="I am 100% authentic object:human")
 logging.basicConfig(level=logging.INFO)
 
