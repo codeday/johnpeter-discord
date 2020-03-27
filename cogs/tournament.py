@@ -19,6 +19,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.enabled = True
         self.games = {}
         self.status_message = None
+        self.round = 0
 
 
     @commands.command(hidden=True, aliases=['createtournament', 'tournament', 'tourney'])
@@ -27,11 +28,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         await ctx.message.delete()
         self.gamers = []
         self.enabled = True
-        """Creates a new tournament with the provided game name
-            creates a VC and TC for the team as well as an invite message
-            Does not use firebase, because tournaments will be short and I'm lazy
-            Does not add any players, they must add themselves or be manually added separately
-        """
+        self.round = -1
         logging.debug("Starting tournament creation...")
         # Creates a new channel for the tournament
         self.game_name = game_name
@@ -41,14 +38,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
             ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(read_messages=False),
             ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
         }
-        self.tc = await ctx.guild.create_text_channel(name=f"{game_name.replace(' ', '-')}-tournament-📋",
-                                                      overwrites=self.overwrites,
-                                                      category=ctx.guild.get_channel(self.category),
-                                                      topic=f"A channel for the {game_name} tournament!")
-        self.vc = await ctx.guild.create_voice_channel(name=f"{game_name.replace(' ', '-')}-tournament-🔊",
-                                                       overwrites=self.overwrites,
-                                                       category=ctx.guild.get_channel(self.category),
-                                                       topic=f"A channel for the {game_name} tournament!")
+        self.tc = ctx.channel
         # Creates and sends the join message
         self.join_message: discord.Message = await ctx.channel.send(
             make_join_message(game_name,emoji,self.gamers)
@@ -60,26 +50,18 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         if payload.event_type == "REACTION_ADD" and payload.emoji.name == '🏆' and payload.message_id == self.join_message.id and self.enabled is True:
             if payload.user_id != self.bot.user.id:  # John must not become gamer
                 self.gamers.append(payload.user_id)
-            await payload.member.guild.get_channel(self.tc.id).set_permissions(payload.member,
-                                                                               read_messages=True,
-                                                                               manage_messages=True)
-            await payload.member.guild.get_channel(self.vc.id).set_permissions(payload.member,
-                                                                               read_messages=True)
             await self.join_message.edit(content=make_join_message(self.game_name, self.emoji, self.gamers))
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
         if payload.event_type == "REACTION_REMOVE" and payload.emoji.name == '🏆' and payload.message_id == self.join_message.id and self.enabled is True:
             self.gamers.remove(payload.user_id)
-            guild = self.bot.get_guild(payload.guild_id)
-            member = guild.get_member(payload.user_id)
-            await guild.get_channel(self.tc.id).set_permissions(member, read_messages=False)
-            await guild.get_channel(self.vc.id).set_permissions(member, read_messages=False)
             await self.join_message.edit(content=make_join_message(self.game_name,self.emoji,self.gamers))
 
     @commands.command(hidden=True)
     @commands.has_any_role('Tournament Master')
     async def start_round(self, ctx: commands.context.Context, groupSize = 4):
+        self.round += 1
         await ctx.message.delete()
         self.enabled = False
         groups = makeGroups(self.gamers, groupSize)
@@ -101,11 +83,8 @@ Game on! {''.join([f'<@{gamer}> 'for gamer in self.games[game]['gamers'] if game
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
                 f'''<@{random.choice(self.games[game]['gamers'])}> has been randomly selected as the game host. Please send them a link to your steam profile so y'all can begin the HIGH OCTANE GAMING ACTION! :race_car:'''
             )
-            await self.join_message.edit(content=make_running_message(self.game_name, self.games))
-
+            await self.join_message.edit(content=make_running_message(self.game_name, self.games, self.round))
             await self.join_message.clear_reactions()
-            self.status_message = await self.tc.send(make_running_message(self.game_name, self.games))
-            await self.status_message.pin()
             self.gamers = []
 
 
@@ -116,9 +95,8 @@ Game on! {''.join([f'<@{gamer}> 'for gamer in self.games[game]['gamers'] if game
         if winner_id in self.games[ctx.channel.id]['gamers']:
             self.gamers.append(winner_id)
             self.games[ctx.channel.id]['winner'] = winner_id
-            await self.join_message.edit(content=make_running_message(self.game_name, self.games))
-            await self.status_message.edit(content=make_running_message(self.game_name,self.games))
-            await self.tc.send(f'Congratulations to <@{winner_id}> for winning game {self.games[ctx.channel.id]["idx"]}!')
+            await self.join_message.edit(content=make_running_message(self.game_name, self.games, self.round))
+            await self.tc.send(f'Congratulations to <@{winner_id}> for winning round {self.round} game {self.games[ctx.channel.id]["idx"]}!')
             await ctx.channel.send('Thank you for playing!')
             await asyncio.sleep(5)
             await self.games[ctx.channel.id]['tc'].delete()
@@ -185,9 +163,9 @@ Please react to this message with {} to join the tournament!
 '''.format(gamer)
     return msg
 
-def make_running_message(game,games):
+def make_running_message(game,games, round):
     msg = f'''{game} Tournament:
-Current matches:
+Current matches (Round {round}):
 '''
     for g in games:
         out = f'''Match {games[g]['idx']} - '''
@@ -204,11 +182,11 @@ Current matches:
 async def create_games(groups, ctx, game_name='Gaming', overwrites=None, category=None):
     games = {}
     for idx, group in enumerate(groups):
-        tc = await ctx.guild.create_text_channel(name=f"{game_name.replace(' ', '-')}-tournament-{idx}📋",
+        tc = await ctx.guild.create_text_channel(name=f"game-{idx}📋",
                                                  overwrites=overwrites,
                                                  category=ctx.guild.get_channel(category),
                                                  topic=f"A channel for the {game_name} tournament!")
-        vc = await ctx.guild.create_voice_channel(name=f"{game_name.replace(' ', '-')}-tournament-{idx}🔊",
+        vc = await ctx.guild.create_voice_channel(name=f"game-{idx}🔊",
                                                   overwrites=overwrites,
                                                   category=ctx.guild.get_channel(category),
                                                   topic=f"A channel for the {game_name} tournament!")
@@ -253,7 +231,7 @@ def makeGroups(players, groupSize):
 
 
 def make_voting_message(game):
-    out = f'''Winner for round {game['idx']}:
+    out = f'''Winner for game {game['idx']}:
 '''
     for gamer in game['gamers']:
         out += f'''
