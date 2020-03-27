@@ -83,8 +83,8 @@ Game on! {''.join([f'<@{gamer}> 'for gamer in self.games[game]['gamers'] if game
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
                 f'''<@{random.choice(self.games[game]['gamers'])}> has been randomly selected as the game host. Please send them a link to your steam profile so y'all can begin the HIGH OCTANE GAMING ACTION! :race_car:'''
             )
-            await self.join_message.edit(content=make_running_message(self.game_name, self.games, self.round))
-            await self.join_message.clear_reactions()
+            await self.tc.send(f'Round {self.round} has started!')
+            self.join_message = await self.tc.send(make_running_message(self.game_name, self.games, self.round))
             self.gamers = []
 
 
@@ -135,8 +135,6 @@ j!report_winner <@689549152275005513>''')
     async def delete_tournament(self, ctx: commands.context.Context):
         await ctx.message.delete()
         await (await ctx.send('Ok, I deleted the tournament')).delete(delay=5)
-        await self.tc.delete()
-        await self.vc.delete()
         for game in self.games:
             try:
                 await self.games[game]['tc'].delete()
@@ -158,10 +156,12 @@ Please react to this message with {} to join the tournament!
     if len(gamers) > 0:
         msg += f'''Currently participating - {len(gamers)}:
 '''
-        for gamer in gamers:
-            msg += '''<@{}>
+        if len(gamers) < 50:
+            for gamer in gamers:
+                msg += '''<@{}>
 '''.format(gamer)
-    return msg
+    return msg[:1999]
+
 
 def make_running_message(game,games, round):
     msg = f'''{game} Tournament:
@@ -176,7 +176,7 @@ Current matches (Round {round}):
             out += '''In progress
 '''
         msg += out
-    return msg
+    return msg[:1999]
 
 
 async def create_games(groups, ctx, game_name='Gaming', overwrites=None, category=None):
@@ -241,4 +241,4 @@ def make_voting_message(game):
         else:
             out += f'<@{game["votes"][gamer]}>'
 
-    return out
+    return out[:1999]
