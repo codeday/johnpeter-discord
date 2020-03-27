@@ -12,7 +12,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.category = int(689585702350225435)  # off topic
+        self.category = int(692803392031948911)  # gaming tournament
         self.gamers = []  # initialize the epic people
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.join_message = None
