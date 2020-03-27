@@ -12,21 +12,41 @@ class CleverbotCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.states = {}
+        self.dmstates = {}
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if type(message.channel) == discord.channel.TextChannel and message.channel.name == 'random' and message.content.lower().startswith('john '):
+        if type(
+                message.channel) == discord.channel.TextChannel and message.channel.name == 'random' and message.content.lower().startswith(
+                'john '):
             state_id = str(message.channel.name)  # each channel has unique state
 
             if state_id not in self.states:
                 self.states[state_id] = None
-            input =  message.content.split(' ', 1)[1]
+            input = message.content.split(' ', 1)[1]
             r = requests.get(
                 url='http://www.cleverbot.com/getreply?key={}&input={}&cs={}'.format(API_KEY, input,
                                                                                      self.states[state_id]),
                 verify=False)
             msg_out = json.loads(r.text)['output']
             self.states[state_id] = json.loads(r.text)['cs']
+            await message.channel.send(content=str(msg_out))
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if type(message.channel) == discord.channel.DMChannel and message.author is not message.channel.me:
+            state_id = str(message.channel.id)  # each channel has unique state
+
+            if state_id not in self.dmstates:
+                self.dmstates[state_id] = None
+            # input = message.content.split(' ', 1)[1]
+            input = message.content
+            r = requests.get(
+                url='http://www.cleverbot.com/getreply?key={}&input={}&cs={}'.format(API_KEY, input,
+                                                                                     self.dmstates[state_id]),
+                verify=False)
+            msg_out = json.loads(r.text)['output']
+            self.dmstates[state_id] = json.loads(r.text)['cs']
             await message.channel.send(content=str(msg_out))
 
 
