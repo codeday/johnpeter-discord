@@ -38,6 +38,11 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         if ctx.channel.id == self.random_channel:
             await ctx.send(f"owo what's {ctx.author.mention}")
 
+    @commands.command()
+    async def updownupdownleftrightleftrightbastart(self, ctx):
+        if ctx.channel.id == self.random_channel:
+            await ctx.send("wow that's a long cheat code")
+
 
 def setup(bot):
     bot.add_cog(FunCommands(bot))

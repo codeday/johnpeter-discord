@@ -48,7 +48,7 @@ class AdminCommands(commands.Cog):
                 print("I have an exception!" + ex.__str__())
 
     @commands.command(hidden=True)
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Global Staff')
     async def kill(self, ctx):
         await \
             ctx.send("goodbye :(")
