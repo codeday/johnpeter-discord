@@ -24,8 +24,8 @@ sys.excepthook = handle_exception
 
 
 def command_prefix(bot, message):
-    if message.content.startswith('t!') is None:
-        return 't!'
+    if message.content.startswith('~'):
+        return '~'
     else:
         return 'j!'
 
