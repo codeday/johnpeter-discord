@@ -22,6 +22,12 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 sys.excepthook = handle_exception
 
+def command_prefix(bot, message):
+    if message.content.startswith('t!') is None:
+        return 't!'
+    else:
+        return 'j!'
+
 bot = commands.Bot(command_prefix='j!', command_not_found="Heck! That command doesn't exist!!",
                    description="I am 100% authentic object:human")
 logging.basicConfig(level=logging.INFO)
