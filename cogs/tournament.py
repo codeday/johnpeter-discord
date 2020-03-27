@@ -26,6 +26,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
     async def create_tournament(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
         await ctx.message.delete()
         self.gamers = []
+        self.enabled = True
         """Creates a new tournament with the provided game name
             creates a VC and TC for the team as well as an invite message
             Does not use firebase, because tournaments will be short and I'm lazy
