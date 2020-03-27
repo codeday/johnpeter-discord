@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import random
 from os import getenv
@@ -16,10 +17,14 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.join_message = None
         self.enabled = True
+        self.games = {}
+        self.status_message = None
 
-    @commands.command(aliases=['createtournament', 'tournament', 'tourney'])
-    @commands.has_any_role('Global Staff')
+
+    @commands.command(hidden=True, aliases=['createtournament', 'tournament', 'tourney'])
+    @commands.has_any_role('Tournament Master')
     async def create_tournament(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
+        await ctx.message.delete()
         """Creates a new tournament with the provided game name
             creates a VC and TC for the team as well as an invite message
             Does not use firebase, because tournaments will be short and I'm lazy
@@ -70,40 +75,16 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
             await guild.get_channel(self.vc.id).set_permissions(member, read_messages=False)
             await self.join_message.edit(content=make_join_message(self.game_name,self.emoji,self.gamers))
 
-    @commands.command()
-    @commands.has_any_role('Global Staff')
-    async def start_round(self, ctx: commands.context.Context):
+    @commands.command(hidden=True)
+    @commands.has_any_role('Tournament Master')
+    async def start_round(self, ctx: commands.context.Context, groupSize = 4):
+        await ctx.message.delete()
         self.enabled = False
-        self.games = {}
-        if len(self.gamers) % 4 != 0:
-            for i in range(4 - (len(self.gamers) % 4)):  # Make sure it's a multiple of 4
-                self.gamers.append(None)
-        for tournament in range(int(len(self.gamers)/4)):
-            rand_gamers = []
-            for i in range(4):
-                rand_gamer = random.choice(self.gamers)
-                rand_gamers.append(rand_gamer)
-                self.gamers.remove(rand_gamer)
-            tc = await ctx.guild.create_text_channel(name=f"{self.game_name.replace(' ', '-')}-tournament-{tournament}📋",
-                                                     overwrites=self.overwrites,
-                                                     category=ctx.guild.get_channel(self.category),
-                                                     topic=f"A channel for the {self.game_name} tournament!")
-            vc = await ctx.guild.create_voice_channel(name=f"{self.game_name.replace(' ', '-')}-tournament-{tournament}🔊",
-                                                      overwrites=self.overwrites,
-                                                      category=ctx.guild.get_channel(self.category),
-                                                      topic=f"A channel for the {self.game_name} tournament!")
-
-            self.games[tc.id] = {
-                'gamers': rand_gamers,
-                'tc': tc,
-                'vc': vc,
-                'winner': None,
-                'idx': tournament
-            }
-
+        groups = makeGroups(self.gamers, groupSize)
+        self.games = await create_games(groups=groups, ctx=ctx, game_name=self.game_name, overwrites=self.overwrites, category=self.category)
         for game in self.games:
             for gamer in self.games[game]['gamers']:
-                if gamer != None:
+                if gamer is not None:
                     await self.games[game]['tc'].set_permissions(ctx.guild.get_member(gamer),
                                                                  read_messages=True,
                                                                  manage_messages=True)
@@ -112,20 +93,79 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
                 f'''Cowabunga, Gamers! :cowboy:
-Welcome to the Game Tournament! Please join the associated voice channel. It is now time to fight your fellow comrades. When you are finished, please ping @/Global Staff in this channel with your final scores.
+Welcome to the Game Tournament! Please join the associated voice channel. It is now time to fight your fellow comrades. When you are finished, please use the command j!report_winner with who won.
 Game on! {''.join([f'<@{gamer}> 'for gamer in self.games[game]['gamers'] if gamer != None])}'''
             )
+            await ctx.guild.get_channel(self.games[game]['tc'].id).send(
+                f'''<@{random.choice(self.games[game]['gamers'])}> has been randomly selected as the game host. Please send them a link to your steam profile so y'all can begin the HIGH OCTANE GAMING ACTION! :race_car:'''
+            )
             await self.join_message.edit(content=make_running_message(self.game_name, self.games))
+
             await self.join_message.clear_reactions()
+            self.status_message = await self.tc.send(make_running_message(self.game_name, self.games))
+            await self.status_message.pin()
+            self.gamers = []
+
 
     @commands.command(hidden=True)
-    @commands.has_any_role('Global Staff')
-    async def report_winner(self, ctx: commands.context.Context, winner):
+    @commands.has_any_role('Tournament Master')
+    async def announce_winner(self, ctx: commands.context.Context, winner):
         winner_id = int(winner.replace('<','').replace('!','').replace('>','').replace('@',''))
         if winner_id in self.games[ctx.channel.id]['gamers']:
             self.gamers.append(winner_id)
             self.games[ctx.channel.id]['winner'] = winner_id
             await self.join_message.edit(content=make_running_message(self.game_name, self.games))
+            await self.status_message.edit(content=make_running_message(self.game_name,self.games))
+            await self.tc.send(f'Congratulations to <@{winner_id}> for winning game {self.games[ctx.channel.id]["idx"]}!')
+            await ctx.channel.send('Thank you for playing!')
+            await asyncio.sleep(5)
+            await self.games[ctx.channel.id]['tc'].delete()
+            await self.games[ctx.channel.id]['vc'].delete()
+
+
+    @commands.command(hidden=True)
+    async def report_winner(self, ctx: commands.context.Context, winner=None):
+        if ctx.channel.id in self.games:
+            game = self.games[ctx.channel.id]
+        else:
+            await ctx.channel.send('''I'm sorry, but this is not a known channel for a round. Please retry your command in a channel for a tournament match.''')
+            return
+        try:
+            winner_id = int(winner.replace('<','').replace('!','').replace('>','').replace('@',''))
+        except:
+            await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
+            j!report_winner <@689549152275005513>''')
+            return
+        if winner_id in game['gamers']:
+            self.games[ctx.channel.id]['votes'][ctx.author.id] = winner_id
+            game = self.games[ctx.channel.id]
+            if game['voting_message'] is None:
+                self.games[ctx.channel.id]['voting_message'] = await ctx.channel.send(make_voting_message(game))
+            else:
+                await self.games[ctx.channel.id]['voting_message'].edit(content=make_voting_message(game))
+            if all(vote == game['votes'][ctx.author.id] for vote in game['votes'].values()):
+                await self.announce_winner(ctx=ctx, winner=winner)
+        else:
+            await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
+j!report_winner <@689549152275005513>''')
+
+
+    @commands.command(hidden=True)
+    @commands.has_any_role('Tournament Master')
+    async def delete_tournament(self, ctx: commands.context.Context):
+        await ctx.message.delete()
+        await (await ctx.send('Ok, I deleted the tournament')).delete(delay=5)
+        await self.tc.delete()
+        await self.vc.delete()
+        for game in self.games:
+            try:
+                await self.games[game]['tc'].delete()
+            except:
+                pass
+            try:
+                await self.games[game]['vc'].delete()
+            except:
+                pass
 
 
 def setup(bot):
@@ -157,18 +197,68 @@ Current matches:
 '''
         msg += out
     return msg
-#
-# class Game:
-#     def __init__(self,gamers, channel):
-#         self.gamers = []
-#         self.winner = None
-#
-#     def add_gamer(self, gamer):
-#         self.gamers.append(gamer)
-#
-#     def set_winner(self, winner):
-#         if winner in self.gamers:
-#             self.winner = winner
-#         else:
-#             print('Improper gamer set to winner!')
-#             return False
+
+
+async def create_games(groups, ctx, game_name='Gaming', overwrites=None, category=None):
+    games = {}
+    for idx, group in enumerate(groups):
+        tc = await ctx.guild.create_text_channel(name=f"{game_name.replace(' ', '-')}-tournament-{idx}📋",
+                                                 overwrites=overwrites,
+                                                 category=ctx.guild.get_channel(category),
+                                                 topic=f"A channel for the {game_name} tournament!")
+        vc = await ctx.guild.create_voice_channel(name=f"{game_name.replace(' ', '-')}-tournament-{idx}🔊",
+                                                  overwrites=overwrites,
+                                                  category=ctx.guild.get_channel(category),
+                                                  topic=f"A channel for the {game_name} tournament!")
+        games[tc.id] = {
+            'gamers': group,
+            'tc': tc,
+            'vc': vc,
+            'winner': None,
+            'idx': idx,
+            'voting_message': None,
+            'votes': {gamer: None for gamer in group}
+        }
+    return games
+
+
+def chunk(list, n):
+    """Breaks a list into chunks of size n."""
+    return [ list[i:i+n] for i in range(0, len(list), n)]
+
+def balanceGroups(groups):
+    """Balances a list of lists, so they are roughly equally sized."""
+    numPlayers = sum([len(group) for group in groups])
+    minGroupSize = int(numPlayers/len(groups))
+    groupsArr = list(enumerate(groups))
+    for i, group in groupsArr:
+        while(len(group) < minGroupSize):
+            for j, groupSteal in groupsArr:
+                if (i != j) and len(groupSteal) > minGroupSize:
+                    group.append(groupSteal.pop())
+    return [group for group in groups]
+
+def makeGroups(players, groupSize):
+    """Makes even-ish groups of size groupSize and return an array of the players."""
+    if len(players) == 1:
+        return []
+
+    groups = chunk(players, groupSize)
+    if len(groups) == 1:
+        return groups
+
+    return balanceGroups(groups)
+
+
+def make_voting_message(game):
+    out = f'''Winner for round {game['idx']}:
+'''
+    for gamer in game['gamers']:
+        out += f'''
+<@{gamer}> - '''
+        if game['votes'][gamer] is None:
+            out += 'Not yet voted'
+        else:
+            out += f'<@{game["votes"][gamer]}>'
+
+    return out
