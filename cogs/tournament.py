@@ -77,7 +77,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
                 f'''Cowabunga, Gamers! :cowboy:
-Welcome to the Game Tournament! Please join the associated voice channel. It is now time to fight your fellow comrades. When you are finished, please use the command j!report_winner with who won.
+Welcome to the Game Tournament! Please join the associated voice channel. It is now time to fight your fellow comrades. When you are finished, please use the command ~report_winner with who won.
 Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gamer != None])}'''
             )
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
@@ -114,7 +114,7 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             winner_id = int(winner.replace('<', '').replace('!', '').replace('>', '').replace('@', ''))
         except:
             await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
-            j!report_winner <@689549152275005513>''')
+            ~report_winner <@689549152275005513>''')
             return
         if winner_id in game['gamers']:
             self.games[ctx.channel.id]['votes'][ctx.author.id] = winner_id
