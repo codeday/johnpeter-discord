@@ -31,9 +31,6 @@ class CleverbotCog(commands.Cog):
             msg_out = json.loads(r.text)['output']
             self.states[state_id] = json.loads(r.text)['cs']
             await message.channel.send(content=str(msg_out))
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
         if type(message.channel) == discord.channel.DMChannel and message.author is not message.channel.me:
             state_id = str(message.channel.id)  # each channel has unique state
 
@@ -48,6 +45,8 @@ class CleverbotCog(commands.Cog):
             msg_out = json.loads(r.text)['output']
             self.dmstates[state_id] = json.loads(r.text)['cs']
             await message.channel.send(content=str(msg_out))
+
+
 
 
 def setup(bot):
