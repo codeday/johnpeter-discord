@@ -12,7 +12,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.category = int(689585702350225435)  # off topic
+        self.category = int(692803392031948911)  # gaming tournament
         self.gamers = []  # initialize the epic people
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.join_message = None
@@ -25,6 +25,8 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
     @commands.has_any_role('Tournament Master')
     async def create_tournament(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
         await ctx.message.delete()
+        self.gamers = []
+        self.enabled = True
         """Creates a new tournament with the provided game name
             creates a VC and TC for the team as well as an invite message
             Does not use firebase, because tournaments will be short and I'm lazy

@@ -30,3 +30,5 @@ typing-extensions==3.7.4.1
 urllib3==1.25.8
 websockets==8.1
 yarl==1.4.2
+pytest==5.4.1
+pytest-asyncio==0.10.0
