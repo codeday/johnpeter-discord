@@ -97,9 +97,12 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             self.gamers.append(winner_id)
             self.games[ctx.channel.id]['winner'] = winner_id
             await self.join_message.edit(content=make_running_message(self.game_name, self.games, self.round))
-            await self.tc.send(
-                f'Congratulations to <@{winner_id}> for winning round {self.round} game {self.games[ctx.channel.id]["idx"]}!')
-            await ctx.channel.send('Thank you for playing!')
+            if len(self.games) == 1:
+                await self.tc.send(
+                    f'<@{winner_id}> has won the tournament! Congratulations!~~')
+            else:
+                await self.tc.send(
+                    f'Congratulations to <@{winner_id}> for winning round {self.round} game {self.games[ctx.channel.id]["idx"]}!')
             await asyncio.sleep(5)
             await self.games[ctx.channel.id]['tc'].delete()
             await self.games[ctx.channel.id]['vc'].delete()
