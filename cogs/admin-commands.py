@@ -2,7 +2,7 @@ import sys
 
 from discord.ext import commands
 import discord
-from service_classes.teamservice import TeamService
+from services.teamservice import TeamService
 from urllib import parse
 from random import choice
 

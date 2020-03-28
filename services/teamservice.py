@@ -1,5 +1,5 @@
 from main import client
-from database_classes.teams import Team
+from database.teams import Team
 
 
 class DatabaseError(Exception):

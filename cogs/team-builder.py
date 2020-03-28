@@ -6,9 +6,9 @@ import discord
 from discord.ext import commands
 from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
 
-from database_classes.teams import Team
+from database.teams import Team
 from main import client
-from service_classes.teamservice import TeamService
+from services.teamservice import TeamService
 
 team_service = TeamService()
 
