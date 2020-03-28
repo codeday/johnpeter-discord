@@ -1,8 +1,8 @@
+import discord
 import json
 import os
-
-import discord
 import requests
+
 from discord.ext import commands
 
 API_KEY = os.getenv('CLEVERBOT_API_KEY')

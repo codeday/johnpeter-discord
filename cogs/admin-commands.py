@@ -1,11 +1,11 @@
+import discord
 import sys
 
 from discord.ext import commands
-import discord
-from services.teamservice import TeamService
-from urllib import parse
 from random import choice
+from urllib import parse
 
+from services.teamservice import TeamService
 
 class AdminCommands(commands.Cog):
     """A cog where all the server admin commands live"""

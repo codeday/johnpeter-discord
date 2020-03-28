@@ -1,11 +1,10 @@
 import asyncio
+import discord
 import logging
 import random
-from os import getenv
 
-import discord
 from discord.ext import commands
-
+from os import getenv
 
 class TournamentCog(commands.Cog, name="Tournament Helper"):
     """Creates Tournament Brackets!"""

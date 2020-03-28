@@ -1,16 +1,14 @@
+import discord
 import logging
+
+from discord.ext import commands
+from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
+from main import client
 from os import getenv
 from random import choice
 
-import discord
-from discord.ext import commands
-from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
-
 from database.teams import Team
-from main import client
 from services.teamservice import TeamService
-
-team_service = TeamService()
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -20,6 +18,7 @@ teamCreateMessages = [
     "What's this? team **{0}** is here!",
 ]
 
+team_service = TeamService()
 
 class DatabaseError(Exception):
     pass
