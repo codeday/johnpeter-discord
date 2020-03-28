@@ -24,6 +24,8 @@ sys.excepthook = handle_exception
 
 
 def command_prefix(bot, message):
+    if message.content.startswith('~~'):
+        return 'j!'
     if message.content.startswith('~'):
         return '~'
     else:
