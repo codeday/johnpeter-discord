@@ -1,13 +1,15 @@
 import asyncio
+import glob
 import io
+import os
+import urllib
 from os import getenv, path, makedirs
+from random import choice
 
 import aiohttp
 import discord
 from discord.ext import commands
 from urllib import parse
-
-from main import bot
 
 
 class FunCommands(commands.Cog, name="Fun Commands"):
@@ -15,6 +17,10 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         self.bot: commands.Bot = bot
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
+        names = {"zeke.mp3"}
+        for name in names:
+            url = f'https://f1.srnd.org/fun/pledge/{name}'
+            urllib.request.urlretrieve(url, f'./audiofiles/{name}')
 
     @commands.command(aliases=['crabrave', 'crab_rave', 'crab-rave'], hidden=True)
     async def crab(self, ctx, *, text = None):
@@ -46,13 +52,19 @@ class FunCommands(commands.Cog, name="Fun Commands"):
 
     @commands.command()
     async def pledge(self, ctx):
+        if ctx.message.author.voice is None:
+            ctx.send
         voice_channel = ctx.message.author.voice.channel
         channel = None
         if voice_channel != None:
             channel = voice_channel
             vc = await channel.connect()
-            person = 'Zeke'
-            source = discord.FFmpegPCMAudio('./audiofiles/Zeke.mp3')
+            os.chdir("./audiofiles")
+            people = []
+            for file in glob.glob("*.mp3"):
+                people.append(file)
+            person = choice(people)
+            source = discord.FFmpegPCMAudio(f'{person}')
             player = vc.play(source)
             while vc.is_playing():
                 await asyncio.sleep(1)
