@@ -24,7 +24,7 @@ class DatabaseError(Exception):
     pass
 
 
-class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
+class TeamBuilderCog(commands.Cog, name="Team Builder"):
     """Creates Teams!"""
 
     def __init__(self, bot):
@@ -35,9 +35,9 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.category = int(getenv("CATEGORY", 689598417063772226))
 
-    @commands.command(aliases=['create', 'createteam', 'addteam', 'add'])
+    @commands.command(name="team-add", aliases=['team_add', 'team-create', 'team_create'])
     @commands.has_any_role('Global Staff', 'Staff')
-    async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
+    async def team_add(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
             adds the team to the firebase thing for future reference.
@@ -86,9 +86,10 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
-    @commands.command(aliases=['setproject', 'setteamproject'])
+    @commands.command(name="team-project", aliases=['team_project'])
     @commands.has_any_role('Global Staff', 'Staff')
-    async def set_team_project(self, ctx, name, project):
+    async def team_project(self, ctx, name, project):
+        """Sets the team description."""
         # Sets team project
         team = team_service.edit_team(name, "project", project)
         if team is True:
@@ -101,19 +102,20 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             await ctx.send("Could not find guild with the name: " + name)
 
-    @commands.command(aliases=['getteams', 'get'])
+    @commands.command(name="teams")
     @commands.has_any_role('Global Staff', 'Staff')
-    async def get_teams(self, ctx):
-        """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
+    async def teams(self, ctx):
+        """Prints out the current teams."""
         teams = client.collection("teams")
         long_message_string = "Teams:"
         for i in teams.stream():
             long_message_string = long_message_string + f"\n {i.to_dict()}"
         await ctx.send(long_message_string)
 
-    @commands.command(pass_context=True, aliases=['purge', 'clean', 'delete', 'deleteteam'])
+    @commands.command(name="team-delete", aliases=['team_delete'], pass_context=True)
     @commands.has_any_role('Global Staff', 'Staff')
-    async def delete_team(self, ctx, name):
+    async def team_delete(self, ctx, name):
+        """Deletes the specified team."""
         team = team_service.get_by_name(name)
         if team is not False:
             await ctx.guild.get_channel(team.vc_id).delete()

@@ -7,16 +7,16 @@ from urllib import parse
 
 from services.teamservice import TeamService
 
-class AdminCommands(commands.Cog):
+class AdminCommands(commands.Cog, name="Administration"):
     """A cog where all the server admin commands live"""
 
     def __init__(self, bot):
         self.bot = bot
         self.teamservice = TeamService()
 
-    @commands.command(alias=["check_in", "checkin"])
+    @commands.command(name="check-in", alias=["check_in", "checkin"])
     @commands.has_any_role('Global Staff', 'Staff')
-    async def CheckIn(self, ctx):
+    async def check_in(self, ctx):
         self.teamservice.__update__()
         for team in self.teamservice.get_teams():
             try:
