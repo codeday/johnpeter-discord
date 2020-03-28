@@ -53,22 +53,23 @@ class FunCommands(commands.Cog, name="Fun Commands"):
     @commands.command()
     async def pledge(self, ctx):
         if ctx.message.author.voice is None:
-            ctx.send
-        voice_channel = ctx.message.author.voice.channel
-        channel = None
-        if voice_channel != None:
-            channel = voice_channel
-            vc = await channel.connect()
-            os.chdir("./audiofiles")
-            people = []
-            for file in glob.glob("*.mp3"):
-                people.append(file)
-            person = choice(people)
-            source = discord.FFmpegPCMAudio(f'{person}')
-            player = vc.play(source)
-            while vc.is_playing():
-                await asyncio.sleep(1)
-            await vc.disconnect()
+            await ctx.send("Please join a voice channel")
+        else:
+            voice_channel = ctx.message.author.voice.channel
+            channel = None
+            if voice_channel != None:
+                channel = voice_channel
+                vc = await channel.connect()
+                os.chdir("./audiofiles")
+                people = []
+                for file in glob.glob("*.mp3"):
+                    people.append(file)
+                person = choice(people)
+                source = discord.FFmpegPCMAudio(f'{person}')
+                player = vc.play(source)
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+                await vc.disconnect()
 
 
 def setup(bot):
