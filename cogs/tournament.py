@@ -33,8 +33,8 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.game_name = game_name
         self.emoji = emoji
         self.overwrites = {
-            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(read_messages=False),
+            ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False),
+            ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(send_messages=False),
             ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
         }
         self.tc = ctx.channel
@@ -60,6 +60,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
     @commands.command(hidden=True)
     @commands.has_any_role('Tournament Master')
     async def start_round(self, ctx: commands.context.Context, groupSize=4):
+        random.shuffle(self.gamers)
         self.round += 1
         await ctx.message.delete()
         self.enabled = False
@@ -73,7 +74,8 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                                                                  read_messages=True,
                                                                  manage_messages=True)
                     await self.games[game]['vc'].set_permissions(ctx.guild.get_member(gamer),
-                                                                 read_messages=True)
+                                                                 read_messages=True,
+                                                                 send_messages=True)
 
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
                 f'''Cowabunga, Gamers! :cowboy:
