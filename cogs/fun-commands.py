@@ -1,3 +1,4 @@
+import asyncio
 import io
 from os import getenv, path, makedirs
 
@@ -5,8 +6,8 @@ import aiohttp
 import discord
 from discord.ext import commands
 from urllib import parse
-import json
-import typing
+
+from main import bot
 
 
 class FunCommands(commands.Cog, name="Fun Commands"):
@@ -42,6 +43,20 @@ class FunCommands(commands.Cog, name="Fun Commands"):
     async def updownupdownleftrightleftrightbastart(self, ctx):
         if ctx.channel.id == self.random_channel:
             await ctx.send("wow that's a long cheat code")
+
+    @commands.command()
+    async def pledge(self, ctx):
+        voice_channel = ctx.message.author.voice.channel
+        channel = None
+        if voice_channel != None:
+            channel = voice_channel
+            vc = await channel.connect()
+            person = 'Zeke'
+            source = discord.FFmpegPCMAudio('./audiofiles/Zeke.mp3')
+            player = vc.play(source)
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            await vc.disconnect()
 
 
 def setup(bot):
