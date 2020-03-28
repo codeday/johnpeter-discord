@@ -5,7 +5,7 @@ from os import environ, getenv
 import discord
 from discord.ext import commands
 from google.cloud import firestore
-from service_classes.randomservice import RandomFuncs
+from services.randomservice import RandomFuncs
 import sys
 from raygun4py import raygunprovider
 

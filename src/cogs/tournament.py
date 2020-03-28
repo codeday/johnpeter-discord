@@ -1,11 +1,10 @@
 import asyncio
+import discord
 import logging
 import random
-from os import getenv
 
-import discord
 from discord.ext import commands
-
+from os import getenv
 
 class TournamentCog(commands.Cog, name="Tournament Helper"):
     """Creates Tournament Brackets!"""
@@ -21,9 +20,10 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.status_message = None
         self.round = 0
 
-    @commands.command(hidden=True, aliases=['createtournament', 'tournament', 'tourney'])
+    @commands.command(name="tourney-create", aliases=["tourney_create"])
     @commands.has_any_role('Tournament Master')
-    async def create_tournament(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
+    async def tourney_create(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
+        """Creates a tournament with the given name and reaction emoji."""
         await ctx.message.delete()
         self.gamers = []
         self.enabled = True
@@ -57,9 +57,10 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
             self.gamers.remove(payload.user_id)
             await self.join_message.edit(content=make_join_message(self.game_name, self.emoji, self.gamers))
 
-    @commands.command(hidden=True)
+    @commands.command(name="tourney-round", aliases=["tourney_round"])
     @commands.has_any_role('Tournament Master')
-    async def start_round(self, ctx: commands.context.Context, groupSize=4):
+    async def tourney_round(self, ctx: commands.context.Context, groupSize=4):
+        """Creates a round of matches of the specified size."""
         random.shuffle(self.gamers)
         self.round += 1
         await ctx.message.delete()
@@ -79,7 +80,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
                 f'''Cowabunga, Gamers! :cowboy:
-Welcome to the Game Tournament! Please join the associated voice channel. It is now time to fight your fellow comrades. When you are finished, please use the command ~report_winner with who won.
+Welcome to the Game Tournament! Please join the associated voice channel. It is now time to fight your fellow comrades. When you are finished, please use the command ~winner with who won.
 Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gamer != None])}'''
             )
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
@@ -89,9 +90,10 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
         self.join_message = await self.tc.send(make_running_message(self.game_name, self.games, self.round))
         self.gamers = []
 
-    @commands.command(hidden=True)
+    @commands.command(name="winner-set", aliases=["winner_set", "round-winner-set", "round_winner_set"])
     @commands.has_any_role('Tournament Master')
-    async def announce_winner(self, ctx: commands.context.Context, winner):
+    async def round_winner_set(self, ctx: commands.context.Context, winner):
+        """Sets the winner of a round."""
         winner_id = int(winner.replace('<', '').replace('!', '').replace('>', '').replace('@', ''))
         if winner_id in self.games[ctx.channel.id]['gamers']:
             self.gamers.append(winner_id)
@@ -107,8 +109,9 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             await self.games[ctx.channel.id]['tc'].delete()
             await self.games[ctx.channel.id]['vc'].delete()
 
-    @commands.command(hidden=True)
-    async def report_winner(self, ctx: commands.context.Context, winner=None):
+    @commands.command(name="winner", aliases=["round-winner", "round_winner"])
+    async def round_winner(self, ctx: commands.context.Context, winner=None):
+        """Votes for the winner of a round."""
         if ctx.channel.id in self.games:
             game = self.games[ctx.channel.id]
         else:
@@ -119,7 +122,7 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             winner_id = int(winner.replace('<', '').replace('!', '').replace('>', '').replace('@', ''))
         except:
             await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
-            ~report_winner <@689549152275005513>''')
+            ~winner <@689549152275005513>''')
             return
         if winner_id in game['gamers']:
             self.games[ctx.channel.id]['votes'][ctx.author.id] = winner_id
@@ -132,11 +135,12 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
                 await self.announce_winner(ctx=ctx, winner=winner)
         else:
             await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
-j!report_winner <@689549152275005513>''')
+~winner <@689549152275005513>''')
 
-    @commands.command(hidden=True)
+    @commands.command(name="tourney-delete", aliases=["tourney_delete"])
     @commands.has_any_role('Tournament Master')
-    async def delete_tournament(self, ctx: commands.context.Context):
+    async def tourney_delete(self, ctx: commands.context.Context):
+        """Deletes the specified tournament."""
         await ctx.message.delete()
         await (await ctx.send('Ok, I deleted the tournament')).delete(delay=5)
         for game in self.games:
@@ -150,9 +154,10 @@ j!report_winner <@689549152275005513>''')
                 pass
 
 
-    @commands.command(hidden=True)
+    @commands.command(name="tourney-broadcast", aliases=["tourney_broadcast"])
     @commands.has_any_role('Tournament Master')
-    async def broadcast_tournament_message(self, ctx: commands.context.Context, message):
+    async def tourney_broadcast(self, ctx: commands.context.Context, message):
+        """Sends a message to all in-progress games."""
         for game in self.games:
             try:
                 await self.games[game]['tc'].send(message)

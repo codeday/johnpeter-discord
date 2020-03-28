@@ -12,7 +12,7 @@ from discord.ext import commands
 from urllib import parse
 
 
-class FunCommands(commands.Cog, name="Fun Commands"):
+class FunCommands(commands.Cog, name="Fun"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
@@ -20,10 +20,11 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         names = {"zeke.mp3"}
         for name in names:
             url = f'https://f1.srnd.org/fun/pledge/{name}'
-            urllib.request.urlretrieve(url, f'./audiofiles/{name}')
+            urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
 
-    @commands.command(aliases=['crabrave', 'crab_rave', 'crab-rave'], hidden=True)
+    @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     async def crab(self, ctx, *, text = None):
+        """Turns the text into a crab rave."""
         if ctx.channel.id == self.random_channel:
             await ctx.message.delete()
 
@@ -40,18 +41,21 @@ class FunCommands(commands.Cog, name="Fun Commands"):
         else:
             await ctx.send("Sorry, please do that in #random")
 
-    @commands.command(hidden=True)
+    @commands.command(name="owo")
     async def owo(self, ctx):
+        """owo"""
         if ctx.channel.id == self.random_channel:
             await ctx.send(f"owo what's {ctx.author.mention}")
 
-    @commands.command()
+    @commands.command(name="up-up-down-down-left-right-left-right-b-a-start", hidden=True)
     async def updownupdownleftrightleftrightbastart(self, ctx):
+        """A lot of typing for nothing."""
         if ctx.channel.id == self.random_channel:
             await ctx.send("wow that's a long cheat code")
 
-    @commands.command()
+    @commands.command(name="pledge")
     async def pledge(self, ctx):
+        """Recites the pledge in the currently-joined voice channel."""
         if ctx.message.author.voice is None:
             await ctx.send("Please join a voice channel")
         else:
@@ -60,7 +64,7 @@ class FunCommands(commands.Cog, name="Fun Commands"):
             if voice_channel != None:
                 channel = voice_channel
                 vc = await channel.connect()
-                os.chdir("./audiofiles")
+                os.chdir("./cache/pledge")
                 people = []
                 for file in glob.glob("*.mp3"):
                     people.append(file)

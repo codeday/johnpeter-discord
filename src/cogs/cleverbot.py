@@ -1,14 +1,14 @@
+import discord
 import json
 import os
-
-import discord
 import requests
+
 from discord.ext import commands
 
 API_KEY = os.getenv('CLEVERBOT_API_KEY')
 
 
-class CleverbotCog(commands.Cog):
+class CleverbotCog(commands.Cog, name="Cleverbot"):
     def __init__(self, bot):
         self.bot = bot
         self.states = {}
