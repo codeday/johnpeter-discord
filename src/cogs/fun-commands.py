@@ -20,9 +20,9 @@ class FunCommands(commands.Cog, name="Fun"):
         names = {"zeke.mp3"}
         for name in names:
             url = f'https://f1.srnd.org/fun/pledge/{name}'
-            urllib.request.urlretrieve(url, f'./audiofiles/{name}')
+            urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
 
-    @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'], hidden=True)
+    @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     async def crab(self, ctx, *, text = None):
         """Turns the text into a crab rave."""
         if ctx.channel.id == self.random_channel:
@@ -41,7 +41,7 @@ class FunCommands(commands.Cog, name="Fun"):
         else:
             await ctx.send("Sorry, please do that in #random")
 
-    @commands.command(name="owo", hidden=True)
+    @commands.command(name="owo")
     async def owo(self, ctx):
         """owo"""
         if ctx.channel.id == self.random_channel:
@@ -64,7 +64,7 @@ class FunCommands(commands.Cog, name="Fun"):
             if voice_channel != None:
                 channel = voice_channel
                 vc = await channel.connect()
-                os.chdir("./audiofiles")
+                os.chdir("./cache/pledge")
                 people = []
                 for file in glob.glob("*.mp3"):
                     people.append(file)
