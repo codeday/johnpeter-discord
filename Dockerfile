@@ -1,15 +1,10 @@
 FROM python:3.7-slim-buster
 
 COPY requirements.txt /
-
 RUN pip install -r /requirements.txt
 
-COPY cogs/ /app/cogs/
-COPY database_classes/ /app/database_classes/
-COPY main.py /app
-
-COPY service_classes/ /app/service_classes/
+COPY src /app/src/
+RUN mkdir -p /app/cache/pledge
 
 WORKDIR /app
-
-CMD ["python3", "main.py"]
+CMD ["python3", "src/main.py"]

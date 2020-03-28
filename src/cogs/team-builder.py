@@ -1,16 +1,15 @@
-import logging
-from os import getenv
-from random import choice
-
 import discord
+import logging
+
 from discord.ext import commands
 from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
-
-from database_classes.teams import Team
 from main import client
-from service_classes.teamservice import TeamService
+from os import getenv
+from random import choice
+from urllib import parse
 
-team_service = TeamService()
+from database.teams import Team
+from services.teamservice import TeamService
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -20,12 +19,10 @@ teamCreateMessages = [
     "What's this? team **{0}** is here!",
 ]
 
-
 class DatabaseError(Exception):
     pass
 
-
-class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
+class TeamBuilderCog(commands.Cog, name="Team Builder"):
     """Creates Teams!"""
 
     def __init__(self, bot):
@@ -35,10 +32,47 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         self.role_staff = int(getenv('ROLE_STAFF', 689215241996730417))  # staff role also not used
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.category = int(getenv("CATEGORY", 689598417063772226))
+        self.team_service = TeamService()
 
-    @commands.command(aliases=['create', 'createteam', 'addteam', 'add'])
+
+    @commands.command(name="team-checkin", alias=["team-check-in", "team_check_in", "team_checkin"])
     @commands.has_any_role('Global Staff', 'Staff')
-    async def add_team(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
+    async def team_check_in(self, ctx):
+        """Requests that all teams fill out the check-in form."""
+        self.team_service.__update__()
+        for team in self.team_service.get_teams():
+            try:
+                url = f"https://www.cognitoforms.com/Srnd1/VirtualCodeDayCheckInForm?entry=%7B%22TeamName%22:%22{parse.quote(team.name)}%22,%22ProjectName%22:%22{parse.quote(team.project)}%22%7D"
+                title_options = [f"How's life {team.name}?",
+                                 "Hello, living organism! How do you do this fine [weather:city] day?", "Howdy do!?!"]
+                message_options = [
+                    f"Good? I hope so! Please, go to the link down there and tell me so we can keep tabs on how you're doing. Thanks!",
+                    f"Hope you're programming is going swell! I have orders to have you fill out the form down there so my fellow staff can keep up to date. Thanks!",
+                    f"I'm feeling pretty [john:emotion]! Please, tell me how you are feeling about your project down there. Bye for now!"
+                ]
+                thumbnail = ["https://f1.srnd.org/codeday/virtual-s20/tropical1.png",
+                             "https://f1.srnd.org/codeday/virtual-s20/tropical2.png",
+                             "https://f1.srnd.org/codeday/virtual-s20/tropical3.png",
+                             "https://f1.srnd.org/codeday/virtual-s20/tropical4.png",
+                             "https://f1.srnd.org/codeday/virtual-s20/tropical5.png",
+                             "https://f1.srnd.org/codeday/virtual-s20/tropical6.png",
+                             "https://f1.srnd.org/codeday/virtual-s20/tropical7.png",
+                             ]
+                embed = discord.Embed(title=f"Virtual CodeDay Checkin Form",
+                                      url=url,
+                                      description=f"[Let us know how your project is doing!]({url})",
+                                      color=0xff686b)
+                embed.set_thumbnail(url=choice(thumbnail))
+                embed.set_footer(text="John Peter - Professional Human")
+                await ctx.guild.get_channel(team.tc_id).send(choice(title_options) + " " + choice(message_options), embed=embed)
+                # await ctx.send(choice(title_options) + " " + choice(message_options), embed=embed)
+            except Exception as ex:
+                print("I have an exception!" + ex.__str__())
+
+
+    @commands.command(name="team-add", aliases=['team_add', 'team-create', 'team_create'])
+    @commands.has_any_role('Global Staff', 'Staff')
+    async def team_add(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
             adds the team to the firebase thing for future reference.
@@ -83,17 +117,18 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
             await join_message.add_reaction(team_emoji)
 
             team = Team(team_name, team_emoji.__str__(), vc.id, tc.id, join_message.id)
-            team_service.add_team(team)
+            self.team_service.add_team(team)
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
-    @commands.command(aliases=['setproject', 'setteamproject'])
+    @commands.command(name="team-project", aliases=['team_project'])
     @commands.has_any_role('Global Staff', 'Staff')
-    async def set_team_project(self, ctx, name, project):
+    async def team_project(self, ctx, name, project):
+        """Sets the team description."""
         # Sets team project
-        team = team_service.edit_team(name, "project", project)
+        team = self.team_service.edit_team(name, "project", project)
         if team is True:
-            team_dict = team_service.get_by_name(name).to_dict()
+            team_dict = self.team_service.get_by_name(name).to_dict()
             message = await ctx.guild.get_channel(self.channel_gallery).fetch_message((team_dict["join_message_id"]))
             message_content = message.content.split("\nProject:")
             await message.edit(content=message_content[0] + "\nProject: " + project)
@@ -102,26 +137,27 @@ class TeamBuilderCog(commands.Cog, name="Team Builder Commands"):
         else:
             await ctx.send("Could not find guild with the name: " + name)
 
-    @commands.command(aliases=['getteams', 'get'])
+    @commands.command(name="teams")
     @commands.has_any_role('Global Staff', 'Staff')
-    async def get_teams(self, ctx):
-        """Prints out the teams, useful for debugging maybe? Locked to global staff only"""
+    async def teams(self, ctx):
+        """Prints out the current teams."""
         teams = client.collection("teams")
         long_message_string = "Teams:"
         for i in teams.stream():
             long_message_string = long_message_string + f"\n {i.to_dict()}"
         await ctx.send(long_message_string)
 
-    @commands.command(pass_context=True, aliases=['purge', 'clean', 'delete', 'deleteteam'])
+    @commands.command(name="team-delete", aliases=['team_delete'], pass_context=True)
     @commands.has_any_role('Global Staff', 'Staff')
-    async def delete_team(self, ctx, name):
-        team = team_service.get_by_name(name)
+    async def team_delete(self, ctx, name):
+        """Deletes the specified team."""
+        team = self.team_service.get_by_name(name)
         if team is not False:
             await ctx.guild.get_channel(team.vc_id).delete()
             await ctx.guild.get_channel(team.tc_id).delete()
             message = await ctx.guild.get_channel(self.channel_gallery).fetch_message(team.join_message_id)
             await message.delete()
-            team_service.delete_team(name)
+            self.team_service.delete_team(name)
             await ctx.send("Deleted team: " + name)
         else:
             await ctx.send("Could not find team with the name: " + name)
