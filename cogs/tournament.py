@@ -72,7 +72,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                     await self.games[game]['tc'].set_permissions(ctx.guild.get_member(gamer),
                                                                  read_messages=True,
                                                                  manage_messages=True)
-                    await self.games[game]['tc'].set_permissions(ctx.guild.get_member(gamer),
+                    await self.games[game]['vc'].set_permissions(ctx.guild.get_member(gamer),
                                                                  read_messages=True)
 
             await ctx.guild.get_channel(self.games[game]['tc'].id).send(
@@ -84,8 +84,8 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
                 f'''<@{random.choice(self.games[game]['gamers'])}> has been randomly selected as the game host. Please send them a link to your steam profile so y'all can begin the HIGH OCTANE GAMING ACTION! :race_car:'''
             )
             await self.tc.send(f'Round {self.round} has started!')
-            self.join_message = await self.tc.send(make_running_message(self.game_name, self.games, self.round))
-            self.gamers = []
+        self.join_message = await self.tc.send(make_running_message(self.game_name, self.games, self.round))
+        self.gamers = []
 
     @commands.command(hidden=True)
     @commands.has_any_role('Tournament Master')
