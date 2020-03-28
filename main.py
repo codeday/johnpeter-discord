@@ -10,7 +10,7 @@ import sys
 from raygun4py import raygunprovider
 
 BOT_TOKEN = environ['BOT_TOKEN']
-error_channel = int(getenv('CHANNEL_ERRORS', 689601755406663711))  # Where errors go when reported
+error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))  # Where errors go when reported
 raygun_key = getenv('RAYGUN_KEY', None)
 
 
