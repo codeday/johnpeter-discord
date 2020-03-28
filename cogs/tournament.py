@@ -150,6 +150,16 @@ j!report_winner <@689549152275005513>''')
                 pass
 
 
+    @commands.command(hidden=True)
+    @commands.has_any_role('Tournament Master')
+    async def broadcast_tournament_message(self, ctx: commands.context.Context, message):
+        for game in self.games:
+            try:
+                await self.games[game]['tc'].send(message)
+            except:
+                print('Error sending broadcast')
+
+
 def setup(bot):
     bot.add_cog(TournamentCog(bot))
 
