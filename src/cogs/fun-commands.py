@@ -47,7 +47,7 @@ class FunCommands(commands.Cog, name="Fun"):
         if ctx.channel.id == self.random_channel:
             await ctx.send(f"owo what's {ctx.author.mention}")
 
-    @commands.command(name="up-up-down-down-left-right-left-right-b-a-start", hidden=True, aliases=['updownupdownleftrightleftrightbastart'])
+    @commands.command(name="up-down-up-down-left-right-left-right-b-a-start", hidden=True, aliases=['updownupdownleftrightleftrightbastart'])
     async def updownupdownleftrightleftrightbastart(self, ctx):
         """A lot of typing for nothing."""
         if ctx.channel.id == self.random_channel:

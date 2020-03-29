@@ -21,7 +21,12 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.status_message = None
         self.round = 0
 
-    @commands.command(name="tourney-create", aliases=["tourney_create"])
+    @commands.group(name="tournament")
+    async def tournament(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid team command passed...')
+
+    @tournament.command(name="create")
     @commands.has_any_role('Tournament Master')
     async def tourney_create(self, ctx: commands.context.Context, game_name: str, emoji=':trophy:'):
         """Creates a tournament with the given name and reaction emoji."""
@@ -58,7 +63,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
             self.gamers.remove(payload.user_id)
             await self.join_message.edit(content=make_join_message(self.game_name, self.emoji, self.gamers))
 
-    @commands.command(name="tourney-round", aliases=["tourney_round"])
+    @tournament.command(name="round")
     @commands.has_any_role('Tournament Master')
     async def tourney_round(self, ctx: commands.context.Context, groupSize=4):
         """Creates a round of matches of the specified size."""
@@ -91,7 +96,7 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
         self.join_message = await self.tc.send(make_running_message(self.game_name, self.games, self.round))
         self.gamers = []
 
-    @commands.command(name="winner-set", aliases=["winner_set", "round-winner-set", "round_winner_set"])
+    @tournament.command(name="winner-set", aliases=["winner_set", "round-winner-set", "round_winner_set"])
     @commands.has_any_role('Tournament Master')
     async def round_winner_set(self, ctx: commands.context.Context, winner):
         """Sets the winner of a round."""
@@ -110,7 +115,9 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             await self.games[ctx.channel.id]['tc'].delete()
             await self.games[ctx.channel.id]['vc'].delete()
 
-    @commands.command(name="winner", aliases=["round-winner", "round_winner"])
+    @tournament.command(name="winner",
+                        aliases=["round-winner", "round_winner", 'votewinner', 'vote_winner', 'vote-winner',
+                                 'roundwinner'])
     async def round_winner(self, ctx: commands.context.Context, winner=None):
         """Votes for the winner of a round."""
         if ctx.channel.id in self.games:
@@ -138,7 +145,7 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
 ~winner <@689549152275005513>''')
 
-    @commands.command(name="tourney-delete", aliases=["tourney_delete"])
+    @tournament.command(name="delete")
     @commands.has_any_role('Tournament Master')
     async def tourney_delete(self, ctx: commands.context.Context):
         """Deletes the specified tournament."""
@@ -154,8 +161,7 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             except:
                 pass
 
-
-    @commands.command(name="tourney-broadcast", aliases=["tourney_broadcast"])
+    @tournament.command(name="broadcast")
     @commands.has_any_role('Tournament Master')
     async def tourney_broadcast(self, ctx: commands.context.Context, message):
         """Sends a message to all in-progress games."""
@@ -182,7 +188,6 @@ Please react to this message with {} to join the tournament!
                 msg += '''<@{}>
 '''.format(gamer)
     return msg[:1999]
-
 
 
 def make_running_message(game, games, round):

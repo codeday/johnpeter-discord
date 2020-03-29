@@ -11,6 +11,8 @@ from urllib import parse
 from database.teams import Team
 from services.teamservice import TeamService
 
+from main import bot
+
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
     "Team **{0}** has entered the chat!",
@@ -36,7 +38,12 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         self.category = int(getenv("CATEGORY", 689598417063772226))
         self.team_service = TeamService()
 
-    @commands.command(name="team-checkin", alias=["team-check-in", "team_check_in", "team_checkin"])
+    @commands.group(name="team")
+    async def team(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid team command passed...')
+
+    @team.command(name="check-in", alias=["checkin", "check_in"])
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_check_in(self, ctx):
         """Requests that all teams fill out the check-in form."""
@@ -71,7 +78,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             except Exception as ex:
                 print("I have an exception!" + ex.__str__())
 
-    @commands.command(name="team-add", aliases=['team_add', 'team-create', 'team_create'])
+    @team.command(name="add", aliases=['create'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_add(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
@@ -122,7 +129,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
-    @commands.command(name="team-project", aliases=['team_project'])
+    @team.command(name="project", aliases=['set-project', 'setproject', 'set_project'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_project(self, ctx, name, project):
         """Sets the team description."""
@@ -138,7 +145,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         else:
             await ctx.send("Could not find guild with the name: " + name)
 
-    @commands.command(name="teams")
+    @team.command(name="teams", aliases=['get_teams', 'get-teams', 'list_teams', 'list-teams'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def teams(self, ctx):
         """Prints out the current teams."""
@@ -148,7 +155,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             long_message_string = long_message_string + f"\n {i.to_dict()}"
         await ctx.send(long_message_string)
 
-    @commands.command(name="team-delete", aliases=['team_delete'], pass_context=True)
+    @team.command(name="delete")
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_delete(self, ctx, name):
         """Deletes the specified team."""
