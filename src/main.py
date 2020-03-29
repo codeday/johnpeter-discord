@@ -9,6 +9,8 @@ from services.randomservice import RandomFuncs
 import sys
 from raygun4py import raygunprovider
 
+from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
+
 BOT_TOKEN = environ['BOT_TOKEN']
 error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))  # Where errors go when reported
 raygun_key = getenv('RAYGUN_KEY', None)
@@ -93,5 +95,12 @@ async def on_message(message):
     # Insures the other commands are still processed
     await bot.process_commands(message)
 
+@bot.event
+async def on_command_error(ctx, exception):
+    if (type(exception) is OnlyAllowedInChannels):
+        return await ctx.send(f"You can only do that in {'/'.join([f'<#{cid}>' for cid in exception.channels])}")
+
+    if (type(exception) is RequiresVoiceChannel):
+        return await ctx.send(f"You're not in a voice channel!")
 
 bot.run(BOT_TOKEN, bot=True, reconnect=True)
