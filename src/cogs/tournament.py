@@ -23,6 +23,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
     @commands.group(name="tournament")
     async def tournament(self, ctx):
+        """Contains tournament subcommands, do '~help tournament' for more info"""
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid team command passed...')
 

@@ -11,7 +11,6 @@ from urllib import parse
 from database.teams import Team
 from services.teamservice import TeamService
 
-from main import bot
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -40,6 +39,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
     @commands.group(name="team")
     async def team(self, ctx):
+        """Contains team subcommands, do '~help team' for more info"""
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid team command passed...')
 
