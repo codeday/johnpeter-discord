@@ -17,6 +17,10 @@ class FunCommands(commands.Cog, name="Fun"):
         self.bot: commands.Bot = bot
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
+        self.people = []
+        for file in glob.glob("*.mp3"):
+            print(file)
+            self.people.append(file)
 
     @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     async def crab(self, ctx, *, text = None):
@@ -54,27 +58,26 @@ class FunCommands(commands.Cog, name="Fun"):
     @commands.command(name="pledge", aliases=['pledgeofsrnd', 'pledge-of-srnd'])
     async def pledge(self, ctx):
         """Recites the pledge in the currently-joined voice channel."""
+        retval = os.getcwd()
         if ctx.message.author.voice is None:
             await ctx.send("Please join a voice channel")
         else:
-            voice_channel = ctx.message.author.voice.channel
-            channel = None
-            if voice_channel != None:
-                channel = voice_channel
-                try:
-                    vc = await channel.connect()
-                    os.chdir("./cache/pledge")
-                    people = []
-                    for file in glob.glob("*.mp3"):
-                        people.append(file)
-                    person = choice(people)
-                    source = discord.FFmpegPCMAudio(f'{person}')
-                    player = vc.play(source)
-                    while vc.is_playing():
-                        await asyncio.sleep(1)
-                    await vc.disconnect()
-                except:
-                    await ctx.send("I'm unable to join your voice channel right now, please try again later.")
+            channel = ctx.message.author.voice.channel
+            if channel != None:
+                vc = await channel.connect()
+                os.chdir("./cache/pledge")
+                people = []
+                for file in glob.glob("*.mp3"):
+                    print(file)
+                    people.append(file)
+                person = choice(people)
+                source = discord.FFmpegPCMAudio(f'{person}')
+                player = vc.play(source)
+                while vc.is_playing():
+                    await asyncio.sleep(1)
+                await vc.disconnect()
+        os.chdir(retval)
+
 
     @commands.command()
     async def disconnectvc(self, ctx):
