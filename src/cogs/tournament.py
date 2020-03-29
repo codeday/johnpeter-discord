@@ -5,6 +5,7 @@ from os import getenv
 
 import discord
 from discord.ext import commands
+from utils.groups import make_groups
 
 
 class TournamentCog(commands.Cog, name="Tournament Helper"):
@@ -72,7 +73,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.round += 1
         await ctx.message.delete()
         self.enabled = False
-        groups = makeGroups(self.gamers, groupSize)
+        groups = make_groups(self.gamers, groupSize)
         self.games = await create_games(groups=groups, ctx=ctx, game_name=self.game_name, overwrites=self.overwrites,
                                         category=self.category)
         for game in self.games:
@@ -178,16 +179,12 @@ def setup(bot):
 
 
 def make_join_message(game, emoji, gamers):
-    msg = '''{} tournament:
-Please react to this message with {} to join the tournament!
-'''.format(game, emoji)
+    msg = f"{game} tournament: react with {emoji} to join!"
     if len(gamers) > 0:
-        msg += f'''Currently participating - {len(gamers)}:
-'''
+        msg += f"Currently participating - {len(gamers)}:\n"
         if len(gamers) < 50:
             for gamer in gamers:
-                msg += '''<@{}>
-'''.format(gamer)
+                msg += f"<@{gamer}\n"
     return msg[:1999]
 
 
@@ -228,37 +225,6 @@ async def create_games(groups, ctx, game_name='Gaming', overwrites=None, categor
             'votes': {gamer: None for gamer in group}
         }
     return games
-
-
-def chunk(list, n):
-    """Breaks a list into chunks of size n."""
-    return [list[i:i + n] for i in range(0, len(list), n)]
-
-
-def balanceGroups(groups):
-    """Balances a list of lists, so they are roughly equally sized."""
-    numPlayers = sum([len(group) for group in groups])
-    minGroupSize = int(numPlayers / len(groups))
-    groupsArr = list(enumerate(groups))
-    for i, group in groupsArr:
-        while (len(group) < minGroupSize):
-            for j, groupSteal in groupsArr:
-                if (i != j) and len(groupSteal) > minGroupSize:
-                    group.append(groupSteal.pop())
-    return [group for group in groups]
-
-
-def makeGroups(players, groupSize):
-    """Makes even-ish groups of size groupSize and return an array of the players."""
-    if len(players) == 1:
-        return []
-
-    groups = chunk(players, groupSize)
-    if len(groups) == 1:
-        return groups
-
-    return balanceGroups(groups)
-
 
 def make_voting_message(game):
     out = f'''Winner for game {game['idx']}:

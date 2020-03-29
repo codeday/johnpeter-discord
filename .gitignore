@@ -209,5 +209,7 @@ pip-selfcheck.json
 # End of https://www.gitignore.io/api/venv,python,pycharm+all
 
 
-/src/secrets/
+/secrets/
 src/cache/*
+secrets/*
+cache/*
