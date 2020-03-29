@@ -1,6 +1,6 @@
 import random
 
-from cogs import tournament
+from src.cogs import tournament
 
 
 def generate_gamers(count):

@@ -19,8 +19,10 @@ teamCreateMessages = [
     "What's this? team **{0}** is here!",
 ]
 
+
 class DatabaseError(Exception):
     pass
+
 
 class TeamBuilderCog(commands.Cog, name="Team Builder"):
     """Creates Teams!"""
@@ -33,7 +35,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.category = int(getenv("CATEGORY", 689598417063772226))
         self.team_service = TeamService()
-
 
     @commands.command(name="team-checkin", alias=["team-check-in", "team_check_in", "team_checkin"])
     @commands.has_any_role('Global Staff', 'Staff')
@@ -64,11 +65,11 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                                       color=0xff686b)
                 embed.set_thumbnail(url=choice(thumbnail))
                 embed.set_footer(text="John Peter - Professional Human")
-                await ctx.guild.get_channel(team.tc_id).send(choice(title_options) + " " + choice(message_options), embed=embed)
+                await ctx.guild.get_channel(team.tc_id).send(choice(title_options) + " " + choice(message_options),
+                                                             embed=embed)
                 # await ctx.send(choice(title_options) + " " + choice(message_options), embed=embed)
             except Exception as ex:
                 print("I have an exception!" + ex.__str__())
-
 
     @commands.command(name="team-add", aliases=['team_add', 'team-create', 'team_create'])
     @commands.has_any_role('Global Staff', 'Staff')
@@ -100,13 +101,13 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
             }
             tc = await ctx.guild.create_text_channel(name=f"{team_name.replace(' ', '-')}-📋",
-                                          overwrites=overwrites,
-                                          category=ctx.guild.get_channel(self.category),
-                                          topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+                                                     overwrites=overwrites,
+                                                     category=ctx.guild.get_channel(self.category),
+                                                     topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
             vc = await ctx.guild.create_voice_channel(name=f"{team_name.replace(' ', '-')}-🔊",
-                                           overwrites=overwrites,
-                                           category=ctx.guild.get_channel(self.category),
-                                           topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
+                                                      overwrites=overwrites,
+                                                      category=ctx.guild.get_channel(self.category),
+                                                      topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
             await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
 
             # Creates and sends the join message
