@@ -18,7 +18,8 @@ jobs:
     docker:
       - image: circleci/node:latest
     steps:
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - checkout
       - run: |
           TAG=$CIRCLE_SHA1
@@ -33,7 +34,8 @@ jobs:
     docker:
       - image: circleci/node:latest
     steps:
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - checkout
       - run: |
           TAG=$CIRCLE_SHA1
