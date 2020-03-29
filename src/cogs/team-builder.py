@@ -3,13 +3,13 @@ import logging
 
 from discord.ext import commands
 from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
-from main import client
+from src.main import client
 from os import getenv
 from random import choice
 from urllib import parse
 
-from database.teams import Team
-from services.teamservice import TeamService
+from src.database.teams import Team
+from src.services.teamservice import TeamService
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
