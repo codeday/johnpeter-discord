@@ -43,13 +43,15 @@ class FunCommands(commands.Cog, name="Fun"):
         if ctx.channel.id == self.random_channel:
             await ctx.send(f"owo what's {ctx.author.mention}")
 
-    @commands.command(name="up-up-down-down-left-right-left-right-b-a-start", hidden=True)
+    @commands.command(name="up-up-down-down-left-right-left-right-b-a-start", hidden=True, aliases=['updownupdownleftrightleftrightbastart'])
     async def updownupdownleftrightleftrightbastart(self, ctx):
         """A lot of typing for nothing."""
         if ctx.channel.id == self.random_channel:
             await ctx.send("wow that's a long cheat code")
+        else:
+            await ctx.send("Sorry, please do that in #random")
 
-    @commands.command(name="pledge")
+    @commands.command(name="pledge", aliases=['pledgeofsrnd', 'pledge-of-srnd'])
     async def pledge(self, ctx):
         """Recites the pledge in the currently-joined voice channel."""
         if ctx.message.author.voice is None:
@@ -59,17 +61,26 @@ class FunCommands(commands.Cog, name="Fun"):
             channel = None
             if voice_channel != None:
                 channel = voice_channel
-                vc = await channel.connect()
-                os.chdir("./cache/pledge")
-                people = []
-                for file in glob.glob("*.mp3"):
-                    people.append(file)
-                person = choice(people)
-                source = discord.FFmpegPCMAudio(f'{person}')
-                player = vc.play(source)
-                while vc.is_playing():
-                    await asyncio.sleep(1)
-                await vc.disconnect()
+                try:
+                    vc = await channel.connect()
+                    os.chdir("./cache/pledge")
+                    people = []
+                    for file in glob.glob("*.mp3"):
+                        people.append(file)
+                    person = choice(people)
+                    source = discord.FFmpegPCMAudio(f'{person}')
+                    player = vc.play(source)
+                    while vc.is_playing():
+                        await asyncio.sleep(1)
+                    await vc.disconnect()
+                except:
+                    await ctx.send("I'm unable to join your voice channel right now, please try again later.")
+
+    @commands.command()
+    async def disconnectvc(self, ctx):
+        for vc in self.bot.voice_clients:
+            if vc.guild == ctx.message.guild:
+                return await vc.disconnect()
 
 
 def setup(bot):
