@@ -17,10 +17,6 @@ class FunCommands(commands.Cog, name="Fun"):
         self.bot: commands.Bot = bot
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
-        names = {"zeke.mp3"}
-        for name in names:
-            url = f'https://f1.srnd.org/fun/pledge/{name}'
-            urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
 
     @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     async def crab(self, ctx, *, text = None):
@@ -78,3 +74,7 @@ class FunCommands(commands.Cog, name="Fun"):
 
 def setup(bot):
     bot.add_cog(FunCommands(bot))
+    names = {"zeke.mp3"}
+    for name in names:
+        url = f'https://f1.srnd.org/fun/pledge/{name}'
+        urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
