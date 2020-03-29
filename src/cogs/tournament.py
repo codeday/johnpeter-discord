@@ -1,10 +1,11 @@
 import asyncio
-import discord
 import logging
 import random
-
-from discord.ext import commands
 from os import getenv
+
+import discord
+from discord.ext import commands
+
 
 class TournamentCog(commands.Cog, name="Tournament Helper"):
     """Creates Tournament Brackets!"""
@@ -132,7 +133,7 @@ Game on! {''.join([f'<@{gamer}> ' for gamer in self.games[game]['gamers'] if gam
             else:
                 await self.games[ctx.channel.id]['voting_message'].edit(content=make_voting_message(game))
             if all(vote == game['votes'][ctx.author.id] for vote in game['votes'].values()):
-                await self.announce_winner(ctx=ctx, winner=winner)
+                await self.round_winner_set(ctx=ctx, winner=winner)
         else:
             await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command as follows, mentioning the person who won:
 ~winner <@689549152275005513>''')
