@@ -28,7 +28,7 @@ class Round(object):
 
     @staticmethod
     def from_dict(source):
-        round = Round(idx=source['idx'], games=[game.from_dict() for game in source['games']], gamers=source['gamers'], group_size=source['group_size'])
+        round = Round(idx=source['idx'], games=[Game.from_dict(game) for game in source['games']], gamers=source['gamers'], group_size=source['group_size'])
 
         return round
 
