@@ -63,3 +63,6 @@ class Round(object):
             return [game.winner for game in self.games]
         else:
             return False
+
+    def game_from_channel_id(self, id):
+        return next((g for g in self.games if g.tc_id == id))
