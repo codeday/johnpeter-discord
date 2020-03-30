@@ -26,7 +26,7 @@ class FunCommands(commands.Cog, name="Fun"):
 
     @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     @only_random
-    async def crab(self, ctx, *, text = None):
+    async def crab(self, ctx, *, text=None):
         """Turns the text into a crab rave."""
         await ctx.message.delete()
         async with ctx.channel.typing():
@@ -45,7 +45,8 @@ class FunCommands(commands.Cog, name="Fun"):
         """owo"""
         await ctx.send(f"owo what's {ctx.author.mention}")
 
-    @commands.command(name="up-down-up-down-left-right-left-right-b-a-start", hidden=True, aliases=['updownupdownleftrightleftrightbastart'])
+    @commands.command(name="up-down-up-down-left-right-left-right-b-a-start", hidden=True,
+                      aliases=['updownupdownleftrightleftrightbastart'])
     @only_random
     async def updownupdownleftrightleftrightbastart(self, ctx):
         """A lot of typing for nothing."""
@@ -70,7 +71,10 @@ class FunCommands(commands.Cog, name="Fun"):
         finally:
             await vc.disconnect()
 
-
+    @commands.command(pass_context=True)
+    async def disconnectvc(self, ctx):
+        server = ctx.message.guild.voice_client
+        await server.disconnect()
 
 def setup(bot):
     bot.add_cog(FunCommands(bot))
