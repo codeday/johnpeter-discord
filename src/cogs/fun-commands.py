@@ -22,6 +22,16 @@ class FunCommands(commands.Cog, name="Fun"):
         self.bot: commands.Bot = bot
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
+        # Downloads mp3 files
+        names = {"zeke.mp3"}
+        for name in names:
+            url = f'https://f1.srnd.org/fun/pledge/{name}'
+            urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
+        urls = [get_sponsor_intro()] + get_sponsor_audio()
+        for url in urls:
+            file_name = re.sub('(h.*\/)+', "", url)
+            urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
+
         self.people = []
         for file in glob("./cache/pledge/*.mp3"):
             print(file)
@@ -81,7 +91,7 @@ class FunCommands(commands.Cog, name="Fun"):
         server = ctx.message.guild.voice_client
         await server.disconnect()
 
-    @commands.command(name="sponsorship")
+    @commands.command(name="sponsorship", aliases=['sponsor', 'sponsormessage', 'sponsor-message', 'sponsor_message'])
     @require_vc
     async def sponsorship(self, ctx):
         """Says a message from a sponsor."""
@@ -100,11 +110,3 @@ class FunCommands(commands.Cog, name="Fun"):
 
 def setup(bot):
     bot.add_cog(FunCommands(bot))
-    names = {"zeke.mp3"}
-    for name in names:
-        url = f'https://f1.srnd.org/fun/pledge/{name}'
-        urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
-    urls = [get_sponsor_intro()] + get_sponsor_audio()
-    for url in urls:
-        file_name = re.sub('(h.*\/)+', "", url)
-        urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
