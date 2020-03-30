@@ -55,7 +55,7 @@ class Game(object):
         return dest
 
     def generate_voting_message(self):
-        out = f'''Please use `~round_winner @username` to report the winner for this round.
+        out = f'''Please use `~tournament winner @username` to report the winner for this round.
 Winner will not be finalized until unanimous agreement from participants.
 Votes cast:
 '''
