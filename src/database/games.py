@@ -75,7 +75,7 @@ Votes cast:
 
         return out[:1999]  # Just in case, discord limits message to 2,000 characters
 
-    def vote(self, gamer, winner):  # Vote for round winner
+    def vote(self, gamer, winner, bot):  # Vote for round winner
         if winner in self.gamers:
             self.votes[gamer] = winner
             if all(self.votes[vote] == winner for vote in self.votes):
