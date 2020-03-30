@@ -78,9 +78,14 @@ Votes cast:
     def vote(self, gamer, winner):  # Vote for round winner
         if winner in self.gamers:
             self.votes[gamer] = winner
+            if all(self.votes[vote] == winner for vote in self.votes):
+                self.set_winner(winner)
             return True
         else:
             return False
+
+    def set_winner(self, winner):
+        self.winner = winner
 
     def create_channel(self, ctx, game_name, category):
         overwrites = {
