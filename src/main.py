@@ -12,7 +12,8 @@ from raygun4py import raygunprovider
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 
 BOT_TOKEN = environ['BOT_TOKEN']
-error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))  # Where errors go when reported
+# Where errors go when reported
+error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))
 raygun_key = getenv('RAYGUN_KEY', None)
 
 
@@ -41,7 +42,8 @@ logging.basicConfig(level=logging.INFO)
 client = firestore.Client()
 collection = client.collection('teams')
 
-initial_cogs = ['cogs.team-builder', 'cogs.cleverbot', 'cogs.admin-commands', 'cogs.tournament']
+initial_cogs = ['cogs.team-builder', 'cogs.cleverbot',
+                'cogs.admin-commands', 'cogs.tournament']
 other_cogs = ['cogs.fun-commands']
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
@@ -51,7 +53,8 @@ for cog in initial_cogs:
         bot.load_extension(cog)
         logging.info(f'Successfully loaded extension {cog}')
     except Exception as e:
-        logging.exception(f'Failed to load extension {cog}.', exc_info=traceback.format_exc())
+        logging.exception(
+            f'Failed to load extension {cog}.', exc_info=traceback.format_exc())
 
 
 @bot.event
@@ -77,7 +80,15 @@ async def on_ready():
             bot.load_extension(other_cog)
             logging.info(f'Successfully loaded extension {other_cog}')
         except Exception as e:
-            logging.exception(f'Failed to load extension {other_cog}.', exc_info=traceback.format_exc())
+            logging.exception(
+                f'Failed to load extension {other_cog}.', exc_info=traceback.format_exc())
+
+
+@bot.event
+async def on_ready():
+    version = getenv('IMAGE_TAG')
+    if version:
+        await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
 
 
 @bot.event
@@ -104,6 +115,7 @@ async def on_message(message):
     # This is just here to exist in case I need it later. Should be moved out soon
     # Insures the other commands are still processed
     await bot.process_commands(message)
+
 
 @bot.event
 async def on_command_error(ctx, exception):
