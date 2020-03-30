@@ -36,3 +36,12 @@ class Tournament(object):
         }
 
         return dest
+
+    def next_round(self):
+        if not self.rounds:  # If no round already exists create one
+            self.rounds = [Round(0,self.gamers)]
+        with round as self.rounds[-1]:  # Get latest round
+            if round.round_complete():
+                self.rounds.append(Round(len(self.rounds),round.winners()))
+            else:
+                return False
