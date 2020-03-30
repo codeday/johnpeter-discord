@@ -1,5 +1,5 @@
 class Game(object):
-    def __init__(self, idx, gamers, tc_id, vc_id, votes=None, voting_message=None, winner=None):
+    def __init__(self, idx, gamers, tc_id=None, vc_id=None, votes=None, voting_message=None, winner=None):
         """
         :param idx: The index number of the game
         :param gamers: a list of all the participants, by user ID
