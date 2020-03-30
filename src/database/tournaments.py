@@ -45,3 +45,15 @@ class Tournament(object):
                 self.rounds.append(Round(len(self.rounds),round.winners()))
             else:
                 return False
+
+    @staticmethod
+    def make_join_message(game_name):
+        return f'Please react to this message with :trophy: to join the {game_name} Tournament!'
+
+    def update_join_message(self):
+        out = self.make_join_message(self.game_name)
+        out += f'\n{len(self.gamers)} gamers currently registered'
+        if len(self.gamers) < 50:
+            out += ':'
+            for gamer in self.gamers:
+                out += f'\n <@{gamer}>'
