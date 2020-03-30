@@ -1,10 +1,10 @@
 import asyncio
 import logging
 import random
-from os import getenv
 
 import discord
 from discord.ext import commands
+
 from utils.groups import make_groups
 
 
@@ -14,19 +14,13 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.category = int(692803392031948911)  # gaming tournament
-        self.gamers = []  # initialize the epic people
-        self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
-        self.join_message = None
-        self.enabled = True
-        self.games = {}
-        self.status_message = None
-        self.round = 0
+        self.tournaments = []
 
     @commands.group(name="tournament")
     async def tournament(self, ctx):
         """Contains tournament subcommands, do '~help tournament' for more info"""
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid team command passed...')
+            await ctx.send('Invalid tournament command passed...')
 
     @tournament.command(name="create")
     @commands.has_any_role('Tournament Master')
