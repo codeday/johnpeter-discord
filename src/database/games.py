@@ -75,3 +75,16 @@ Votes cast:
             return True
         else:
             return False
+
+    def create_channel(self, ctx, game_name, category, overwrites):
+        tc = await ctx.guild.create_text_channel(name=f"game-{self.idx}📋",
+                                                 overwrites=overwrites,
+                                                 category=ctx.guild.get_channel(category),
+                                                 topic=f"A channel for the {game_name} tournament!")
+        vc = await ctx.guild.create_voice_channel(name=f"game-{self.idx}🔊",
+                                                  overwrites=overwrites,
+                                                  category=ctx.guild.get_channel(category),
+                                                  topic=f"A channel for the {game_name} tournament!")
+        self.tc_id = tc.id
+        self.vc_id = vc.id
+        return tc, vc
