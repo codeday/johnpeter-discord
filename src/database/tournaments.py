@@ -17,6 +17,7 @@ class Tournament(object):
         self.players_per_game = players_per_game
         self.gamers = gamers
         self.rounds = rounds
+        self.current_round = None
 
     @staticmethod
     def from_dict(source):
@@ -40,7 +41,8 @@ class Tournament(object):
     def next_round(self, bot=None):
         if not self.rounds:  # If no round already exists create one
             self.rounds = [Round(0,self.gamers)]
-        with round as self.rounds[-1]:  # Get latest round
+        self.current_round = self.rounds[-1]
+        with round as self.current_round:  # Get latest round
             if round.round_complete():
                 self.rounds.append(Round(len(self.rounds),round.winners()))
                 if bot:
