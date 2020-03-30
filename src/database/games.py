@@ -95,6 +95,13 @@ Votes cast:
                                                   overwrites=overwrites,
                                                   category=ctx.guild.get_channel(category),
                                                   topic=f"A channel for the {game_name} tournament!")
+        for gamer in self.gamers:
+            await tc.set_permissions(ctx.guild.get_member(gamer),
+                                     read_messages=True,
+                                     send_messages=True)
+            await vc.set_permissions(ctx.guild.get_member(gamer),
+                                     read_messages=True,
+                                     send_messages=True)
         self.tc_id = tc.id
         self.vc_id = vc.id
         return tc, vc
