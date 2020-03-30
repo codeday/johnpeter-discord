@@ -1,3 +1,8 @@
+from os import getenv
+
+import discord
+
+
 class Game(object):
     def __init__(self, idx, gamers, tc_id=None, vc_id=None, votes=None, voting_message_id=None, winner=None):
         """
@@ -76,7 +81,12 @@ Votes cast:
         else:
             return False
 
-    def create_channel(self, ctx, game_name, category, overwrites):
+    def create_channel(self, ctx, game_name, category):
+        overwrites = {
+            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            ctx.guild.get_role(int(getenv('ROLE_STUDENT', 689214914010808359))): discord.PermissionOverwrite(read_messages=False),
+            ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
+        }
         tc = await ctx.guild.create_text_channel(name=f"game-{self.idx}📋",
                                                  overwrites=overwrites,
                                                  category=ctx.guild.get_channel(category),
