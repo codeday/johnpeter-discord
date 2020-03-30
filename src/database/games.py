@@ -1,12 +1,12 @@
 class Game(object):
-    def __init__(self, idx, gamers, tc_id=None, vc_id=None, votes=None, voting_message=None, winner=None):
+    def __init__(self, idx, gamers, tc_id=None, vc_id=None, votes=None, voting_message_id=None, winner=None):
         """
         :param idx: The index number of the game
         :param gamers: a list of all the participants, by user ID
         :param tc_id: The ID of the text channel for the game
         :param vc_id: The ID of the voice channel for the game
         :param votes: a dictionary of who voted for who
-        :param voting_message: the ID of the message used to display votes
+        :param voting_message_id: the ID of the message used to display votes
         :param winner: the ID of the voted (or set) winner of the game
         """
         self.idx = idx
@@ -14,7 +14,7 @@ class Game(object):
         self.tc_id = tc_id
         self.vc_id = vc_id
         self.votes = votes
-        self.voting_message = voting_message
+        self.voting_message_id = voting_message_id
         self.winner = winner
 
         if self.votes is None:
@@ -28,7 +28,7 @@ class Game(object):
             game.votes = source['votes']
 
         if 'voting_message' in source:
-            game.voting_message = source['voting_message']
+            game.voting_message_id = source['voting_message_id']
 
         if 'winner' in source:
             game.winner = source['winner']
@@ -46,8 +46,8 @@ class Game(object):
         if self.votes:
             dest['votes'] = self.votes
 
-        if self.voting_message:
-            dest['voting_message'] = self.voting_message
+        if self.voting_message_id:
+            dest['voting_message_id'] = self.voting_message_id
 
         if self.winner:
             dest['winner'] = self.winner
