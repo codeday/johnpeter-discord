@@ -55,6 +55,7 @@ class FunCommands(commands.Cog, name="Fun"):
     @require_vc
     async def pledge(self, ctx):
         """Recites the pledge in the currently-joined voice channel."""
+        await ctx.message.delete()
         retval = os.getcwd()
         vc = await ctx.message.author.voice.channel.connect()
         try:
