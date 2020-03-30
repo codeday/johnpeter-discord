@@ -2,6 +2,7 @@ def chunk(list, n):
     """Breaks a list into chunks of size n."""
     return [list[i:i + n] for i in range(0, len(list), n)]
 
+
 def balance_groups(groups):
     """Balances a list of lists, so they are roughly equally sized."""
     numPlayers = sum([len(group) for group in groups])
@@ -13,6 +14,7 @@ def balance_groups(groups):
                 if (i != j) and len(groupSteal) > minGroupSize:
                     group.append(groupSteal.pop())
     return [group for group in groups]
+
 
 def make_groups(players, groupSize):
     """Makes even-ish groups of size groupSize and return an array of the players."""
