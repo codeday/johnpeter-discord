@@ -27,10 +27,12 @@ class FunCommands(commands.Cog, name="Fun"):
         for name in names:
             url = f'https://f1.srnd.org/fun/pledge/{name}'
             urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
-        urls = [get_sponsor_intro()] + get_sponsor_audio()
+        urls = get_sponsor_audio()
         for url in urls:
             file_name = re.sub('(h.*\/)+', "", url)
             urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
+        file_name = re.sub('(h.*\/)+', "", get_sponsor_intro())
+        urllib.request.urlretrieve(get_sponsor_intro(), f"./cache/{file_name}")
 
         self.people = []
         for file in glob("./cache/pledge/*.mp3"):
@@ -100,8 +102,12 @@ class FunCommands(commands.Cog, name="Fun"):
         vc = await ctx.message.author.voice.channel.connect()
         try:
             file = choice(self.sponsorships)
-            source = discord.FFmpegPCMAudio(f"{file}")
-            player = vc.play(source)
+            intro = discord.FFmpegPCMAudio(f"./cache/sponsor-intro.mp3")
+            sponsor = discord.FFmpegPCMAudio(f"{file}")
+            player = vc.play(intro)
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            player = vc.play(sponsor)
             while vc.is_playing():
                 await asyncio.sleep(1)
         finally:
