@@ -6,6 +6,7 @@ def get_user_id(user_or_id):
         return user_or_id['user_id']
     return None
 
+
 def truncate_list_length(lst, length, *, add_per_element=0):
     total_length = 0
     for i, elem in enumerate(lst):
@@ -13,6 +14,7 @@ def truncate_list_length(lst, length, *, add_per_element=0):
         if (total_length > length):
             return lst[0:i-1]
     return lst
+
 
 def mention_users(users, max_count, max_length, *, join="\n", prefix=" - "):
     trunc_users = users[0:max_count]
@@ -26,3 +28,7 @@ def mention_users(users, max_count, max_length, *, join="\n", prefix=" - "):
     )
 
     return join.join(user_strs)
+
+
+def id_from_mention(mention):
+    return int(mention.replace('<', '').replace('!', '').replace('>', '').replace('@', ''))
