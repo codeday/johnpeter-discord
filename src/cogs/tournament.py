@@ -27,13 +27,12 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         """Creates a tournament with the given name."""
         await ctx.message.delete()
         logging.debug("Starting tournament creation...")
-        foo = await ctx.channel.send(Tournament.make_join_message(game_name)).id
         t = Tournament(game_name=game_name,
                        tc_id=ctx.channel.id,
-                       join_message_id=foo
+                       join_message_id=(await ctx.channel.send(Tournament.make_join_message(game_name))).id
                        )
         self.tournaments.append(t)
-        await t.join_message(self.bot).add_reaction('🏆')
+        await (await t.join_message(self.bot)).add_reaction('🏆')
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
@@ -51,7 +50,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                 await user.dm_channel.send(
                     'Sorry, but the tournament is already running, I am unable to add you'
                 )
-            await t.join_message(self.bot).edit(content=t.update_join_message())
+            await (await t.join_message(self.bot)).edit(content=t.update_join_message())
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
