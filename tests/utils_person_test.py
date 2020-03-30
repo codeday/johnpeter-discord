@@ -1,6 +1,6 @@
 from utils import person
 
-class TestPerson:
+class Person:
     def __init__(self, user_id):
         self.user_id = user_id
 
@@ -10,7 +10,7 @@ def get_users_list(count):
 def test_get_user_id():
     assert person.get_user_id(6) == "6"
     assert person.get_user_id("6") == "6"
-    assert person.get_user_id(TestPerson(6)) == "6"
+    assert person.get_user_id(Person(6)) == "6"
     assert person.get_user_id({"user_id": 6}) == "6"
     assert person.get_user_id({}) == None
 

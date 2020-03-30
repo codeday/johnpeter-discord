@@ -2,6 +2,10 @@ version: 2.1
 workflows:
   build:
     jobs:
+      - test:
+          filters:
+            branches:
+              only: master
       - build:
           filters:
             branches:
@@ -9,6 +13,10 @@ workflows:
           context: Docker Hub
   build_test:
     jobs:
+      - test:
+          filters:
+            branches:
+              ignore: master
       - build_test:
           filters:
             branches:
@@ -16,7 +24,7 @@ workflows:
 jobs:
   build:
     docker:
-      - image: circleci/node:latest
+      - image: circleci/python:3.7
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
@@ -32,7 +40,7 @@ jobs:
 
   build_test:
     docker:
-      - image: circleci/node:latest
+      - image: circleci/python:3.7
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
@@ -41,3 +49,17 @@ jobs:
           TAG=$CIRCLE_SHA1
           DOCKER_REPO=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
           docker build -t $DOCKER_REPO:$TAG .
+
+  test:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run: pip install -r requirements.txt
+      - run: python -m pytest --junitxml=reports/pytest/pytest-report.xml -o junit_family=xunit1
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: reports
+          destination: test_results
