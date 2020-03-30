@@ -6,13 +6,14 @@ workflows:
           filters:
             branches:
               only: master
+          context: johnpeter-discord
       - build:
           requires:
             - test
           filters:
             branches:
               only: master
-          context: Docker Hub
+          context: johnpeter-discord
   build_test:
     jobs:
       - test:
