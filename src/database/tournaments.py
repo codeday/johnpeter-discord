@@ -43,6 +43,7 @@ class Tournament(object):
         with round as self.rounds[-1]:  # Get latest round
             if round.round_complete():
                 self.rounds.append(Round(len(self.rounds),round.winners()))
+                return True
             else:
                 return False
 
@@ -61,6 +62,13 @@ class Tournament(object):
     def add_gamer(self,gamer):
         if not self.rounds:  # don't add someone if tourney already started
             self.gamers.append(gamer)
+            return True
+        else:
+            return False
+
+    def remove_gamer(self,gamer):
+        if not self.rounds:  # don't remove someone if tourney already started
+            self.gamers.remove(gamer)
             return True
         else:
             return False
