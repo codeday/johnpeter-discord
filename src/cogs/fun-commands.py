@@ -73,6 +73,7 @@ class FunCommands(commands.Cog, name="Fun"):
 
     @commands.command(pass_context=True)
     async def disconnectvc(self, ctx):
+        await ctx.message.delete()
         server = ctx.message.guild.voice_client
         await server.disconnect()
 
