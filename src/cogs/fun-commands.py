@@ -1,3 +1,5 @@
+import re
+
 import aiohttp
 import asyncio
 import discord
@@ -12,6 +14,7 @@ from random import choice
 from urllib import parse
 
 from utils.commands import only_random, require_vc
+from utils.cms import get_sponsor_intro, get_sponsor_audio
 
 
 class FunCommands(commands.Cog, name="Fun"):
@@ -20,9 +23,13 @@ class FunCommands(commands.Cog, name="Fun"):
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
         self.people = []
-        for file in glob("*.mp3"):
+        for file in glob("./cache/pledge/*.mp3"):
             print(file)
             self.people.append(file)
+        self.sponsorships = []
+        for file in glob("./cache/sponsorships/*.mp3"):
+            print(file)
+            self.sponsorships.append(file)
 
     @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     @only_random
@@ -60,11 +67,8 @@ class FunCommands(commands.Cog, name="Fun"):
         retval = os.getcwd()
         vc = await ctx.message.author.voice.channel.connect()
         try:
-            people = []
-            for file in glob("./cache/pledge/*.mp3"):
-                people.append(file)
-            person = choice(people)
-            source = discord.FFmpegPCMAudio(f'{person}')
+            file = choice(self.people)
+            source = discord.FFmpegPCMAudio(f"{file}")
             player = vc.play(source)
             while vc.is_playing():
                 await asyncio.sleep(1)
@@ -77,9 +81,30 @@ class FunCommands(commands.Cog, name="Fun"):
         server = ctx.message.guild.voice_client
         await server.disconnect()
 
+    @commands.command(name="sponsorship")
+    @require_vc
+    async def sponsorship(self, ctx):
+        """Says a message from a sponsor."""
+        await ctx.message.delete()
+        retval = os.getcwd()
+        vc = await ctx.message.author.voice.channel.connect()
+        try:
+            file = choice(self.sponsorships)
+            source = discord.FFmpegPCMAudio(f"{file}")
+            player = vc.play(source)
+            while vc.is_playing():
+                await asyncio.sleep(1)
+        finally:
+            await vc.disconnect()
+
+
 def setup(bot):
     bot.add_cog(FunCommands(bot))
     names = {"zeke.mp3"}
     for name in names:
         url = f'https://f1.srnd.org/fun/pledge/{name}'
         urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
+    urls = [get_sponsor_intro()] + get_sponsor_audio()
+    for url in urls:
+        file_name = re.sub('(h.*\/)+', "", url)
+        urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
