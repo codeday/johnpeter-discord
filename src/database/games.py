@@ -122,3 +122,7 @@ Votes cast:
         self.tc_id = tc.id
         self.vc_id = vc.id
         return tc, vc
+
+    async def delete_channel(self, bot):
+        await bot.get_channel(self.tc_id).delete()
+        await bot.get_channel(self.vc_id).delete()
