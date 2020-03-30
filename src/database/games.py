@@ -87,7 +87,7 @@ Votes cast:
     def set_winner(self, winner):
         self.winner = winner
 
-    def create_channel(self, ctx, game_name, category):
+    async def create_channel(self, ctx, game_name, category):
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.guild.get_role(int(getenv('ROLE_STUDENT', 689214914010808359))): discord.PermissionOverwrite(read_messages=False),
