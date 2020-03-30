@@ -27,9 +27,10 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         """Creates a tournament with the given name."""
         await ctx.message.delete()
         logging.debug("Starting tournament creation...")
+        foo = await ctx.channel.send(Tournament.make_join_message(game_name)).id
         t = Tournament(game_name=game_name,
                        tc_id=ctx.channel.id,
-                       join_message_id=await ctx.channel.send(Tournament.make_join_message(game_name)).id
+                       join_message_id=foo
                        )
         self.tournaments.append(t)
         await t.join_message(self.bot).add_reaction('🏆')
