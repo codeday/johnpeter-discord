@@ -57,3 +57,10 @@ class Tournament(object):
             out += ':'
             for gamer in self.gamers:
                 out += f'\n <@{gamer}>'
+
+    def add_gamer(self,gamer):
+        if not self.rounds:  # don't add someone if tourney already started
+            self.gamers.append(gamer)
+            return True
+        else:
+            return False
