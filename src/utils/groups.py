@@ -23,4 +23,4 @@ def make_groups(players, groupSize):
     if len(groups) == 1:
         return groups
 
-    return balanceGroups(groups)
+    return balance_groups(groups)
