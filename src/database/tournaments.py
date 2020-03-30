@@ -37,12 +37,14 @@ class Tournament(object):
 
         return dest
 
-    def next_round(self):
+    def next_round(self, bot=None):
         if not self.rounds:  # If no round already exists create one
             self.rounds = [Round(0,self.gamers)]
         with round as self.rounds[-1]:  # Get latest round
             if round.round_complete():
                 self.rounds.append(Round(len(self.rounds),round.winners()))
+                if bot:
+                    bot.get_channel(self.tc_id).send(f'Round {len(self.rounds)} has begun!')
                 return True
             else:
                 return False
