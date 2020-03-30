@@ -43,8 +43,7 @@ client = firestore.Client()
 collection = client.collection('teams')
 
 initial_cogs = ['cogs.team-builder', 'cogs.cleverbot',
-                'cogs.admin-commands', 'cogs.tournament']
-other_cogs = ['cogs.fun-commands']
+                'cogs.admin-commands', 'cogs.tournament', 'cogs.fun-commands']
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 for cog in initial_cogs:
@@ -73,15 +72,6 @@ async def on_ready():
         print('We have logged in as {0.user}'.format(bot))
     logging.info("We are in {0} server!".format(counter))
 
-    # Loads other cogs
-    for other_cog in other_cogs:
-        # noinspection PyBroadException
-        try:
-            bot.load_extension(other_cog)
-            logging.info(f'Successfully loaded extension {other_cog}')
-        except Exception as e:
-            logging.exception(
-                f'Failed to load extension {other_cog}.', exc_info=traceback.format_exc())
 
 
 @bot.event
