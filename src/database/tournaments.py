@@ -65,5 +65,5 @@ class Tournament(object):
         else:
             return False
 
-    async def join_message(self, ctx):
-        return await ctx.guild.get_channel(self.tc_id).fetch_message(self.join_message_id)
+    async def join_message(self, bot):
+        return await bot.get_channel(self.tc_id).fetch_message(self.join_message_id)
