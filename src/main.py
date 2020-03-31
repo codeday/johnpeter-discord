@@ -7,6 +7,7 @@ from os import environ, getenv
 import discord
 import requests
 from discord.ext import commands
+from discord.ext.commands import MissingAnyRole
 from google.cloud import firestore
 from raygun4py import raygunprovider
 
@@ -102,6 +103,10 @@ async def on_command_error(ctx, error: commands.CommandError):
 
     if type(error) is RequiresVoiceChannel:
         return await ctx.send(f"You're not in a voice channel!")
+
+    if type(error) is MissingAnyRole:
+        return await ctx.sent("You are not in the sudoers file.   This incident will be reported.")
+
     else:
         error_message_list = list(RandomFuncs.paginate(
             ''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__))), 1900))
