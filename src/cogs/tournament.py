@@ -121,6 +121,7 @@ mentioning the person who won:
     @commands.has_any_role('Tournament Master')
     async def tourney_delete(self, ctx: commands.context.Context, idx):
         """Deletes the specified tournament."""
+        idx = int(idx)
         if idx + 1 >= len(self.tournaments):
             t = self.tournaments[idx]
             msgs = [await ctx.send(f'Are you sure you would like to delete the {t.game_name} tournament?')]
@@ -138,8 +139,8 @@ mentioning the person who won:
                     msgs.append(await ctx.send(f'Ok, I will not delete the {t.game_name} tournament'))
                 elif str(reaction.emoji) == '✅':
                     msgs.append(await ctx.send(f'Ok, I am now deleting the {t.game_name} tournament.'))
-                    t.delete()
-
+                    await t.delete()
+                    self.tournaments.pop(idx)
                 for msg in msgs:
                     await msg.delete(delay=5)
         else:
