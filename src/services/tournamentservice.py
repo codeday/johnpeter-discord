@@ -19,7 +19,6 @@ class TournamentService:
         if os.path.exists(path):
             with open(path, 'r') as f:
                 tournaments = json.loads(f.read())
-            print(tournaments)
             return [Tournament.from_dict(tournament) for tournament in tournaments]
         else:
             return []
