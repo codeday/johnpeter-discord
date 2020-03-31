@@ -54,6 +54,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                     'Sorry, but the tournament is already running, I am unable to add you'
                 )
             await (await t.join_message(self.bot)).edit(content=t.update_join_message())
+        TournamentService.store_tournaments(self.tournaments)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
@@ -73,6 +74,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 If you have to leave, please inform the @Tournament Master'''
                 )
             await (await t.join_message(self.bot)).edit(content=t.update_join_message())
+        TournamentService.store_tournaments(self.tournaments)
 
     @tournament.command(name="round")
     @commands.has_any_role('Tournament Master')
