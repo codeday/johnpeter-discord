@@ -1,3 +1,6 @@
+import random
+
+
 def chunk(list, n):
     """Breaks a list into chunks of size n."""
     return [list[i:i + n] for i in range(0, len(list), n)]
@@ -18,6 +21,7 @@ def balance_groups(groups):
 
 def make_groups(players, groupSize):
     """Makes even-ish groups of size groupSize and return an array of the players."""
+    random.shuffle(players)
     if len(players) == 1:
         return []
 

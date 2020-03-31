@@ -1,14 +1,14 @@
 import logging
+import sys
 import traceback
 from os import environ, getenv
 
 import discord
 from discord.ext import commands
 from google.cloud import firestore
-from services.randomservice import RandomFuncs
-import sys
 from raygun4py import raygunprovider
 
+from services.randomservice import RandomFuncs
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 
 BOT_TOKEN = environ['BOT_TOKEN']
@@ -85,8 +85,14 @@ async def on_ready():
 async def on_command_error(ctx, error: commands.CommandError):
     """Specially handles some errors, all others take the unhandled route"""
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send('That command doesn\'t seem to exist! Please try again, and type `'
-                       'help` to view the help documentation.')
+        return await ctx.send('That command doesn\'t seem to exist! Please try again, and type `'
+                              'help` to view the help documentation.')
+
+    if type(error) is OnlyAllowedInChannels:
+        return await ctx.send(f"You can only do that in {'/'.join([f'<#{cid}>' for cid in error.channels])}")
+
+    if type(error) is RequiresVoiceChannel:
+        return await ctx.send(f"You're not in a voice channel!")
     else:
         error_message_list = list(RandomFuncs.paginate(
             ''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__))), 1900))
@@ -116,3 +122,4 @@ async def on_command_error(ctx, exception):
         return await ctx.send(f"You're not in a voice channel!")
 
 bot.run(BOT_TOKEN, bot=True, reconnect=True)
+

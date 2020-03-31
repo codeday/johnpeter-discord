@@ -39,3 +39,10 @@ def mention_users(users, max_count, max_length, *, join="\n", prefix=" - "):
         return ''
     else:
         return out_msg
+
+
+def id_from_mention(mention):
+    try:
+        return int(mention.replace('<', '').replace('!', '').replace('>', '').replace('@', ''))
+    except:
+        return False
