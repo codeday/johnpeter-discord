@@ -41,7 +41,7 @@ class Round(object):
         }
 
     def round_complete(self):
-        return all(game.winner for game in self.games)
+        return all(game.winner is not None for game in self.games)
 
     def generate_status_message(self):
         out = ''
