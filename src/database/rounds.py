@@ -57,6 +57,7 @@ class Round(object):
                     out += f'won by <@{game.winner}>'
                 else:
                     out += 'in progress'
+        return out[:1999]
 
     def winners(self):
         if self.round_complete():

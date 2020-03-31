@@ -47,14 +47,14 @@ class Tournament(object):
             return True
         elif bot:
             for game in self.rounds[-1].games:
-                game.delete_channel(bot)
-        self.current_round = self.rounds[-1]
+                await game.delete_channel(bot)
         r = self.current_round
         # Get latest round
         if r.round_complete():
             self.rounds.append(Round(len(self.rounds),r.winners()))
+            self.current_round = self.rounds[-1]
             if bot:
-                self.join_message_id = await bot.get_channel(self.tc_id).send(f'Round {len(self.rounds)} has begun!').id
+                self.join_message_id = (await bot.get_channel(self.tc_id).send(self.current_round.generate_status_message())).id
             return True
         else:
             return False

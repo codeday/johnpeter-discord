@@ -83,6 +83,7 @@ Votes cast:
             self.votes[gamer] = winner
             if all(self.votes[vote] == winner for vote in self.votes):
                 self.set_winner(winner)
+                await bot.get_channel(self.tc_id).fetch_message(self.voting_message_id)
             m = await bot.get_channel(self.tc_id).fetch_message(self.voting_message_id)
             await m.edit(content=self.generate_voting_message())
             return True

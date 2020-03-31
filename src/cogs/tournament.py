@@ -103,14 +103,16 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         game = t.current_round.game_from_channel_id(ctx.channel.id)
         if game and winner_id:
             await game.vote(ctx.author.id, winner_id, self.bot)
+            await (await self.bot.get_channel(t.tc_id).fetch_message(t.join_message_id)).edit(content=t.current_round.generate_status_message())
+
         elif not game:
             await ctx.channel.send(
                 "I'm sorry, but this is not a known channel.\
-                 Please retry your command in a channel for a tournament match.")
+Please retry your command in a channel for a tournament match.")
         else:
             await ctx.channel.send('''I'm sorry, I don't know who you're talking about! Please use the command like so,\
-             mentioning the person who won:
-            ~tournament winner <@689549152275005513>''')
+mentioning the person who won:
+~tournament winner <@689549152275005513>''')
             return
     #
     # @tournament.command(name="delete")
