@@ -99,7 +99,8 @@ class Tournament(object):
             for game in self.current_round.games:
                 await game.delete_channel(bot)
         else:
-            await (await self.join_mesage(bot)).delete()
+            m = await self.join_message(bot)
+            await m.delete()
 
     async def broadcast(self, message, bot):
         for game in self.current_round.games:
