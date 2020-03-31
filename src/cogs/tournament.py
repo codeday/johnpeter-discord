@@ -79,7 +79,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         if t.next_round(bot=self.bot):
             await ctx.message.delete()
             for game in t.rounds[-1].games:
-                game.create_channel(ctx=ctx, game_name=t.game_name, category=self.category)
+                await game.create_channel(ctx=ctx, game_name=t.game_name, category=self.category)
         else:
             await ctx.send('Previous round not yet finished! Aborting')
 
@@ -89,8 +89,8 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         """Sets the winner of a round."""
         t = self.tournaments[0]
         winner_id = id_from_mention(winner)
-        game = t.latest_round.game_from_channel_id(ctx.channel.id)
-        if winner_id in t.latest_round.game_from_channel_id(ctx.channel.id).gamers:
+        game = t.current_round.game_from_channel_id(ctx.channel.id)
+        if winner_id in t.current_round.game_from_channel_id(ctx.channel.id).gamers:
             game.set_winner(winner_id, self.bot)
 
     @tournament.command(name="winner",
@@ -100,7 +100,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         """Votes for the winner of a round."""
         t = self.tournaments[0]
         winner_id = id_from_mention(winner)
-        game = t.latest_round.game_from_channel_id(ctx.channel.id)
+        game = t.current_round.game_from_channel_id(ctx.channel.id)
         if game and winner_id:
             game.vote(ctx.author.id, winner, self.bot)
         elif not game:
