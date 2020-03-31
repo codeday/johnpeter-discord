@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 import discord
@@ -115,32 +116,54 @@ Please retry your command in a channel for a tournament match.")
 mentioning the person who won:
 ~tournament winner <@689549152275005513>''')
             return
-    #
-    # @tournament.command(name="delete")
-    # @commands.has_any_role('Tournament Master')
-    # async def tourney_delete(self, ctx: commands.context.Context):
-    #     """Deletes the specified tournament."""
-    #     await ctx.message.delete()
-    #     await (await ctx.send('Ok, I deleted the tournament')).delete(delay=5)
-    #     for game in self.games:
-    #         try:
-    #             await self.games[game]['tc'].delete()
-    #         except:
-    #             pass
-    #         try:
-    #             await self.games[game]['vc'].delete()
-    #         except:
-    #             pass
-    #
-    # @tournament.command(name="broadcast")
-    # @commands.has_any_role('Tournament Master')
-    # async def tourney_broadcast(self, ctx: commands.context.Context, message):
-    #     """Sends a message to all in-progress games."""
-    #     for game in self.games:
-    #         try:
-    #             await self.games[game]['tc'].send(message)
-    #         except:
-    #             print('Error sending broadcast')
+
+    @tournament.command(name="delete")
+    @commands.has_any_role('Tournament Master')
+    async def tourney_delete(self, ctx: commands.context.Context, idx):
+        """Deletes the specified tournament."""
+        if idx + 1 >= len(self.tournaments):
+            t = self.tournaments[idx]
+            msgs = [await ctx.send(f'Are you sure you would like to delete the {t.game_name} tournament?')]
+            await msgs[0].add_reaction('🚫')
+            await msgs[0].add_reaction('✅')
+
+            def check(reaction, user):
+                return user == ctx.author and (str(reaction.emoji) == '🚫' or str(reaction.emoji) == '✅')
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                await msgs[0].delete()
+            else:
+                if str(reaction.emoji) == '🚫':
+                    msgs.append(await ctx.send(f'Ok, I will not delete the {t.game_name} tournament'))
+                elif str(reaction.emoji) == '✅':
+                    msgs.append(await ctx.send(f'Ok, I am now deleting the {t.game_name} tournament.'))
+                    t.delete()
+
+                for msg in msgs:
+                    await msg.delete(delay=5)
+        else:
+            await ctx.send(f'No tournament found with index {idx}')
+            await self.tourney_list(ctx)
+
+    @tournament.command(name="list")
+    @commands.has_any_role('Tournament Master')
+    async def tourney_list(self, ctx: commands.context.Context):
+        out = f'```Running Tournaments ({len(self.tournaments)}):'
+        for idx,tournament in enumerate(self.tournaments):
+            out += f'\n {idx} - {tournament.game_name}'
+        out += '```'
+        await ctx.send(out)
+
+    @tournament.command(name="broadcast")
+    @commands.has_any_role('Tournament Master')
+    async def tourney_broadcast(self, ctx: commands.context.Context, message):
+        """Sends a message to all in-progress games."""
+        for game in self.games:
+            try:
+                await self.games[game]['tc'].send(message)
+            except:
+                print('Error sending broadcast')
 
 
 def setup(bot):
