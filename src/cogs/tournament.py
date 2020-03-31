@@ -67,7 +67,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                     await user.create_dm()
                 await user.dm_channel.send(
                     '''Sorry, but the tournament has already started, so I am unable to remove you.
-                     If you have to leave, please inform the @Tournament Master'''
+If you have to leave, please inform the @Tournament Master'''
                 )
             await (await t.join_message(self.bot)).edit(content=t.update_join_message())
 
