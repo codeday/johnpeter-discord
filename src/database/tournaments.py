@@ -43,7 +43,7 @@ class Tournament(object):
             self.rounds = [Round(0,self.gamers)]
             self.current_round = self.rounds[-1]
             if bot:
-                await bot.get_channel(self.tc_id).fetch_message(self.join_message_id).edit(content=self.update_join_message(complete=True))
+                await (await bot.get_channel(self.tc_id)).fetch_message(self.join_message_id).edit(content=self.update_join_message(complete=True))
                 self.join_message_id = (await bot.get_channel(self.tc_id).send(self.current_round.generate_status_message())).id
             return True
         elif bot:
