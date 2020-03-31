@@ -1,17 +1,23 @@
 import json
+import os
 
 
 class TournamentService:
     @staticmethod
-    def store_tournaments(tournaments):
+    def store_tournaments(tournaments, path='./tourney_data/tourneys.tmt'):
         tournaments = [tournament.to_dict() for tournament in tournaments]
-        with open('./tourney_data/tourneys.tmt', 'w') as f:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w') as f:
             json.dumps(tournaments, f)
         return
 
     @staticmethod
-    def load_tournaments():
-        with open('./tourney_data/tourneys.tmt', 'r') as f:
-            tournaments = json.loads(f)
-        print(tournaments)
-        return tournaments
+    def load_tournaments(path='./tourney_data/tourneys.tmt'):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        if os.path.exists(path):
+            with open(path, 'r') as f:
+                tournaments = json.loads(f)
+            print(tournaments)
+            return tournaments
+        else:
+            return []
