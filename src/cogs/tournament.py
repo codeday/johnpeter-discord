@@ -128,7 +128,7 @@ mentioning the person who won:
     async def tourney_delete(self, ctx: commands.context.Context, idx):
         """Deletes the specified tournament."""
         idx = int(idx)
-        if idx + 1 >= len(self.tournaments):
+        if idx + 1 <= len(self.tournaments):
             t = self.tournaments[idx]
             msgs = [await ctx.send(f'Are you sure you would like to delete the {t.game_name} tournament?')]
             await msgs[0].add_reaction('🚫')
