@@ -139,7 +139,7 @@ mentioning the person who won:
                     msgs.append(await ctx.send(f'Ok, I will not delete the {t.game_name} tournament'))
                 elif str(reaction.emoji) == '✅':
                     msgs.append(await ctx.send(f'Ok, I am now deleting the {t.game_name} tournament.'))
-                    await t.delete()
+                    await t.delete(self.bot)
                     self.tournaments.pop(idx)
                 for msg in msgs:
                     await msg.delete(delay=5)
