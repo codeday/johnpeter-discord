@@ -50,7 +50,7 @@ class Round(object):
             for game in self.games:
                 out += f'\n <@{game.winner}> for winning game {game.idx}'
         else:
-            out += f'Round {self.idx} still in progress... please wait for games to be completed'
+            out += f'Round {self.idx} in progress... please wait for games to be completed'
             for game in self.games:
                 out += f'\nGame {game.idx} - '
                 if game.winner:
