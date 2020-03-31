@@ -46,9 +46,14 @@ class Round(object):
     def generate_status_message(self):
         out = ''
         if self.round_complete():
-            out += f'Round {self.idx} complete! Please congratulate the following players:'
-            for game in self.games:
-                out += f'\n <@{game.winner}> for winning game {game.idx}'
+            if len(self.games) > 1:
+                out += f'Round {self.idx} complete! Please congratulate the following players:'
+                for game in self.games:
+                    out += f'\n <@{game.winner}> for winning game {game.idx}'
+            elif len(self.games) == 1:
+                out += f'Congratulations, <@{self.games[0].winner}> for winning the gaming tournament!'
+            else:
+                out += f'No games running'
         else:
             out += f'Round {self.idx} in progress... please wait for games to be completed'
             for game in self.games:
