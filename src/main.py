@@ -1,9 +1,11 @@
+import json
 import logging
 import sys
 import traceback
 from os import environ, getenv
 
 import discord
+import requests
 from discord.ext import commands
 from google.cloud import firestore
 from raygun4py import raygunprovider
@@ -78,7 +80,14 @@ async def on_ready():
 async def on_ready():
     version = getenv('IMAGE_TAG')
     if version:
-        await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
+        r = requests.get(f'https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}')  # hardcode bad
+        if r.status_code == requests.codes.ok:
+            with json.loads(r.text)['commit'] as commit:
+                await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']}`")
+        else:
+            await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
+    else:
+        await bot.get_channel(error_channel).send(f"~~Started~~ woke up)")
 
 
 @bot.event
