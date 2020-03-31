@@ -1,6 +1,8 @@
 import json
 import os
 
+from database.tournaments import Tournament
+
 
 class TournamentService:
     @staticmethod
@@ -18,6 +20,6 @@ class TournamentService:
             with open(path, 'r') as f:
                 tournaments = json.loads(f.read())
             print(tournaments)
-            return tournaments
+            return [Tournament.from_dict(tournament) for tournament in tournaments]
         else:
             return []
