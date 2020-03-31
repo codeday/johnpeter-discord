@@ -39,6 +39,7 @@ class Round(object):
             'gamers': self.gamers,
             'group_size': self.groupSize
         }
+        return dest
 
     def round_complete(self):
         return all(game.winner is not None for game in self.games)
