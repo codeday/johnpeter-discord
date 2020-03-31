@@ -67,7 +67,7 @@ class Tournament(object):
 
     def update_join_message(self, complete=False):
         if complete:
-            out = 'Tournament has started!'
+            out = f'The {self.game_name} Tournament has started!'
         else:
             out = self.make_join_message(self.game_name)
         out += f'\n{len(self.gamers)} gamers currently registered'
