@@ -83,7 +83,8 @@ If you have to leave, please inform the @Tournament Master'''
         else:
             await ctx.send('Previous round not yet finished! Aborting')
 
-    @tournament.command(name="winner-set", aliases=["winner_set", "round-winner-set", "round_winner_set"])
+    @tournament.command(name="winner-set", aliases=["winner_set", "round-winner-set", "round_winner_set", "set-winner",
+                                                    "set-round-winner", "set_round_winner", "set_"])
     @commands.has_any_role('Tournament Master')
     async def round_winner_set(self, ctx: commands.context.Context, winner):
         """Sets the winner of a round."""
