@@ -158,13 +158,29 @@ mentioning the person who won:
 
     @tournament.command(name="broadcast")
     @commands.has_any_role('Tournament Master')
-    async def tourney_broadcast(self, ctx: commands.context.Context, message):
-        """Sends a message to all in-progress games."""
-        for game in self.games:
-            try:
-                await self.games[game]['tc'].send(message)
-            except:
-                print('Error sending broadcast')
+    async def tourney_broadcast(self, ctx: commands.context.Context, *message):
+        """Sends the message to all in-progress games."""
+        t = self.tournaments[0]
+        message = message.join(' ')
+        msgs = [await ctx.send(f'Are you sure you would like to broadcast the message "{message}" to all running games?')]
+        await msgs[0].add_reaction('🚫')
+        await msgs[0].add_reaction('✅')
+
+        def check(reaction, user):
+            return user == ctx.author and (str(reaction.emoji) == '🚫' or str(reaction.emoji) == '✅')
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await msgs[0].delete()
+        else:
+            if str(reaction.emoji) == '🚫':
+                msgs.append(await ctx.send('Ok, I will not send the message'))
+            elif str(reaction.emoji) == '✅':
+                msgs.append(await ctx.send('Ok, I am now sending the message'))
+                await t.broadcast(self.bot)
+            for msg in msgs:
+                await msg.delete(delay=5)
 
 
 def setup(bot):
