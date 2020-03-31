@@ -116,14 +116,14 @@ Votes cast:
                                      send_messages=True)
         await tc.send(
             f'''Cowabunga, Gamers! :cowboy:
-        Welcome to the Game Tournament! Please join the associated voice channel.\
-         It is now time to fight your fellow comrades. When you are finished, \
-         please use the command `~tournament winner`.
+Welcome to the Game Tournament! Please join the associated voice channel.\
+It is now time to fight your fellow comrades. When you are finished, \
+please use the command `~tournament winner`.
         Game on! {''.join([f'<@{gamer}> ' for gamer in self.gamers])}'''
         )
         await tc.send(
-            f'''<@{random.choice(self.gamers)}> has been randomly selected as the game host.\
-             Please send them a link to your steam profile to begin the HIGH OCTANE GAMING ACTION! :race_car:'''
+            f'''<@{random.choice(self.gamers)}> has been randomly selected as the game host.
+Please send them a link to your steam profile to begin the HIGH OCTANE GAMING ACTION! :race_car:'''
         )
         self.tc_id = tc.id
         self.vc_id = vc.id
