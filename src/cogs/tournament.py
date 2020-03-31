@@ -17,7 +17,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.category = int(692803392031948911)  # gaming tournament
         self.tournaments = TournamentService.load_tournaments()
 
-    async def cog_before_invoke(self, ctx):
+    async def cog_after_invoke(self, ctx):
         TournamentService.store_tournaments(self.tournaments)
 
     @commands.group(name="tournament")
