@@ -100,3 +100,7 @@ class Tournament(object):
                 await game.delete_channel(bot)
         else:
             await (await self.join_mesage(bot)).delete()
+
+    async def broadcast(self, message, bot):
+        for game in self.current_round.games:
+            await bot.get_channel(game.tc_id).send(message)
