@@ -87,7 +87,7 @@ async def on_ready():
         else:
             await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
     else:
-        await bot.get_channel(error_channel).send(f"~~Started~~ woke up)")
+        await bot.get_channel(error_channel).send(f"~~Started~~ woke up")
 
 
 @bot.event
