@@ -161,7 +161,7 @@ mentioning the person who won:
     async def tourney_broadcast(self, ctx: commands.context.Context, *message):
         """Sends the message to all in-progress games."""
         t = self.tournaments[0]
-        message = message.join(' ')
+        message = ' '.join(list(message))
         msgs = [await ctx.send(f'Are you sure you would like to broadcast the message "{message}" to all running games?')]
         await msgs[0].add_reaction('🚫')
         await msgs[0].add_reaction('✅')
