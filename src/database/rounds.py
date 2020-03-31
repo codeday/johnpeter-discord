@@ -19,7 +19,7 @@ class Round(object):
         if self.games is None:
             self.games = []
             for idx, group in enumerate(groups.make_groups(self.gamers, self.groupSize)):
-                games.append(
+                self.games.append(
                     Game(
                         idx=idx,
                         gamers=group
