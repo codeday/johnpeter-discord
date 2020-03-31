@@ -8,7 +8,7 @@ class TournamentService:
         tournaments = [tournament.to_dict() for tournament in tournaments]
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as f:
-            json.dump(f, tournaments)
+            json.dump(tournaments, f)
         return
 
     @staticmethod
