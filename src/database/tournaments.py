@@ -94,6 +94,9 @@ class Tournament(object):
     async def join_message(self, bot):
         return await bot.get_channel(self.tc_id).fetch_message(self.join_message_id)
 
-    async def delete(self):
-        for game in self.current_round.games:
-            await game.delete_channel()
+    async def delete(self, bot):
+        if self.current_round:
+            for game in self.current_round.games:
+                await game.delete_channel(bot)
+        else:
+            await (await self.join_mesage(bot)).delete()
