@@ -178,7 +178,7 @@ mentioning the person who won:
                 msgs.append(await ctx.send('Ok, I will not send the message'))
             elif str(reaction.emoji) == '✅':
                 msgs.append(await ctx.send('Ok, I am now sending the message'))
-                await t.broadcast(self.bot)
+                await t.broadcast(message, self.bot)
             for msg in msgs:
                 await msg.delete(delay=5)
 
