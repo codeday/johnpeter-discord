@@ -34,7 +34,8 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         logging.debug("Starting tournament creation...")
         t = Tournament(game_name=game_name,
                        tc_id=ctx.channel.id,
-                       join_message_id=(await ctx.channel.send(Tournament.make_join_message(game_name))).id
+                       join_message_id=(await ctx.channel.send(Tournament.make_join_message(game_name))).id,
+                       gamers=[]
                        )
         self.tournaments.append(t)
         await (await t.join_message(self.bot)).add_reaction('🏆')
