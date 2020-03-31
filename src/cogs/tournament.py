@@ -28,14 +28,15 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
     @tournament.command(name="create")
     @commands.has_any_role('Tournament Master')
-    async def tourney_create(self, ctx: commands.context.Context, game_name: str):
+    async def tourney_create(self, ctx: commands.context.Context, game_name: str, players_per_game: int):
         """Creates a tournament with the given name."""
         await ctx.message.delete()
         logging.debug("Starting tournament creation...")
         t = Tournament(game_name=game_name,
                        tc_id=ctx.channel.id,
                        join_message_id=(await ctx.channel.send(Tournament.make_join_message(game_name))).id,
-                       gamers=[]
+                       gamers=[],
+                       players_per_game=players_per_game
                        )
         self.tournaments.append(t)
         await (await t.join_message(self.bot)).add_reaction('🏆')
@@ -99,7 +100,7 @@ If you have to leave, please inform the @Tournament Master'''
         t = self.tournaments[0]
         winner_id = id_from_mention(winner)
         game = t.rounds[-1].game_from_channel_id(ctx.channel.id)
-        if winner_id in t.current_round.game_from_channel_id(ctx.channel.id).gamers:
+        if winner_id in t.rounds[-1].game_from_channel_id(ctx.channel.id).gamers:
             await game.set_winner(winner_id, self.bot)
 
     @tournament.command(name="winner",

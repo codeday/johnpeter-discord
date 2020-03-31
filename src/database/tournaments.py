@@ -17,7 +17,6 @@ class Tournament(object):
         self.players_per_game = players_per_game
         self.gamers = gamers
         self.rounds = rounds
-        self.current_round = None
 
     @staticmethod
     def from_dict(source):
@@ -40,23 +39,21 @@ class Tournament(object):
 
     async def next_round(self, bot=None):
         if not self.rounds:  # If no round already exists create one
-            self.rounds = [Round(0,self.gamers)]
-            self.current_round = self.rounds[-1]
+            self.rounds = [Round(0,self.gamers, group_size=self.players_per_game)]
             if bot:
                 await (await bot.get_channel(self.tc_id).fetch_message(self.join_message_id)).edit(
                     content=self.update_join_message(complete=True))
-                self.join_message_id = (await bot.get_channel(self.tc_id).send(self.current_round.generate_status_message())).id
+                self.join_message_id = (await bot.get_channel(self.tc_id).send(self.rounds[-1].generate_status_message())).id
             return True
         elif bot:
             for game in self.rounds[-1].games:
                 await game.delete_channel(bot)
-        r = self.current_round
+        r = self.rounds[-1]
         # Get latest round
         if r.round_complete():
-            self.rounds.append(Round(len(self.rounds),r.winners()))
-            self.current_round = self.rounds[-1]
+            self.rounds.append(Round(len(self.rounds), r.winners(), group_size=self.players_per_game))
             if bot:
-                self.join_message_id = (await bot.get_channel(self.tc_id).send(self.current_round.generate_status_message())).id
+                self.join_message_id = (await bot.get_channel(self.tc_id).send(self.rounds[-1].generate_status_message())).id
             return True
         else:
             return False
@@ -96,13 +93,13 @@ class Tournament(object):
         return await bot.get_channel(self.tc_id).fetch_message(self.join_message_id)
 
     async def delete(self, bot):
-        if self.current_round:
-            for game in self.current_round.games:
+        if self.rounds:
+            for game in self.rounds[-1].games:
                 await game.delete_channel(bot)
         else:
             m = await self.join_message(bot)
             await m.delete()
 
     async def broadcast(self, message, bot):
-        for game in self.current_round.games:
+        for game in self.rounds[-1].games:
             await bot.get_channel(game.tc_id).send(message + ' ' + ''.join([f'<@{gamer}> ' for gamer in self.gamers]))
