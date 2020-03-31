@@ -38,10 +38,12 @@ class Tournament(object):
 
         return dest
 
-    def next_round(self, bot=None):
+    async def next_round(self, bot=None):
         if not self.rounds:  # If no round already exists create one
             self.rounds = [Round(0,self.gamers)]
             self.current_round = self.rounds[-1]
+            if bot:
+                self.join_message_id = (await bot.get_channel(self.tc_id).send(self.current_round.generate_status_message())).id
             return True
         elif bot:
             for game in self.rounds[-1].games:
@@ -52,7 +54,7 @@ class Tournament(object):
         if r.round_complete():
             self.rounds.append(Round(len(self.rounds),r.winners()))
             if bot:
-                bot.get_channel(self.tc_id).send(f'Round {len(self.rounds)} has begun!')
+                self.join_message_id = await bot.get_channel(self.tc_id).send(f'Round {len(self.rounds)} has begun!').id
             return True
         else:
             return False
