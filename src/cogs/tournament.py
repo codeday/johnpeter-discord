@@ -76,7 +76,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
     async def tourney_round(self, ctx: commands.context.Context, idx=None):
         """Creates the next round"""
         t = self.tournaments[0]
-        if t.next_round(bot=self.bot):
+        if await t.next_round(bot=self.bot):
             await ctx.message.delete()
             for game in t.rounds[-1].games:
                 await game.create_channel(ctx=ctx, game_name=t.game_name, category=self.category)
