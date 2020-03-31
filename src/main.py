@@ -82,8 +82,8 @@ async def on_ready():
     if version:
         r = requests.get(f'https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}')  # hardcode bad
         if r.status_code == requests.codes.ok:
-            with json.loads(r.text)['commit'] as commit:
-                await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']}`")
+            commit = json.loads(r.text)['commit']
+            await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']}`")
         else:
             await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
     else:
