@@ -102,7 +102,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         winner_id = id_from_mention(winner)
         game = t.current_round.game_from_channel_id(ctx.channel.id)
         if game and winner_id:
-            game.vote(ctx.author.id, winner, self.bot)
+            await game.vote(ctx.author.id, winner_id, self.bot)
         elif not game:
             await ctx.channel.send(
                 "I'm sorry, but this is not a known channel.\
