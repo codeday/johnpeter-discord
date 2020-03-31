@@ -16,7 +16,7 @@ class TournamentService:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         if os.path.exists(path):
             with open(path, 'r') as f:
-                tournaments = json.loads(f)
+                tournaments = json.loads(f.read())
             print(tournaments)
             return tournaments
         else:
