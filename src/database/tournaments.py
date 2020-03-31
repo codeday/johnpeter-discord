@@ -103,4 +103,4 @@ class Tournament(object):
 
     async def broadcast(self, message, bot):
         for game in self.current_round.games:
-            await bot.get_channel(game.tc_id).send(message)
+            await bot.get_channel(game.tc_id).send(message + ' ' + ''.join([f'<@{gamer}> ' for gamer in self.gamers]))
