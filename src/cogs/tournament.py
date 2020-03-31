@@ -97,7 +97,7 @@ If you have to leave, please inform the @Tournament Master'''
         """Sets the winner of a round."""
         t = self.tournaments[0]
         winner_id = id_from_mention(winner)
-        game = t.current_round.game_from_channel_id(ctx.channel.id)
+        game = t.rounds[-1].game_from_channel_id(ctx.channel.id)
         if winner_id in t.current_round.game_from_channel_id(ctx.channel.id).gamers:
             await game.set_winner(winner_id, self.bot)
 
@@ -108,10 +108,10 @@ If you have to leave, please inform the @Tournament Master'''
         """Votes for the winner of a round."""
         t = self.tournaments[0]
         winner_id = id_from_mention(winner)
-        game = t.current_round.game_from_channel_id(ctx.channel.id)
+        game = t.rounds[-1].game_from_channel_id(ctx.channel.id)
         if game and winner_id:
             await game.vote(ctx.author.id, winner_id, self.bot)
-            await (await self.bot.get_channel(t.tc_id).fetch_message(t.join_message_id)).edit(content=t.current_round.generate_status_message())
+            await (await self.bot.get_channel(t.tc_id).fetch_message(t.join_message_id)).edit(content=t.rounds[-1].generate_status_message())
         elif not game:
             await ctx.channel.send(
                 "I'm sorry, but this is not a known channel.\
