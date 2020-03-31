@@ -75,11 +75,14 @@ Votes cast:
 
         return out[:1999]  # Just in case, discord limits message to 2,000 characters
 
-    def vote(self, gamer, winner, bot):  # Vote for round winner
+    async def vote(self, gamer, winner, bot):  # Vote for round winner
         if winner in self.gamers:
+            if not self.voting_message_id:
+                self.voting_message_id = (await bot.get_channel(self.tc_id)).send(self.generate_voting_message()).id
             self.votes[gamer] = winner
             if all(self.votes[vote] == winner for vote in self.votes):
                 self.set_winner(winner)
+            await (await (await bot.get_channel(self.tc_id)).get_message(self.voting_message_id)).edit(content=self.generate_voting_message())
             return True
         else:
             return False
