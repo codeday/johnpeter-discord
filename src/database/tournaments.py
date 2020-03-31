@@ -63,8 +63,10 @@ class Tournament(object):
     def make_join_message(game_name):
         return f'Please react to this message with :trophy: to join the {game_name} Tournament!'
 
-    def update_join_message(self):
+    def update_join_message(self, complete=False):
         out = self.make_join_message(self.game_name)
+        if complete:
+            out += ' (Now closed, tournament has started)'
         out += f'\n{len(self.gamers)} gamers currently registered'
         if len(self.gamers) < 50:
             out += ':'
