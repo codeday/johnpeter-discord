@@ -91,7 +91,8 @@ Votes cast:
 
     async def set_winner(self, winner, bot):
         self.winner = winner
-        await bot.get_channel(self.tc_id).fetch_message(self.voting_message_id)
+        m = await bot.get_channel(self.tc_id).fetch_message(self.voting_message_id)
+        await m.edit(content=self.generate_voting_message())
 
     async def create_channel(self, ctx, game_name, category):
         overwrites = {
