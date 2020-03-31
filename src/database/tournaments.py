@@ -43,7 +43,8 @@ class Tournament(object):
             self.rounds = [Round(0,self.gamers)]
             self.current_round = self.rounds[-1]
             if bot:
-                await (await bot.get_channel(self.tc_id)).fetch_message(self.join_message_id).edit(content=self.update_join_message(complete=True))
+                await (await bot.get_channel(self.tc_id).fetch_message(self.join_message_id)).edit(
+                    content=self.update_join_message(complete=True))
                 self.join_message_id = (await bot.get_channel(self.tc_id).send(self.current_round.generate_status_message())).id
             return True
         elif bot:
@@ -65,9 +66,10 @@ class Tournament(object):
         return f'Please react to this message with :trophy: to join the {game_name} Tournament!'
 
     def update_join_message(self, complete=False):
-        out = self.make_join_message(self.game_name)
         if complete:
-            out += ' (Now closed, tournament has started)'
+            out = 'Tournament has started!'
+        else:
+            out = self.make_join_message(self.game_name)
         out += f'\n{len(self.gamers)} gamers currently registered'
         if len(self.gamers) < 50:
             out += ':'
