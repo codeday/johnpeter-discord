@@ -20,6 +20,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
     @commands.group(name="tournament")
     async def tournament(self, ctx):
         """Contains tournament subcommands, do '~help tournament' for more info"""
+        TournamentService.store_tournaments(self.tournaments)
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid tournament command passed...')
 
@@ -34,7 +35,6 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                        join_message_id=(await ctx.channel.send(Tournament.make_join_message(game_name))).id
                        )
         self.tournaments.append(t)
-        TournamentService.store_tournaments(self.tournaments)
         await (await t.join_message(self.bot)).add_reaction('🏆')
 
     @commands.Cog.listener()
@@ -54,7 +54,6 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
                     'Sorry, but the tournament is already running, I am unable to add you'
                 )
             await (await t.join_message(self.bot)).edit(content=t.update_join_message())
-            TournamentService.store_tournaments(self.tournaments)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
@@ -74,7 +73,6 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 If you have to leave, please inform the @Tournament Master'''
                 )
             await (await t.join_message(self.bot)).edit(content=t.update_join_message())
-            TournamentService.store_tournaments(self.tournaments)
 
     @tournament.command(name="round")
     @commands.has_any_role('Tournament Master')
@@ -85,7 +83,6 @@ If you have to leave, please inform the @Tournament Master'''
             await ctx.message.delete()
             for game in t.rounds[-1].games:
                 await game.create_channel(ctx=ctx, game_name=t.game_name, category=self.category)
-            TournamentService.store_tournaments(self.tournaments)
         else:
             await ctx.send('Previous round not yet finished! Aborting')
 
@@ -99,7 +96,6 @@ If you have to leave, please inform the @Tournament Master'''
         game = t.current_round.game_from_channel_id(ctx.channel.id)
         if winner_id in t.current_round.game_from_channel_id(ctx.channel.id).gamers:
             await game.set_winner(winner_id, self.bot)
-            TournamentService.store_tournaments(self.tournaments)
 
     @tournament.command(name="winner",
                         aliases=["round-winner", "round_winner", 'votewinner', 'vote_winner', 'vote-winner',
@@ -112,7 +108,6 @@ If you have to leave, please inform the @Tournament Master'''
         if game and winner_id:
             await game.vote(ctx.author.id, winner_id, self.bot)
             await (await self.bot.get_channel(t.tc_id).fetch_message(t.join_message_id)).edit(content=t.current_round.generate_status_message())
-            TournamentService.store_tournaments(self.tournaments)
         elif not game:
             await ctx.channel.send(
                 "I'm sorry, but this is not a known channel.\
@@ -147,7 +142,6 @@ mentioning the person who won:
                     msgs.append(await ctx.send(f'Ok, I am now deleting the {t.game_name} tournament.'))
                     await t.delete(self.bot)
                     self.tournaments.pop(idx)
-                    TournamentService.store_tournaments(self.tournaments)
                 for msg in msgs:
                     await msg.delete(delay=5)
         else:
