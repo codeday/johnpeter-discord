@@ -86,7 +86,8 @@ class Tournament(object):
 
     def remove_gamer(self,gamer):
         if not self.rounds:  # don't remove someone if tourney already started
-            self.gamers.remove(gamer)
+            if gamer in self.gamers:
+                self.gamers.remove(gamer)
             return True
         else:
             return False
