@@ -91,7 +91,7 @@ If you have to leave, please inform the @Tournament Master'''
         winner_id = id_from_mention(winner)
         game = t.current_round.game_from_channel_id(ctx.channel.id)
         if winner_id in t.current_round.game_from_channel_id(ctx.channel.id).gamers:
-            game.set_winner(winner_id, self.bot)
+            await game.set_winner(winner_id, self.bot)
 
     @tournament.command(name="winner",
                         aliases=["round-winner", "round_winner", 'votewinner', 'vote_winner', 'vote-winner',
