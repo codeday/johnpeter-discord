@@ -11,6 +11,7 @@ from discord.ext import commands
 from glob import glob
 from os import getenv, path, makedirs
 from random import choice
+import random
 from urllib import parse
 
 from utils.commands import only_random, require_vc
@@ -27,10 +28,15 @@ class FunCommands(commands.Cog, name="Fun"):
         for name in names:
             url = f'https://f1.srnd.org/fun/pledge/{name}'
             urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
+
         urls = get_sponsor_audio()
         for url in urls:
             file_name = re.sub('(h.*\/)+', "", url)
             urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
+
+        urllib.request.urlretrieve("https://f1.srnd.org/fun/rickroll.mp3",
+                                   f"./cache/RickRoll.mp3")
+
         file_name = re.sub('(h.*\/)+', "", get_sponsor_intro())
         urllib.request.urlretrieve(get_sponsor_intro(), f"./cache/{file_name}")
 
@@ -38,6 +44,7 @@ class FunCommands(commands.Cog, name="Fun"):
         for file in glob("./cache/pledge/*.mp3"):
             print(file)
             self.people.append(file)
+
         self.sponsorships = []
         for file in glob("./cache/sponsorships/*.mp3"):
             print(file)
@@ -67,7 +74,7 @@ class FunCommands(commands.Cog, name="Fun"):
     @commands.command(name="up-down-up-down-left-right-left-right-b-a-start", hidden=True,
                       aliases=['updownupdownleftrightleftrightbastart'])
     @only_random
-    async def updownupdownleftrightleftrightbastart(self, ctx):
+    async def updownupdownleftrightleftrightbastart(self, ctx, ):
         """A lot of typing for nothing."""
         await ctx.send("wow that's a long cheat code")
 
@@ -78,16 +85,21 @@ class FunCommands(commands.Cog, name="Fun"):
         await ctx.message.delete()
         retval = os.getcwd()
         vc = await ctx.message.author.voice.channel.connect()
+        randomint = random.randint(1, 21)
         try:
-            file = choice(self.people)
-            source = discord.FFmpegPCMAudio(f"{file}")
+            if randomint == 1:
+                source = discord.FFmpegPCMAudio(f"./cache/RickRoll.mp3")
+            else:
+                file = choice(self.people)
+                source = discord.FFmpegPCMAudio(f"{file}")
             player = vc.play(source)
             while vc.is_playing():
                 await asyncio.sleep(1)
         finally:
             await vc.disconnect()
 
-    @commands.command(pass_context=True)
+    @require_vc
+    @commands.command(pass_context=True, aliases=['disconnect'])
     async def disconnectvc(self, ctx):
         await ctx.message.delete()
         server = ctx.message.guild.voice_client
