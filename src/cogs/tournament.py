@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from os import getenv
 
 import discord
 from discord.ext import commands
@@ -16,6 +17,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         self.bot: commands.Bot = bot
         self.category = int(692803392031948911)  # gaming tournament
         self.tournaments = TournamentService.load_tournaments()
+        self.error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))
 
     async def cog_after_invoke(self, ctx):
         TournamentService.store_tournaments(self.tournaments)
@@ -146,6 +148,7 @@ mentioning the person who won:
                     msgs.append(await ctx.send(f'Ok, I will not delete the {t.game_name} tournament'))
                 elif str(reaction.emoji) == '✅':
                     msgs.append(await ctx.send(f'Ok, I am now deleting the {t.game_name} tournament.'))
+                    await self.bot.get_channel(self.error_channel).send(str(t.to_dict()))
                     await t.delete(self.bot)
                     self.tournaments.pop(idx)
                 for msg in msgs:
