@@ -98,7 +98,6 @@ class FunCommands(commands.Cog, name="Fun"):
         finally:
             await vc.disconnect()
 
-    @require_vc
     @commands.command(pass_context=True, aliases=['disconnect'])
     async def disconnectvc(self, ctx):
         await ctx.message.delete()
