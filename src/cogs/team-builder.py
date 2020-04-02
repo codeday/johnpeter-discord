@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from os import getenv
 from random import choice
@@ -77,22 +78,61 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def team_broadcast_form(self, ctx: commands.context.Context, *form):
         form = ' '.join(form)
         if form in self.forms:
-            await self.forms[form]['func'](self, ctx)
+            msgs = [await ctx.send(f'Are you sure you would like to send the "{form}" form to all teams?')]
+            await msgs[0].add_reaction('🚫')
+            await msgs[0].add_reaction('✅')
+
+            def check(reaction, user):
+                return user == ctx.author and (str(reaction.emoji) == '🚫' or str(reaction.emoji) == '✅')
+
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                await msgs[0].delete()
+            else:
+                if str(reaction.emoji) == '🚫':
+                    msgs.append(await ctx.send(f'Ok, I will not send the form'))
+                elif str(reaction.emoji) == '✅':
+                    msgs.append(await ctx.send('Ok, I am now sending the form'))
+                    self.team_service.__update__()
+                    await self.forms[form]['func'](self, ctx)
+            for msg in msgs:
+                await msg.delete(delay=5)
+
 
     @team_broadcast.command(name="message")
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_broadcast_message(self, ctx: commands.context.Context, *message):
         message = ' '.join(message)
-        self.team_service.__update__()
-        for team in self.team_service.get_teams():
-            try:
-                await ctx.guild.get_channel(team.tc_id).send(message)
-            except Exception as ex:
-                print("I have an exception!" + ex.__str__())
+        msgs = [await ctx.send(f'Are you sure you would like to send the message "{message}" to all teams?')]
+        await msgs[0].add_reaction('🚫')
+        await msgs[0].add_reaction('✅')
+
+        def check(reaction, user):
+            return user == ctx.author and (str(reaction.emoji) == '🚫' or str(reaction.emoji) == '✅')
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await msgs[0].delete()
+        else:
+            if str(reaction.emoji) == '🚫':
+                msgs.append(await ctx.send(f'Ok, I will not send the message'))
+            elif str(reaction.emoji) == '✅':
+                msgs.append(await ctx.send('Ok, I am now sending the message'))
+                self.team_service.__update__()
+                for team in self.team_service.get_teams():
+                    try:
+                        await ctx.guild.get_channel(team.tc_id).send(message)
+                    except Exception as ex:
+                        print("I have an exception!" + ex.__str__())
+            for msg in msgs:
+                await msg.delete(delay=5)
 
 
     @team.command(name="add", aliases=['create'])
     @commands.has_any_role('Global Staff', 'Staff')
+
     async def team_add(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
