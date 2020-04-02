@@ -56,7 +56,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             }
         }
 
-        for form in self.forms:
+        for form in self.forms.keys():
             for alias in self.forms[form]['aliases']:
                 self.forms[alias] = {'func': self.forms[form]['func']}
 
