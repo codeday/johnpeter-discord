@@ -1,16 +1,15 @@
-import discord
 import logging
-
-from discord.ext import commands
-from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
-from main import client
 from os import getenv
 from random import choice
-from urllib import parse
+
+import discord
+from discord.ext import commands
+from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
 
 from database.teams import Team
+from main import client
 from services.teamservice import TeamService
-
+from utils.forms import send_team_check_in
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -36,6 +35,20 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         self.role_student = int(getenv('ROLE_STUDENT', 689214914010808359))  # student role
         self.category = int(getenv("CATEGORY", 689598417063772226))
         self.team_service = TeamService()
+        self.forms = {
+            'checkin': {
+                'aliases': [
+                    'check-in',
+                    'check_in',
+                    'check in'
+                ],
+                'func': send_team_check_in
+            }
+        }
+
+        for form in self.forms:
+            for alias in form['aliases']:
+                self.forms[alias] = {'func': form['func']}
 
     @commands.group(name="team")
     async def team(self, ctx):
@@ -43,40 +56,20 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid team command passed...')
 
-    @team.command(name="check-in", alias=["checkin", "check_in"])
+    @team.group(name="broadcast")
+    async def team_broadcast(self, ctx):
+        """Contains broadcast subcommands, do '~help team broadcast' for more info"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid team broadcast command passed...')
+
+    @team_broadcast.command(name="form")
     @commands.has_any_role('Global Staff', 'Staff')
-    async def team_check_in(self, ctx):
-        """Requests that all teams fill out the check-in form."""
-        self.team_service.__update__()
-        for team in self.team_service.get_teams():
-            try:
-                url = f"https://www.cognitoforms.com/Srnd1/VirtualCodeDayCheckInForm?entry=%7B%22TeamName%22:%22{parse.quote(team.name)}%22,%22ProjectName%22:%22{parse.quote(team.project)}%22%7D"
-                title_options = [f"How's life {team.name}?",
-                                 "Hello, living organism! How do you do this fine [weather:city] day?", "Howdy do!?!"]
-                message_options = [
-                    f"Good? I hope so! Please, go to the link down there and tell me so we can keep tabs on how you're doing. Thanks!",
-                    f"Hope you're programming is going swell! I have orders to have you fill out the form down there so my fellow staff can keep up to date. Thanks!",
-                    f"I'm feeling pretty [john:emotion]! Please, tell me how you are feeling about your project down there. Bye for now!"
-                ]
-                thumbnail = ["https://f1.srnd.org/codeday/virtual-s20/tropical1.png",
-                             "https://f1.srnd.org/codeday/virtual-s20/tropical2.png",
-                             "https://f1.srnd.org/codeday/virtual-s20/tropical3.png",
-                             "https://f1.srnd.org/codeday/virtual-s20/tropical4.png",
-                             "https://f1.srnd.org/codeday/virtual-s20/tropical5.png",
-                             "https://f1.srnd.org/codeday/virtual-s20/tropical6.png",
-                             "https://f1.srnd.org/codeday/virtual-s20/tropical7.png",
-                             ]
-                embed = discord.Embed(title=f"Virtual CodeDay Checkin Form",
-                                      url=url,
-                                      description=f"[Let us know how your project is doing!]({url})",
-                                      color=0xff686b)
-                embed.set_thumbnail(url=choice(thumbnail))
-                embed.set_footer(text="John Peter - Professional Human")
-                await ctx.guild.get_channel(team.tc_id).send(choice(title_options) + " " + choice(message_options),
-                                                             embed=embed)
-                # await ctx.send(choice(title_options) + " " + choice(message_options), embed=embed)
-            except Exception as ex:
-                print("I have an exception!" + ex.__str__())
+    async def team_broadcast_form(self, ctx: commands.context.Context, *form):
+        form = ' '.join(form)
+        if form in self.forms:
+            self.forms[form]['func'](self, ctx)
+
+
 
     @team.command(name="add", aliases=['create'])
     @commands.has_any_role('Global Staff', 'Staff')
