@@ -77,7 +77,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def team_broadcast_form(self, ctx: commands.context.Context, *form):
         form = ' '.join(form)
         if form in self.forms:
-            self.forms[form]['func'](self, ctx)
+            await self.forms[form]['func'](self, ctx)
 
 
 
