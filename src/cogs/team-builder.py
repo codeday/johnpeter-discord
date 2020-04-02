@@ -57,7 +57,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         }
 
         for form in self.forms:
-            for alias in form['aliases']:
+            for alias in self.forms[form]['aliases']:
                 self.forms[alias] = {'func': form['func']}
 
     @commands.group(name="team")
