@@ -79,6 +79,16 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         if form in self.forms:
             await self.forms[form]['func'](self, ctx)
 
+    @team_broadcast.command(name="message")
+    @commands.has_any_role('Global Staff', 'Staff')
+    async def team_broadcast_message(self, ctx: commands.context.Context, *message):
+        message = ' '.join(message)
+        self.team_service.__update__()
+        for team in self.team_service.get_teams():
+            try:
+                await ctx.guild.get_channel(team.tc_id).send(message)
+            except Exception as ex:
+                print("I have an exception!" + ex.__str__())
 
 
     @team.command(name="add", aliases=['create'])
