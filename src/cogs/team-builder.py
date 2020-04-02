@@ -9,7 +9,7 @@ from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
 from database.teams import Team
 from main import client
 from services.teamservice import TeamService
-from utils.forms import send_team_check_in
+from utils.forms import send_team_check_in, send_team_submit_form
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -43,6 +43,16 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                     'check in'
                 ],
                 'func': send_team_check_in
+            },
+            'submit': {
+                'aliases': [
+                    'submission',
+                    'submit-project',
+                    'submit_project',
+                    'submit-form',
+                    'submit_form'
+                ],
+                'func': send_team_submit_form
             }
         }
 
