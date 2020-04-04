@@ -23,3 +23,10 @@ class Database:
         self.conn.close()
         self.conn = None
         self.cursor = None
+
+    def add_row(self, headers: list, values: list):
+        exec = (f"INSERT INTO {self.database} "
+                f"({[header + ',' for header in headers]}) "
+                f"VALUES ({[value + ',' for value in values]})")
+        with self:
+            self.cursor.execute(exec)
