@@ -8,6 +8,7 @@ class Database:
         self.host=host
         self.database=database
         self.conn = None
+        self.cursor = None
 
     def __enter__(self):
         self.conn = mysql.connector.connect(
@@ -15,6 +16,10 @@ class Database:
             password=self.password,
             host=self.host,
             database=self.database)
+        self.cursor = self.conn.cursor()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
         self.conn.close()
+        self.conn = None
+        self.cursor = None
