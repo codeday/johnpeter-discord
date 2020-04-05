@@ -19,6 +19,7 @@ class Database:
         self.cursor = self.conn.cursor()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.conn.commit()
         self.cursor.close()
         self.conn.close()
         self.conn = None
