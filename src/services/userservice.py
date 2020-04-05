@@ -4,7 +4,7 @@ from .database import Database
 
 class UserDatabase(Database):
     def get_user(self, user: User):
-        query = (f"SELECT discord_id from {self.database}.discord_users "
+        query = (f"SELECT * from {self.database}.discord_users "
                  f"WHERE discord_id = {user.discord_id};")
         with self:
             self.cursor.execute(query)
@@ -24,6 +24,8 @@ class UserDatabase(Database):
     def update_user(self, user):
         u = self.get_user(user)
         if u != user:
-            exc = (f"UPDATE {self.database}.discord_users ",
-                   f"SET clear_username = '{user.clear_username}' ",
+            exc = (f"UPDATE {self.database}.discord_users "
+                   f"SET clear_username = '{user.clear_username}' "
                    f"WHERE clear_username = '{u.clear_username}';")
+            with self:
+                self.cursor.execute(exc)

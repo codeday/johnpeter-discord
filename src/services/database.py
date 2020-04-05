@@ -28,6 +28,7 @@ class Database:
     def add_row(self, table, headers: list, values: list):
         exc = (f"INSERT INTO {table} "
                f'''({str(headers)[1:-1].replace("'","")}) '''
-               f'''VALUES ({str(values)[1:-1].replace("'", "")});''')
+               f'VALUES ({str(values)[1:-1]});')
+        print(exc)
         with self:
             self.cursor.execute(exc)
