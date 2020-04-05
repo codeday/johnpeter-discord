@@ -16,5 +16,7 @@ class UserDatabase(Database):
 
     def create_user(self, user: User):
         if not self.get_user(user):
-            self.add_row(['discord_id', 'clear_username'], [user.discord_id, user.clear_username])
+            self.add_row(table='discord_users',
+                         headers=['discord_id', 'clear_username'],
+                         values=[user.discord_id, user.clear_username])
         return
