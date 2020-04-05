@@ -20,3 +20,10 @@ class UserDatabase(Database):
                          headers=['discord_id', 'clear_username'],
                          values=[user.discord_id, user.clear_username])
         return
+
+    def update_user(self, user):
+        u = self.get_user(user)
+        if u != user:
+            exc = ("UPDATE discord_users ",
+                   f"SET clear_username = '{user.clear_username}' ",
+                   f"WHERE clear_username = '{u.clear_username}'")
