@@ -28,6 +28,6 @@ class Database:
     def add_row(self, table, headers: list, values: list):
         exc = (f"INSERT INTO {table} "
                f"({[header + ',' for header in headers]}) "
-               f"VALUES ({[value + ',' for value in values]})")
+               f"VALUES ({[str(value) + ',' for value in values]})")
         with self:
             self.cursor.execute(exc)
