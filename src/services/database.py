@@ -24,9 +24,9 @@ class Database:
         self.conn = None
         self.cursor = None
 
-    def add_row(self, headers: list, values: list):
-        exec = (f"INSERT INTO {self.database} "
-                f"({[header + ',' for header in headers]}) "
-                f"VALUES ({[value + ',' for value in values]})")
+    def add_row(self, table, headers: list, values: list):
+        exc = (f"INSERT INTO {table} "
+               f"({[header + ',' for header in headers]}) "
+               f"VALUES ({[value + ',' for value in values]})")
         with self:
-            self.cursor.execute(exec)
+            self.cursor.execute(exc)
