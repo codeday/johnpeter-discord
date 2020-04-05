@@ -27,7 +27,7 @@ class Database:
 
     def add_row(self, table, headers: list, values: list):
         exc = (f"INSERT INTO {table} "
-               f"({str(values)[1:-1]}) "
+               f"({str(headers)[1:-1]}) "
                f"VALUES ({str(values)[1:-1]})")
         with self:
             self.cursor.execute(exc)
