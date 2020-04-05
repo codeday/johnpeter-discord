@@ -4,7 +4,7 @@ from .database import Database
 
 class UserDatabase(Database):
     def get_user(self, user: User):
-        query = (f"SELECT discord_id from {self.database} "
+        query = (f"SELECT discord_id from discord_users "
                  f"WHERE discord_id = {user.discord_id}")
         with self:
             self.cursor.execute(query)
