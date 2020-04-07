@@ -213,5 +213,6 @@ pip-selfcheck.json
 src/cache/*
 src/secrets/*
 cache/*
+secrets/*
 !/src/tourney_data/tourneys.tmt
 src/tourney_data/
