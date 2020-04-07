@@ -14,6 +14,8 @@ from raygun4py import raygunprovider
 from services.randomservice import RandomFuncs
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 
+has_bot_started = False
+
 BOT_TOKEN = environ['BOT_TOKEN']
 # Where errors go when reported
 error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))
@@ -77,12 +79,16 @@ async def on_ready():
     logging.info("We are in {0} server!".format(counter))
 
 
-
 @bot.event
 async def on_ready():
+    global has_bot_started
+    if (has_bot_started):
+        return
+    has_bot_started = True
     version = getenv('IMAGE_TAG')
     if version:
-        r = requests.get(f'https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}')  # hardcode bad
+        r = requests.get(
+            f'https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}')  # hardcode bad
         if r.status_code == requests.codes.ok:
             commit = json.loads(r.text)['commit']
             await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`")
