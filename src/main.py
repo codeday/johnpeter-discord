@@ -11,8 +11,8 @@ from discord.ext.commands import MissingAnyRole
 from google.cloud import firestore
 from raygun4py import raygunprovider
 
-from services.randomservice import RandomFuncs
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
+from utils.paginated_send import paginated_send
 
 has_bot_started = False
 
@@ -91,7 +91,8 @@ async def on_ready():
             f'https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}')  # hardcode bad
         if r.status_code == requests.codes.ok:
             commit = json.loads(r.text)['commit']
-            await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`")
+            await bot.get_channel(error_channel).send(
+                f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`")
         else:
             await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
     else:
@@ -112,19 +113,15 @@ async def on_command_error(ctx, error: commands.CommandError):
         return await ctx.send(f"You're not in a voice channel!")
 
     if type(error) is MissingAnyRole:
-        return await ctx.send("You are not in the sudoers file.   This incident will be reported.")
+        return await ctx.send("You are not in the sudoers file. This incident will be reported.")
 
     else:
-        error_message_list = list(RandomFuncs.paginate(
-            ''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__))), 1900))
         await ctx.send("Hmm, that's weird! You just hit an unhandled error! It has been reported.")
-        await bot.get_channel(error_channel).send(
-            f"New error! Yikes! \n\n```{error_message_list[0]}```")
-        if len(error_message_list) > 1:
-            for i in error_message_list[1:]:
-                await bot.get_channel(error_channel).send(f"```{i}```")
+
+        await paginated_send(bot.get_channel(error_channel),
+                             f"New error! Yikes! \n\n Invoking message: ```{ctx.message.content}``` {ctx.message.jump_url} \n\n Traceback: ```{''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__)))}```")
         handle_exception(type(error), error, error.__traceback__)
-        raise error
+    raise error
 
 
 @bot.event
@@ -132,5 +129,6 @@ async def on_message(message):
     # This is just here to exist in case I need it later. Should be moved out soon
     # Insures the other commands are still processed
     await bot.process_commands(message)
+
 
 bot.run(BOT_TOKEN, bot=True, reconnect=True)
