@@ -1,5 +1,6 @@
 import random
 from os import getenv
+from discord.ext import commands
 
 import discord
 
@@ -75,7 +76,7 @@ Votes cast:
 
         return out[:1999]  # Just in case, discord limits message to 2,000 characters
 
-    async def vote(self, gamer, winner, bot):  # Vote for round winner
+    async def vote(self, gamer, winner, bot: commands.Bot):  # Vote for round winner
         if winner in self.gamers:
             if not self.voting_message_id:
                 m = await bot.get_channel(self.tc_id).send(self.generate_voting_message())

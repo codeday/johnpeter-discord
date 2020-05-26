@@ -11,6 +11,7 @@ from database.teams import Team
 from main import client
 from services.teamservice import TeamService
 from utils.forms import send_team_check_in, send_team_submit_form
+from utils.paginated_send import paginated_send
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -212,7 +213,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         long_message_string = "Teams:"
         for i in teams.stream():
             long_message_string = long_message_string + f"\n {i.to_dict()}"
-        await ctx.send(long_message_string)
+        await paginated_send(ctx, long_message_string)
 
     @team.command(name="delete")
     @commands.has_any_role('Global Staff', 'Staff')
