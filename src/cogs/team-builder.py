@@ -187,6 +187,12 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def team_project(self, ctx, name, project):
         """Sets the team description."""
         # Sets team project
+        if not name:
+            ctx.send("No team name provided!")
+            return
+        if not project:
+            ctx.send("No project description provided!")
+            return
         team = self.team_service.edit_team(name, "project", project)
         if team is True:
             team_dict = self.team_service.get_by_name(name).to_dict()
@@ -196,7 +202,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
             await ctx.send("Project updated!")
         else:
-            await ctx.send("Could not find guild with the name: " + name)
+            await ctx.send("Could not find team with the name: " + name)
 
     @team.command(name="teams", aliases=['get_teams', 'get-teams', 'list_teams', 'list-teams'])
     @commands.has_any_role('Global Staff', 'Staff')
