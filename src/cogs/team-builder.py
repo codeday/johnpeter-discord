@@ -100,7 +100,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             for msg in msgs:
                 await msg.delete(delay=5)
 
-
     @team_broadcast.command(name="message")
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_broadcast_message(self, ctx: commands.context.Context, *message):
@@ -130,10 +129,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             for msg in msgs:
                 await msg.delete(delay=5)
 
-
     @team.command(name="add", aliases=['create'])
     @commands.has_any_role('Global Staff', 'Staff')
-
     async def team_add(self, ctx: commands.context.Context, team_name: str, team_emoji: discord.Emoji = None):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
