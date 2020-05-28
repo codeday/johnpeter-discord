@@ -7,7 +7,7 @@ from os import environ, getenv
 import discord
 import requests
 from discord.ext import commands
-from discord.ext.commands import MissingAnyRole, BadArgument
+from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError
 from google.cloud import firestore
 from raygun4py import raygunprovider
 
@@ -115,8 +115,12 @@ async def on_command_error(ctx, error: commands.CommandError):
     if type(error) is MissingAnyRole:
         return await ctx.send("You are not in the sudoers file. This incident will be reported.")
 
-    if type(error) is BadArgument and "Emoji" in error:
-        return await ctx.send("Looks like that emoji is wrong. Maybe it's from another server?")
+    if type(error) is BadArgument:
+        if "Emoji" in error.args[0]:
+            return await ctx.send("Hmm, did you miss some quotes or use an emoji from another server?")
+
+    if type(error) is ExpectedClosingQuoteError:
+        return await ctx.send("Looks like you dropped something: \"")
 
     else:
         await ctx.send("Hmm, that's weird! You just hit an unhandled error! It has been reported.")
