@@ -162,10 +162,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                                                      overwrites=overwrites,
                                                      category=ctx.guild.get_channel(self.category),
                                                      topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
-            vc = await ctx.guild.create_voice_channel(name=f"{team_name.replace(' ', '-')}-🔊",
-                                                      overwrites=overwrites,
-                                                      category=ctx.guild.get_channel(self.category),
-                                                      topic=f"A channel for {team_name} to party! \nAnd maybe do some work too")
             await tc.send(f"Welcome to team `{team_name}`!! I'm excited to see what you can do!")
 
             # Creates and sends the join message
@@ -175,7 +171,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 f"want to join!")
             await join_message.add_reaction(team_emoji)
 
-            team = Team(team_name, team_emoji.__str__(), vc.id, tc.id, join_message.id)
+            team = Team(team_name, team_emoji.__str__(), tc.id, join_message.id)
             self.team_service.add_team(team)
 
             await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
