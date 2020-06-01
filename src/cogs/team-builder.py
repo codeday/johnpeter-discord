@@ -157,7 +157,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
+            ctx.guild.me: discord.PermissionOverwrite(read_messages=True, read_message_history=True),
         }
         tc = await ctx.guild.create_text_channel(name=f"{team_name.replace(' ', '-')}-📋",
                                                  overwrites=overwrites,
