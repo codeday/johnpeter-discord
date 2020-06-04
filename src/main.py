@@ -49,7 +49,8 @@ collection = client.collection('teams')
 
 initial_cogs = ['cogs.team-builder', 'cogs.cleverbot',
                 'cogs.admin-commands', 'cogs.tournament',
-                'cogs.fun-commands', 'cogs.auth']
+                'cogs.fun-commands',
+                'cogs.reactions']
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 for cog in initial_cogs:
