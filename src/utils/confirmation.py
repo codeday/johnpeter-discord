@@ -3,7 +3,7 @@ import asyncio
 from discord.ext import commands
 
 
-def confirm(
+async def confirm(
         confirmation: str,
         ctx: commands.context.Context,
         bot,
