@@ -89,6 +89,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                              abort_msg='Ok, I will not send the form'):
                 self.team_service.__update__()
                 await self.forms[form]['func'](self, ctx)
+        else:
+            await ctx.send("I'm sorry, but I don't know the form you are talking about")
 
     @team_broadcast.command(name="form-individual")
     @commands.has_any_role('Global Staff', 'Staff')
