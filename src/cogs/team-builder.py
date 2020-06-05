@@ -185,8 +185,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     @team.command(name="project", aliases=['set-project', 'setproject', 'set_project'])
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_project(self, ctx, name=None, project=None):
-        """Sets the team description."""
-        # Sets team project
+        """Sets the team project description."""
         if not name:
             await ctx.send("No team name provided!")
             return
