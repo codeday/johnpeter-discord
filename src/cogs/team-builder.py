@@ -197,6 +197,15 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             return
         team = self.team_service.edit_team(name, "project", project)
         if team is True:
+            if not valid_team_string(project):
+                valid_string = make_valid_team_string(project)
+                if await confirm(
+                        f'That team project was invalid.\
+                         Would you like to continue team creation with the project "{valid_string}" instead?',
+                        bot=self.bot, ctx=ctx):
+                    project = valid_string
+                else:
+                    return
             team_dict = self.team_service.get_by_name(name).to_dict()
             message = await ctx.guild.get_channel(self.channel_gallery).fetch_message((team_dict["join_message_id"]))
             message_content = message.content.split("\nProject:")
