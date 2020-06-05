@@ -33,33 +33,43 @@ def generate_message(team_name):
     return choice(title_options) + " " + choice(message_options)
 
 
-async def send_team_check_in(self, ctx):
+async def send_team_check_in(self, ctx, team):
+    """Requests that a specific team fills out the check-in form."""
+    try:
+        url = f"https://www.cognitoforms.com/Srnd1/VirtualCodeDayCheckInForm?entry=%7B%22TeamName%22:%22{parse.quote(team.name)}%22,%22ProjectName%22:%22{parse.quote(team.project)}%22%7D"
+        embed = generate_embed(
+            title='Virtual CodeDay Check-In Form',
+            description='Let us know how your project is doing!',
+            url=url)
+        await ctx.guild.get_channel(team.tc_id).send(generate_message(team_name=team.name),
+                                                     embed=embed)
+    except Exception as ex:
+        print("I have an exception!" + ex.__str__())
+
+
+async def send_team_check_ins(self, ctx):
     """Requests that all teams fill out the check-in form."""
     self.team_service.__update__()
     for team in self.team_service.get_teams():
-        try:
-            url = f"https://www.cognitoforms.com/Srnd1/VirtualCodeDayCheckInForm?entry=%7B%22TeamName%22:%22{parse.quote(team.name)}%22,%22ProjectName%22:%22{parse.quote(team.project)}%22%7D"
-            embed = generate_embed(
-                title='Virtual CodeDay Check-In Form',
-                description='Let us know how your project is doing!',
-                url=url)
-            await ctx.guild.get_channel(team.tc_id).send(generate_message(team_name=team.name),
-                                                         embed=embed)
-        except Exception as ex:
-            print("I have an exception!" + ex.__str__())
+        await send_team_check_in(self,ctx,team)
 
 
-async def send_team_submit_form(self, ctx):
+async def send_team_submit_form(self, ctx, team):
+    """Requests that a specific team fills out the project submission form."""
+    try:
+        url = f"https://www.cognitoforms.com/Srnd1/VirtualCodeDaySubmission?entry=%7B%22TeamName%22:%22{parse.quote(team.name)}%22,%22ProjectName%22:%22{parse.quote(team.project)}%22%7D"
+        embed = generate_embed(
+            title='Virtual CodeDay Submission Form',
+            description='Please submit your project!',
+            url=url)
+        await ctx.guild.get_channel(team.tc_id).send(generate_message(team_name=team.name),
+                                                     embed=embed)
+    except Exception as ex:
+        print("I have an exception!" + ex.__str__())
+
+
+async def send_team_submit_forms(self, ctx):
     """Requests that all teams fill out the project submission form."""
     self.team_service.__update__()
     for team in self.team_service.get_teams():
-        try:
-            url = f"https://www.cognitoforms.com/Srnd1/VirtualCodeDaySubmission?entry=%7B%22TeamName%22:%22{parse.quote(team.name)}%22,%22ProjectName%22:%22{parse.quote(team.project)}%22%7D"
-            embed = generate_embed(
-                title='Virtual CodeDay Submission Form',
-                description='Please submit your project!',
-                url=url)
-            await ctx.guild.get_channel(team.tc_id).send(generate_message(team_name=team.name),
-                                                         embed=embed)
-        except Exception as ex:
-            print("I have an exception!" + ex.__str__())
+        await send_team_submit_form(self, ctx, team)
