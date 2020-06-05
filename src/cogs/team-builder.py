@@ -12,7 +12,7 @@ from database.teams import Team
 from main import client
 from services.teamservice import TeamService
 from utils.confirmation import confirm
-from utils.forms import send_team_check_ins, send_team_submit_forms
+from utils.forms import send_team_check_in, send_team_check_ins, send_team_submit_form, send_team_submit_forms
 from utils.paginated_send import paginated_send
 from utils.valid_team_string import valid_team_string, make_valid_team_string
 
@@ -47,7 +47,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                     'check_in',
                     'check in'
                 ],
-                'func': send_team_check_ins
+                'func': send_team_check_ins,
+                'func_i': send_team_check_in
             },
             'submit': {
                 'aliases': [
@@ -57,7 +58,8 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                     'submit-form',
                     'submit_form'
                 ],
-                'func': send_team_submit_forms
+                'func': send_team_submit_forms,
+                'func_i': send_team_submit_form
             }
         }
 
@@ -87,6 +89,25 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                              abort_msg='Ok, I will not send the form'):
                 self.team_service.__update__()
                 await self.forms[form]['func'](self, ctx)
+
+    @team_broadcast.command(name="form-individual")
+    @commands.has_any_role('Global Staff', 'Staff')
+    async def team_broadcast_form_individual(self, ctx, name=False, *form):
+        if not name:
+            await ctx.send("No team name provided!")
+            return
+        if not form:
+            await ctx.send("No form provided!")
+            return
+        team = self.team_service.get_by_name(name)
+        if not team:
+            await ctx.send('Could not find a team with that name!')
+            return
+        form = ' '.join(form)
+        if form in self.forms:
+            self.team_service.__update__()
+            await self.forms[form]['func'](self,ctx,team)
+
 
     @team_broadcast.command(name="message")
     @commands.has_any_role('Global Staff', 'Staff')
