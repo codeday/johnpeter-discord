@@ -94,7 +94,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
     @team_broadcast.command(name="form-individual")
     @commands.has_any_role('Global Staff', 'Staff')
-    async def team_broadcast_form_individual(self, ctx, name=False, *form):
+    async def team_broadcast_form_individual(self, ctx, name=None, *form):
         if not name:
             await ctx.send("No team name provided!")
             return
