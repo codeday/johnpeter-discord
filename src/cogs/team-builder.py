@@ -106,7 +106,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         form = ' '.join(form)
         if form in self.forms:
             self.team_service.__update__()
-            await self.forms[form]['func'](self,ctx,team)
+            await self.forms[form]['func'](self, ctx, team)
 
 
     @team_broadcast.command(name="message")
