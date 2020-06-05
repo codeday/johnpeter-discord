@@ -144,7 +144,9 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         logging.debug("Starting team creation...")
         if not valid_team_string(team_name):
             valid_string = make_valid_team_string(team_name)
-            if await confirm(f'That team name was invalid. Would you like to continue team creation with the name {valid_string}?'):
+            if await confirm(f'That team name was invalid. \
+            Would you like to continue team creation with the name "{valid_string}" instead?',
+                             bot=self.bot, ctx=ctx):
                 team_name = valid_string
             else:
                 return
