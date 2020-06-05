@@ -108,7 +108,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         form = ' '.join(form)
         if form in self.forms:
             self.team_service.__update__()
-            await self.forms[form]['func'](self, ctx, team)
+            await self.forms[form]['func_i'](self, ctx, team)
         else:
             await ctx.send("I'm sorry, but I do not know the form you are talking about")
 
