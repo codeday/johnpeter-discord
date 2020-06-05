@@ -12,7 +12,7 @@ from database.teams import Team
 from main import client
 from services.teamservice import TeamService
 from utils.confirmation import confirm
-from utils.forms import send_team_check_in, send_team_submit_form
+from utils.forms import send_team_check_ins, send_team_submit_forms
 from utils.paginated_send import paginated_send
 from utils.valid_team_string import valid_team_string, make_valid_team_string
 
@@ -47,7 +47,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                     'check_in',
                     'check in'
                 ],
-                'func': send_team_check_in
+                'func': send_team_check_ins
             },
             'submit': {
                 'aliases': [
@@ -57,7 +57,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                     'submit-form',
                     'submit_form'
                 ],
-                'func': send_team_submit_form
+                'func': send_team_submit_forms
             }
         }
 
