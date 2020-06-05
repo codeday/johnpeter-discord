@@ -12,8 +12,10 @@ from google.cloud.firestore import CollectionReference, ArrayUnion, ArrayRemove
 from database.teams import Team
 from main import client
 from services.teamservice import TeamService
+from utils.confirmation import confirm
 from utils.forms import send_team_check_in, send_team_submit_form
 from utils.paginated_send import paginated_send
+from utils.valid_team_string import valid_team_string, make_valid_team_string
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -140,7 +142,12 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             Does not add any team members, they must add themselves or be manually added separately
         """
         logging.debug("Starting team creation...")
-
+        if not valid_team_string(team_name):
+            valid_string = make_valid_team_string(team_name)
+            if await confirm(f'That team name was invalid. Would you like to continue team creation with the name {valid_string}?'):
+                team_name = valid_string
+            else:
+                return
         if team_emoji is None:
             team_emoji = get(ctx.guild.emojis, name="CODEDAY")
 
