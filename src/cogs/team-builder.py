@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from os import getenv
 from random import choice
@@ -83,55 +82,27 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def team_broadcast_form(self, ctx: commands.context.Context, *form):
         form = ' '.join(form)
         if form in self.forms:
-            msgs = [await ctx.send(f'Are you sure you would like to send the "{form}" form to all teams?')]
-            await msgs[0].add_reaction('🚫')
-            await msgs[0].add_reaction('✅')
-
-            def check(reaction, user):
-                return user == ctx.author and (str(reaction.emoji) == '🚫' or str(reaction.emoji) == '✅')
-
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-            except asyncio.TimeoutError:
-                await msgs[0].delete()
-            else:
-                if str(reaction.emoji) == '🚫':
-                    msgs.append(await ctx.send(f'Ok, I will not send the form'))
-                elif str(reaction.emoji) == '✅':
-                    msgs.append(await ctx.send('Ok, I am now sending the form'))
-                    self.team_service.__update__()
-                    await self.forms[form]['func'](self, ctx)
-            for msg in msgs:
-                await msg.delete(delay=5)
+            if await confirm(f'Are you sure you would like to send the "{form}" form to all teams?',
+                             bot=self.bot, ctx=ctx, success_msg='Ok, I am now sending the form',
+                             abort_msg='Ok, I will not send the form'):
+                self.team_service.__update__()
+                await self.forms[form]['func'](self, ctx)
 
     @team_broadcast.command(name="message")
     @commands.has_any_role('Global Staff', 'Staff')
     async def team_broadcast_message(self, ctx: commands.context.Context, *message):
         message = ' '.join(message)
-        msgs = [await ctx.send(f'Are you sure you would like to send the message "{message}" to all teams?')]
-        await msgs[0].add_reaction('🚫')
-        await msgs[0].add_reaction('✅')
-
-        def check(reaction, user):
-            return user == ctx.author and (str(reaction.emoji) == '🚫' or str(reaction.emoji) == '✅')
-
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-        except asyncio.TimeoutError:
-            await msgs[0].delete()
-        else:
-            if str(reaction.emoji) == '🚫':
-                msgs.append(await ctx.send(f'Ok, I will not send the message'))
-            elif str(reaction.emoji) == '✅':
-                msgs.append(await ctx.send('Ok, I am now sending the message'))
-                self.team_service.__update__()
-                for team in self.team_service.get_teams():
-                    try:
-                        await ctx.guild.get_channel(team.tc_id).send(message)
-                    except Exception as ex:
+        if await confirm(f'Are you sure you would like to send the message "{message}" to all teams?',
+                         bot=self.bot,
+                         ctx=ctx,
+                         success_msg='Ok, I am will send the message',
+                         abort_msg='Ok, I will not send the message'):
+            self.team_service.__update__()
+            for team in self.team_service.get_teams():
+                try:
+                    await ctx.guild.get_channel(team.tc_id).send(message)
+                except Exception as ex:\
                         print("I have an exception!" + ex.__str__())
-            for msg in msgs:
-                await msg.delete(delay=5)
 
     @team.command(name="add", aliases=['create'])
     @commands.has_any_role('Global Staff', 'Staff')
