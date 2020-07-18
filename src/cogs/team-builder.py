@@ -80,7 +80,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.send('Invalid team broadcast command passed...')
 
     @team_broadcast.command(name="form")
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def team_broadcast_form(self, ctx: commands.context.Context, *form):
         form = ' '.join(form)
         if form in self.forms:
@@ -93,7 +93,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.send("I'm sorry, but I don't know the form you are talking about")
 
     @team_broadcast.command(name="form-individual")
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def team_broadcast_form_individual(self, ctx, name=None, *form):
         if not name:
             await ctx.send("No team name provided!")
@@ -114,7 +114,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
 
     @team_broadcast.command(name="message")
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def team_broadcast_message(self, ctx: commands.context.Context, *message):
         message = ' '.join(message)
         if await confirm(f'Are you sure you would like to send the message "{message}" to all teams?',
@@ -130,7 +130,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                         print("I have an exception!" + ex.__str__())
 
     @team.command(name="add", aliases=['create'])
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def team_add(self, ctx: commands.context.Context, team_name: str, team_emoji: Union[discord.PartialEmoji, discord.Emoji, str] = None):
         """Adds a new team with the provided name and emoji.
             Checks for duplicate names, then creates a VC and TC for the team as well as an invite message, then
@@ -183,7 +183,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         await ctx.send("Team created successfully! Direct students to #team-gallery to join the team!")
 
     @team.command(name="project", aliases=['set-project', 'setproject', 'set_project'])
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def team_project(self, ctx, name=None, project=None):
         """Sets the team project description."""
         if not name:
@@ -213,7 +213,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.send("Could not find team with the name: " + name)
 
     @team.command(name="teams", aliases=['get_teams', 'get-teams', 'list_teams', 'list-teams'])
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def teams(self, ctx):
         """Prints out the current teams."""
         teams = client.collection("teams")
@@ -223,7 +223,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         await paginated_send(ctx, long_message_string)
 
     @team.command(name="delete")
-    @commands.has_any_role('Global Staff', 'Staff')
+    @commands.has_any_role('Employee', 'Staff')
     async def team_delete(self, ctx, name):
         """Deletes the specified team."""
         team = self.team_service.get_by_name(name)

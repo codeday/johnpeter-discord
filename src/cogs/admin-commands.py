@@ -1,7 +1,7 @@
-import discord
 import sys
 
 from discord.ext import commands
+
 
 class AdminCommands(commands.Cog, name="Administration"):
     """A cog where all the server admin commands live"""
@@ -16,7 +16,7 @@ class AdminCommands(commands.Cog, name="Administration"):
                 return await vc.disconnect()
 
     @commands.command(hidden=True)
-    @commands.has_any_role('Global Staff')
+    @commands.has_any_role('Employee')
     async def kill(self, ctx):
         await \
             ctx.send("goodbye :(")
