@@ -40,6 +40,8 @@ jobs:
           echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
           docker push $DOCKER_REPO:$TAG
           docker push $DOCKER_REPO:latest
+      - slack/status:
+          webhook: ${DISCORD_WEBHOOK}
 
   build_test:
     docker:
