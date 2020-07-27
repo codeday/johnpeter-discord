@@ -138,7 +138,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             Does not add any team members, they must add themselves or be manually added separately
         """
         logging.debug("Starting team creation...")
-        if not valid_team_string(team_name):
+        if valid_team_string(team_name):
             valid_string = make_valid_team_string(team_name)
             if await confirm(f'That team name was invalid. \
             Would you like to continue team creation with the name "{valid_string}" instead?',
@@ -228,10 +228,19 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         """Deletes the specified team."""
         team = self.team_service.get_by_name(name)
         if team is not False:
-            await ctx.guild.get_channel(team.vc_id).delete()
-            await ctx.guild.get_channel(team.tc_id).delete()
-            message = await ctx.guild.get_channel(self.channel_gallery).fetch_message(team.join_message_id)
-            await message.delete()
+            try:
+                await ctx.guild.get_channel(team.vc_id).delete()
+            except: # Channel may have been deleted already
+                pass
+            try:
+                await ctx.guild.get_channel(team.tc_id).delete()
+            except:
+                pass
+            try:
+                message = await ctx.guild.get_channel(self.channel_gallery).fetch_message(team.join_message_id)
+                await message.delete()
+            except:
+                pass
             self.team_service.delete_team(name)
             await ctx.send("Deleted team: " + name)
         else:
