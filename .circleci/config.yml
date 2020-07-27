@@ -68,3 +68,5 @@ jobs:
       - store_artifacts:
           path: reports
           destination: test_results
+orbs:
+  slack: circleci/slack@3.4.2
