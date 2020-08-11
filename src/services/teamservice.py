@@ -15,14 +15,6 @@ class TeamService:
         for doc in self.documents:
             self.teams.append(Team.from_dict(doc.to_dict()))
 
-    # updates local list
-    def __update__(self):
-        self.collection = client.collection('teams')
-        self.documents = self.collection.stream()
-        self.teams = []
-        for doc in self.documents:
-            self.teams.append(Team.from_dict(doc.to_dict()))
-
     # allows editing of specific attribute
     def edit_team(self, name="", attribute="", value=""):
         try:
@@ -62,13 +54,17 @@ class TeamService:
         return self.teams
 
     # adds a team
-    def add_team(self, team):
+    def add_team(self, name, tc, join_message):
         session = session_creator()
         session.add(
-            Team(
-                discord_user_id=message.author.id,
-                is_team_channel=team_channel.is_team_channel(message.channel),
-            )
+            Team(team_service=name,
+                 tc_id = tc,
+
+                 )
         )
         session.commit()
         session.close()
+
+    # adds a team
+    def add_team(self, team):
+
