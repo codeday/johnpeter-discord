@@ -28,7 +28,6 @@ class TeamService:
                 document = list(self.collection.where("name", "==", name).stream())[0].reference
                 document.update({attribute: value})
                 print("Team has been edited")
-                self.__update__()
                 return True
         except IndexError:
             # return false if attribute/team doesn't exist
@@ -59,7 +58,7 @@ class TeamService:
         session.add(
             Team(team_service=name,
                  tc_id = tc,
-
+                 joijoin_message_id
                  )
         )
         session.commit()
