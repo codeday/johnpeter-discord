@@ -87,7 +87,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             if await confirm(f'Are you sure you would like to send the "{form}" form to all teams?',
                              bot=self.bot, ctx=ctx, success_msg='Ok, I am now sending the form',
                              abort_msg='Ok, I will not send the form'):
-                self.team_service.__update__()
                 await self.forms[form]['func'](self, ctx)
         else:
             await ctx.send("I'm sorry, but I don't know the form you are talking about")
@@ -107,7 +106,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             return
         form = ' '.join(form)
         if form in self.forms:
-            self.team_service.__update__()
             await self.forms[form]['func_i'](self, ctx, team)
         else:
             await ctx.send("I'm sorry, but I do not know the form you are talking about")
@@ -122,7 +120,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                          ctx=ctx,
                          success_msg='Ok, I am will send the message',
                          abort_msg='Ok, I will not send the message'):
-            self.team_service.__update__()
             for team in self.team_service.get_teams():
                 try:
                     await ctx.guild.get_channel(team.tc_id).send(message)
