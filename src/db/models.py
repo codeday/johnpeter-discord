@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker, Session, relationship
 postgres_db = {
     "drivername": "postgres",
     "username": getenv("DB_USERNAME", "postgres"),
-    "password": getenv("DB_PASSWORD", "asdfsdfsdfsdfsdf"),
+    "password": getenv("DB_PASSWORD"),
     "database": getenv("DB_DB", "johnpeter-discord"),
     "host": getenv("DB_HOST", "10.0.3.34"),
     "port": 5432,
@@ -24,7 +24,7 @@ class Team(Base):
     __tablename__ = "team"
 
     id = Column(Integer, primary_key=True)
-    team_name = Column(String, nullable=False)
+    team_name = Column(String, nullable=False, unique=True)
     tc_id = Column(String, nullable=False)
     join_message_id = Column(String, nullable=False)
     project = Column(Text)
