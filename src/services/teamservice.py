@@ -1,5 +1,6 @@
-from main import client
 from database.teams import Team
+from db.models import session_creator, Team
+from main import client
 
 
 class DatabaseError(Exception):
@@ -61,37 +62,13 @@ class TeamService:
         return self.teams
 
     # adds a team
-    def add_team(self, name, emoji, vc, tc, join_message):
-        team = Team(name, emoji.__str__(), vc.id, tc.id, join_message.id)
-        self.teams.append(team)
-        document_reference = self.collection.document(name)
-        result = self.collection.document(name).set(
-            Team(name, emoji.__str__(), vc.id, tc.id, join_message.id).to_dict())
-        if result:
-            print("Successfully added!")
-        else:
-            raise DatabaseError
-
-    # adds a team
-    def add_team(self, name, emoji, vcid, tcid, join_message_id):
-        team = Team(name, emoji.__str__(), vcid, tcid, join_message_id)
-        self.teams.append(team)
-        document_reference = self.collection.document(name)
-        result = self.collection.document(name).set(
-            Team(name, emoji.__str__(), vcid, tcid, join_message_id).to_dict())
-        if result:
-            print("Successfully added!")
-        else:
-            raise DatabaseError
-
-    # adds a team
     def add_team(self, team):
-        self.teams.append(team)
-        name = team.name
-        document_reference = self.collection.document(name)
-        result = self.collection.document(name).set(
-            team.to_dict())
-        if result:
-            print("Successfully added!")
-        else:
-            raise DatabaseError
+        session = session_creator()
+        session.add(
+            Team(
+                discord_user_id=message.author.id,
+                is_team_channel=team_channel.is_team_channel(message.channel),
+            )
+        )
+        session.commit()
+        session.close()
