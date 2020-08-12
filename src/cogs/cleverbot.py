@@ -1,8 +1,10 @@
-import discord
+# noinspection PyPackageRequirements
 import json
 import os
-import requests
 
+import discord
+import requests
+# noinspection PyPackageRequirements
 from discord.ext import commands
 
 API_KEY = os.getenv('CLEVERBOT_API_KEY')

@@ -8,7 +8,6 @@ import discord
 import requests
 from discord.ext import commands
 from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError
-from google.cloud import firestore
 from raygun4py import raygunprovider
 
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
@@ -43,9 +42,6 @@ def command_prefix(bot, message):
 bot = commands.Bot(command_prefix=command_prefix, command_not_found="Heck! That command doesn't exist!!",
                    description="I am 100% authentic object:human")
 logging.basicConfig(level=logging.INFO)
-
-client = firestore.Client()
-collection = client.collection('teams')
 
 initial_cogs = ['cogs.team-builder', 'cogs.cleverbot',
                 'cogs.admin-commands', 'cogs.tournament',
@@ -83,7 +79,7 @@ async def on_ready():
 @bot.event
 async def on_ready():
     global has_bot_started
-    if (has_bot_started):
+    if has_bot_started:
         return
     has_bot_started = True
     version = getenv('IMAGE_TAG')
@@ -109,6 +105,7 @@ async def on_command_error(ctx, error: commands.CommandError):
 
     if type(error) is OnlyAllowedInChannels:
         return await ctx.send(f"You can only do that in {'/'.join([f'<#{cid}>' for cid in error.channels])}")
+        # TODO: See if this works
 
     if type(error) is RequiresVoiceChannel:
         return await ctx.send(f"You're not in a voice channel!")

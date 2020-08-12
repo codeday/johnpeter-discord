@@ -12,7 +12,8 @@ def test_get_user_id():
     assert person.get_user_id("6") == "6"
     assert person.get_user_id(Person(6)) == "6"
     assert person.get_user_id({"user_id": 6}) == "6"
-    assert person.get_user_id({}) == None
+    assert person.get_user_id({}) is None
+
 
 def test_truncate_list_length():
     test_list = ("foo", "bar", "baz")

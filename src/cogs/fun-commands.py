@@ -1,21 +1,20 @@
-import re
-
-import aiohttp
 import asyncio
-import discord
 import io
 import os
-import urllib
-
-from discord.ext import commands
-from glob import glob
-from os import getenv, path, makedirs
-from random import choice
 import random
-from urllib import parse
+import re
+import urllib
+from glob import glob
+from os import getenv
+from random import choice
+from urllib import parse, request
 
-from utils.commands import only_random, require_vc
+import aiohttp
+import discord
+from discord.ext import commands
+
 from utils.cms import get_sponsor_intro, get_sponsor_audio
+from utils.commands import only_random, require_vc
 
 
 class FunCommands(commands.Cog, name="Fun"):

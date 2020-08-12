@@ -2,7 +2,7 @@ from database.rounds import Round
 
 
 class Tournament(object):
-    def __init__(self, game_name, tc_id, join_message_id, players_per_game=4, gamers=[], rounds=[]):
+    def __init__(self, game_name, tc_id, join_message_id, players_per_game=4, gamers=None, rounds=None):
         """
         :param game_name: The game name
         :param tc_id: The ID of the text channel the tournament was created in
@@ -15,7 +15,11 @@ class Tournament(object):
         self.tc_id = tc_id
         self.join_message_id = join_message_id
         self.players_per_game = players_per_game
+        if gamers is None:
+            gamers = []
         self.gamers = gamers
+        if rounds is None:
+            rounds = []
         self.rounds = rounds
 
     @staticmethod

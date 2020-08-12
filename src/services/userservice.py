@@ -1,5 +1,5 @@
+from database import Database
 from database.users import User
-from .database import Database
 
 
 class UserDatabase(Database):

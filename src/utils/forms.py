@@ -50,7 +50,7 @@ async def send_team_check_in(self, ctx, team):
 async def send_team_check_ins(self, ctx):
     """Requests that all teams fill out the check-in form."""
     self.team_service.__update__()
-    for team in self.team_service.get_teams():
+    for team in self.team_service.get_all_teams():
         await send_team_check_in(self,ctx,team)
 
 
@@ -71,5 +71,5 @@ async def send_team_submit_form(self, ctx, team):
 async def send_team_submit_forms(self, ctx):
     """Requests that all teams fill out the project submission form."""
     self.team_service.__update__()
-    for team in self.team_service.get_teams():
+    for team in self.team_service.get_all_teams():
         await send_team_submit_form(self, ctx, team)

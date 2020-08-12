@@ -12,7 +12,7 @@ def balance_groups(groups):
     minGroupSize = int(numPlayers / len(groups))
     groupsArr = list(enumerate(groups))
     for i, group in groupsArr:
-        while (len(group) < minGroupSize):
+        while len(group) < minGroupSize:
             for j, groupSteal in groupsArr:
                 if (i != j) and len(groupSteal) > minGroupSize:
                     group.append(groupSteal.pop())
