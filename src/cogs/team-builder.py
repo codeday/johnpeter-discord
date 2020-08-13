@@ -236,7 +236,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         # TODO: Check on how this is parsed, might need to write something to clean up the team data
         session = session_creator()
         teams = self.team_service.get_all_teams(session=session)
-        out = "------\n"
+        out = "Team List:\n"
         for team in teams:
             out += str(team) + "\n"
         session.commit()
