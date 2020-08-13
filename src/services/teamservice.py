@@ -83,13 +83,25 @@ class TeamService:
             return False
 
     @staticmethod
-    def add_member(team, user_id,  session=None):
+    def add_member(team, user_id, session=None):
         sess_flag = False
         if session is None:
             session = session_creator()
             sess_flag = True
         session.add(team)
         team.members.append(Members(member_id=user_id))
+        if sess_flag:
+            session.commit()
+            session.close()
+
+    @staticmethod
+    def remove_member(team, user_id, session=None):
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
+        session.add(team)
+        session.query(Members).filter(Members.member_id == user_id, Members.team_id == team.id).delete()
         if sess_flag:
             session.commit()
             session.close()

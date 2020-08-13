@@ -235,9 +235,9 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         """Prints out the current teams."""
         # TODO: Check on how this is parsed, might need to write something to clean up the team data
         teams = self.team_service.get_all_teams()
-        out = ''
+        out = ""
         for team in teams:
-            out += str(team) + '\n'
+            out += str(team) + "\n"
         await paginated_send(ctx, str(teams))
 
     @team.command(name="delete")
@@ -278,24 +278,29 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await payload.member.guild.get_channel(int(team.tc_id)).set_permissions(
                 payload.member, read_messages=True, manage_messages=True
             )
-            self.team_service.add_member(team, str(payload.user_id))
+            self.team_service.add_member(team, str(payload.user_id), session)
             session.commit()
             session.close()
 
-
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
-        pass
-        # TODO: Same thing here
-        # if payload.event_type == "REACTION_REMOVE" and payload.emoji.name == 'CODEDAY' and payload.channel_id == self.channel_gallery:
-        #     collection_ref: CollectionReference = client.collection("teams")
-        #     team = list(collection_ref.where("join_message_id", "==", payload.message_id).stream())[0].reference
-        #     team.update({"members": ArrayRemove([payload.user_id])})
-        #     team_dict = team.get().to_dict()
-        #     guild = self.bot.get_guild(payload.guild_id)
-        #     member = guild.get_member(payload.user_id)
-        #     await guild.get_channel(team_dict['tc_id']).set_permissions(member, read_messages=False)
-        #     await guild.get_channel(team_dict['vc_id']).set_permissions(member, read_messages=False)
+        if (
+            payload.event_type == "REACTION_REMOVE"
+            and payload.emoji.name == "CODEDAY"
+            and payload.channel_id == self.channel_gallery
+        ):
+            session = session_creator()
+            team = self.team_service.get_team_by_join_message_id(
+                str(payload.message_id), session
+            )
+            guild = self.bot.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
+            await guild.get_channel(int(team.tc_id)).set_permissions(
+                member, read_messages=False, manage_messages=False
+            )
+            self.team_service.remove_member(team, str(payload.user_id), session)
+            session.commit()
+            session.close()
 
 
 def setup(bot):
