@@ -234,14 +234,15 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def teams(self, ctx):
         """Prints out the current teams."""
         # TODO: Check on how this is parsed, might need to write something to clean up the team data
-        session = session_creator()
-        teams = self.team_service.get_all_teams(session=session)
-        out = "Team List:\n"
-        for team in teams:
-            out += str(team) + "\n"
-        session.commit()
-        session.close()
-        await paginated_send(ctx, out)
+        async with ctx.typing():
+            session = session_creator()
+            teams = self.team_service.get_all_teams(session=session)
+            out = "Team List:\n"
+            for team in teams:
+                out += str(team) + "\n"
+            session.commit()
+            session.close()
+            await paginated_send(ctx, out)
 
     @team.command(name="delete")
     @commands.has_any_role("Employee", "Staff")
