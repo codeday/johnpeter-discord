@@ -195,7 +195,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     @team.command(name="project", aliases=["set-project", "setproject", "set_project"])
     @commands.has_any_role("Employee", "Staff")
     async def team_project(
-        self, ctx, name=str, project=str
+        self, ctx, name: str, project: str
     ):  # TODO: Verify that the typecasting of string works right
         """Sets the team project description."""
         if not name:
@@ -260,8 +260,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 await message.delete()
             except:
                 pass
-            self.team_service.delete_team_by_id(name)
-            # !! Pretty sure we should add delete_team_by_name for this use case
+            self.team_service.delete_team_by_name(name)
             await ctx.send("Deleted team: " + name)
         else:
             await ctx.send("Could not find team with the name: " + name)
