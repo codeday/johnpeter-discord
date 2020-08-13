@@ -55,12 +55,17 @@ class TeamService:
             return False
 
     @staticmethod
-    def get_all_teams() -> list:
+    def get_all_teams(session=None) -> list:
         """Returns a list of team objects"""
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
         session = session_creator()
         teams = session.query(Team).all()
-        session.commit()
-        session.close()
+        if sess_flag:
+            session.commit()
+            session.close()
         return teams
 
     @staticmethod

@@ -5,8 +5,8 @@ from random import choice
 import discord
 from discord.ext import commands
 from discord.utils import get
-from db.models import session_creator
 
+from db.models import session_creator
 from services.teamservice import TeamService
 from utils.confirmation import confirm
 from utils.forms import (
@@ -234,11 +234,14 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def teams(self, ctx):
         """Prints out the current teams."""
         # TODO: Check on how this is parsed, might need to write something to clean up the team data
-        teams = self.team_service.get_all_teams()
-        out = ""
+        session = session_creator()
+        teams = self.team_service.get_all_teams(session=session)
+        out = "------\n"
         for team in teams:
             out += str(team) + "\n"
-        await paginated_send(ctx, str(teams))
+        session.commit()
+        session.close()
+        await paginated_send(ctx, out)
 
     @team.command(name="delete")
     @commands.has_any_role("Employee", "Staff")
