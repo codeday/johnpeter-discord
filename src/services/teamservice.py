@@ -32,12 +32,10 @@ class TeamService:
         return team
 
     @staticmethod
-    def get_team_by_join_message_id(id) -> Optional[Team]:
+    def get_team_by_join_message_id(id, session=None) -> Optional[Team]:
         """Returns the team with the given join message id, or none if it doesn't exist"""
-        session = session_creator()
         team = session.query(Team).filter(Team.join_message_id == id).first()
-        session.commit()
-        session.close()
+
         return team
 
     @staticmethod
@@ -85,9 +83,15 @@ class TeamService:
             return False
 
     @staticmethod
-    def add_member(team, user_id):
-        session = session_creator()
+    def add_member(team, user_id,  session=None):
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
         session.add(team)
         team.members.append(Members(member_id=user_id))
-        session.commit()
-        session.close()
+        if sess_flag:
+            session.commit()
+            session.close()
+
+

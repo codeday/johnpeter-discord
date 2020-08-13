@@ -5,6 +5,7 @@ from random import choice
 import discord
 from discord.ext import commands
 from discord.utils import get
+from db.models import session_creator
 
 from services.teamservice import TeamService
 from utils.confirmation import confirm
@@ -264,12 +265,23 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        if payload.event_type == "REACTION_ADD" and payload.emoji.name == 'CODEDAY' and payload.channel_id == self.channel_gallery:
-            team = self.team_service.get_team_by_join_message_id(str(payload.message_id))
-            self.team_service.add_member(team, str(payload.user_id))
-            await payload.member.guild.get_channel(team.tc_id).set_permissions(
+        if (
+            payload.event_type == "REACTION_ADD"
+            and payload.emoji.name == "CODEDAY"
+            and payload.channel_id == self.channel_gallery
+            and payload.member.id != self.bot.user.id
+        ):
+            session = session_creator()
+            team = self.team_service.get_team_by_join_message_id(
+                str(payload.message_id), session
+            )
+            await payload.member.guild.get_channel(int(team.tc_id)).set_permissions(
                 payload.member, read_messages=True, manage_messages=True
-             )
+            )
+            self.team_service.add_member(team, str(payload.user_id))
+            session.commit()
+            session.close()
+
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
