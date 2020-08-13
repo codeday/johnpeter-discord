@@ -30,6 +30,12 @@ class Team(Base):
     project = Column(Text)
     members = relationship("Members", back_populates="team")
 
+    def __str__(self):
+        return f'''{self.team_name} ({len(self.members)} members)
+---
+    Project: {self.project}
+    Channel: <#{self.tc_id}'''
+
 
 class Members(Base):
     __tablename__ = "members"
@@ -43,6 +49,5 @@ class Members(Base):
 def session_creator() -> Session:
     session = sessionmaker(bind=engine)
     return session()
-
 
 global_session: Session = session_creator()

@@ -234,6 +234,9 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         """Prints out the current teams."""
         # TODO: Check on how this is parsed, might need to write something to clean up the team data
         teams = self.team_service.get_all_teams()
+        out = ''
+        for team in teams:
+            out += str(team) + '\n'
         await paginated_send(ctx, str(teams))
 
     @team.command(name="delete")
