@@ -27,7 +27,7 @@ class Team(Base):
     team_name = Column(String, nullable=False, unique=True)
     tc_id = Column(String, nullable=False)
     join_message_id = Column(String, nullable=False)
-    project = Column(Text)
+    project = Column(String)
     members = relationship("Members", back_populates="team")
 
     def __str__(self):

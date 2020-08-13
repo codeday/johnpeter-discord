@@ -11,7 +11,7 @@ class TeamService:
         """Takes a name, and a project description"""
         # TODO: does this need a try/catch??
         session = session_creator()
-        team = session.query(Team).filter_by(team_name=name).first()
+        team = session.query(Team).filter(Team.team_name==name).first()
         if team is not None:
             team.project = project
             session.commit()
@@ -39,11 +39,11 @@ class TeamService:
         return team
 
     @staticmethod
-    def delete_team_by_id(team_id) -> bool:
+    def delete_team_by_name(name) -> bool:
         # TODO: Confirm that member references are deleted as well
         """Deletes team with given id"""
         session = session_creator()
-        team = session.query(Team).filter_by(id=team_id)
+        team = session.query(Team).filter(Team.team_name == name)
         if team is not None:
             team.delete()
             session.commit()
@@ -101,9 +101,9 @@ class TeamService:
             session = session_creator()
             sess_flag = True
         session.add(team)
-        session.query(Members).filter(Members.member_id == user_id, Members.team_id == team.id).delete()
+        session.query(Members).filter(
+            Members.member_id == user_id, Members.team_id == team.id
+        ).delete()
         if sess_flag:
             session.commit()
             session.close()
-
-
