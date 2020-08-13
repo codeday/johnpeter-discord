@@ -31,10 +31,10 @@ class Team(Base):
     members = relationship("Members", back_populates="team")
 
     def __str__(self):
-        return f'''{self.team_name} ({len(self.members)} members)
----
+        return f'''---
+    {self.team_name} ({len(self.members)} members)
     Project: {self.project}
-    Channel: <#{self.tc_id}'''
+    Channel: <#{self.tc_id}>'''
 
 
 class Members(Base):
