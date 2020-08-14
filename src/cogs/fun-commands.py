@@ -23,26 +23,13 @@ class FunCommands(commands.Cog, name="Fun"):
         self.random_channel = int(getenv("CHANNEL_RANDOM", 689534362760642676))
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
         # Downloads mp3 files
-        names = {"zeke.mp3"}
-        for name in names:
-            url = f'https://f1.srnd.org/fun/pledge/{name}'
-            urllib.request.urlretrieve(url, f'./cache/pledge/{name}')
-
         urls = get_sponsor_audio()
         for url in urls:
             file_name = re.sub('(h.*\/)+', "", url)
             urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
 
-        urllib.request.urlretrieve("https://f1.srnd.org/fun/rickroll.mp3",
-                                   f"./cache/RickRoll.mp3")
-
         file_name = re.sub('(h.*\/)+', "", get_sponsor_intro())
         urllib.request.urlretrieve(get_sponsor_intro(), f"./cache/{file_name}")
-
-        self.people = []
-        for file in glob("./cache/pledge/*.mp3"):
-            print(file)
-            self.people.append(file)
 
         self.sponsorships = []
         for file in glob("./cache/sponsorships/*.mp3"):
@@ -75,27 +62,8 @@ class FunCommands(commands.Cog, name="Fun"):
     @only_random
     async def updownupdownleftrightleftrightbastart(self, ctx, ):
         """A lot of typing for nothing."""
-        await ctx.send("wow that's a long cheat code")
+        await ctx.send("wow that's a long cheat code. You win 20 CodeCoin!!")
 
-    @commands.command(name="pledge", aliases=['pledgeofsrnd', 'pledge-of-srnd'])
-    @require_vc
-    async def pledge(self, ctx):
-        """Recites the pledge in the currently-joined voice channel."""
-        await ctx.message.delete()
-        retval = os.getcwd()
-        vc = await ctx.message.author.voice.channel.connect()
-        randomint = random.randint(1, 21)
-        try:
-            if randomint == 1:
-                source = discord.FFmpegPCMAudio(f"./cache/RickRoll.mp3")
-            else:
-                file = choice(self.people)
-                source = discord.FFmpegPCMAudio(f"{file}")
-            player = vc.play(source)
-            while vc.is_playing():
-                await asyncio.sleep(1)
-        finally:
-            await vc.disconnect()
 
     @commands.command(pass_context=True, aliases=['disconnect'])
     async def disconnectvc(self, ctx):
