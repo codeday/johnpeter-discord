@@ -27,14 +27,14 @@ class Team(Base):
     team_name = Column(String, nullable=False, unique=True)
     tc_id = Column(String, nullable=False)
     join_message_id = Column(String, nullable=False)
-    project = Column(Text)
-    members = relationship("Members", back_populates="team")
+    project = Column(String)
+    members = relationship("Members", back_populates="team", cascade="all, delete")
 
     def __str__(self):
-        return f'''{self.team_name} ({len(self.members)} members)
----
+        return f'''---
+    {self.team_name} ({len(self.members)} members)
     Project: {self.project}
-    Channel: <#{self.tc_id}'''
+    Channel: <#{self.tc_id}>'''
 
 
 class Members(Base):
@@ -43,7 +43,7 @@ class Members(Base):
     id = Column(Integer, primary_key=True)
     team_id = Column(Integer, ForeignKey("team.id"))
     member_id = Column(String, nullable=False)
-    team = relationship("Team", back_populates="members")
+    team = relationship("Team", back_populates="members", cascade="all, delete")
 
 
 def session_creator() -> Session:

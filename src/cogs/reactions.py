@@ -8,6 +8,7 @@ from utils.confirmation import confirm
 
 class ReactionCommands(commands.Cog, name="Reactions"):
     """A cog where all the reaction commands live"""
+    # TODO: better docs for this
 
     def __init__(self, bot):
         self.bot = bot
