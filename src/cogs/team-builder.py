@@ -222,23 +222,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         project = s = re.sub(r'^"|"$', '', project)
         team = self.team_service.edit_team(name, project)
         if team:
-            # if not valid_team_string(project):
-            #     valid_string = make_valid_team_string(project)
-            #     if await confirm(
-            #             f'That team project was invalid.\
-            #              Would you like to continue team creation with the project "{valid_string}" instead?',
-            #             bot=self.bot, ctx=ctx):
-            #         project = valid_string
-            #     else:
-            #         return
-            # team_dict = self.team_service.get_by_name(name).to_dict()
-            # message = await ctx.guild.get_channel(self.channel_gallery).fetch_message((team_dict["join_message_id"]))
-            # message_content = message.content.split("\nProject:")
-            # await message.edit(content=message_content[0] + "\nProject: " + project)
-            # await ctx.guild.get_channel(team_dict['tc_id']).edit(topic=project)
-            #
-            # !! Should all be unnecessary now? Seems like it existed to remove certain characters, which shouldn't be
-            #    an issue now.
             await ctx.send("Project updated!")
         else:
             await ctx.send("Could not find team with the name: " + str(name))
@@ -303,7 +286,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 str(payload.message_id), session
             )
             await payload.member.guild.get_channel(int(team.tc_id)).set_permissions(
-                payload.member, read_messages=True, manage_messages=True, send_messages=True
+                payload.member, read_messages=True, manage_messages=True, send_messages=True, read_message_history=True
             )
             self.team_service.add_member(team, str(payload.user_id), session)
             session.commit()
@@ -323,7 +306,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             guild = self.bot.get_guild(payload.guild_id)
             member = guild.get_member(payload.user_id)
             await guild.get_channel(int(team.tc_id)).set_permissions(
-                member, read_messages=False, manage_messages=False, send_messages=False
+                member, read_messages=False, manage_messages=False, send_messages=False, read_message_history=False
             )
             self.team_service.remove_member(team, str(payload.user_id), session)
             session.commit()
