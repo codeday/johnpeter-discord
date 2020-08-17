@@ -177,7 +177,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             ctx.guild.get_role(self.role_student): discord.PermissionOverwrite(
-                read_messages=False
+                read_messages=False, send_messages=False
             ),
             ctx.guild.me: discord.PermissionOverwrite(
                 read_messages=True, read_message_history=True
@@ -303,7 +303,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 str(payload.message_id), session
             )
             await payload.member.guild.get_channel(int(team.tc_id)).set_permissions(
-                payload.member, read_messages=True, manage_messages=True
+                payload.member, read_messages=True, manage_messages=True, send_messages=True
             )
             self.team_service.add_member(team, str(payload.user_id), session)
             session.commit()
@@ -323,7 +323,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             guild = self.bot.get_guild(payload.guild_id)
             member = guild.get_member(payload.user_id)
             await guild.get_channel(int(team.tc_id)).set_permissions(
-                member, read_messages=False, manage_messages=False
+                member, read_messages=False, manage_messages=False, send_messages=False
             )
             self.team_service.remove_member(team, str(payload.user_id), session)
             session.commit()
