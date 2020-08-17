@@ -28,7 +28,7 @@ class Team(Base):
     tc_id = Column(String, nullable=False)
     join_message_id = Column(String, nullable=False)
     project = Column(String)
-    members = relationship("Members", back_populates="team")
+    members = relationship("Members", back_populates="team", cascade="all, delete")
 
     def __str__(self):
         return f'''---
@@ -43,7 +43,7 @@ class Members(Base):
     id = Column(Integer, primary_key=True)
     team_id = Column(Integer, ForeignKey("team.id"))
     member_id = Column(String, nullable=False)
-    team = relationship("Team", back_populates="members")
+    team = relationship("Team", back_populates="members", cascade="all, delete")
 
 
 def session_creator() -> Session:

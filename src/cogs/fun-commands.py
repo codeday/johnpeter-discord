@@ -24,6 +24,8 @@ class FunCommands(commands.Cog, name="Fun"):
         self.mod_log = int(getenv("CHANNEL_MOD_LOG", 689216590297694211))
         # Downloads mp3 files
         urls = get_sponsor_audio()
+        if not os.path.isdir("./cache/sponsorships/"):
+            os.makedirs("./cache/sponsorships/")
         for url in urls:
             file_name = re.sub('(h.*\/)+', "", url)
             urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
@@ -38,7 +40,7 @@ class FunCommands(commands.Cog, name="Fun"):
 
     @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
     @only_random
-    async def crab(self, ctx, *, text=None):
+    async def crab(self, ctx, *, text: str = None):
         """Turns the text into a crab rave."""
         await ctx.message.delete()
         async with ctx.channel.typing():
@@ -68,10 +70,14 @@ class FunCommands(commands.Cog, name="Fun"):
     @commands.command(pass_context=True, aliases=['disconnect'])
     async def disconnectvc(self, ctx):
         await ctx.message.delete()
-        server = ctx.message.guild.voice_client
-        await server.disconnect()
+        vc = ctx.message.guild.voice_client
+        if vc is None:
+            await ctx.send("You silly, I'm not in any VCs right now.")
+        else:
+            await vc.disconnect()
 
-    @commands.command(name="sponsorship", aliases=['sponsor', 'sponsormessage', 'sponsor-message', 'sponsor_message'])
+
+    @commands.command(name="sponsorship", aliases=['sponsor', 'sponsormessage', 'sponsor-message', 'sponsor_message', "sponsors"])
     @require_vc
     async def sponsorship(self, ctx):
         """Says a message from a sponsor."""

@@ -64,16 +64,9 @@ async def on_ready():
     """Sets up the bot's nicknames and the game it is streaming"""
 
     # Sets up the bot's "game"
-    await bot.change_presence(activity=discord.CustomActivity(
-        name='Hello, Human!', emoji=bot.get_emoji(689553120153698305)))
-    # TODO: Fix the stupid activity because discord bad
+    # await bot.change_presence(activity=discord.CustomActivity(
+    #     name='Hello, Human!', type=discord.ActivityType.watching))
 
-    # Counts servers the bot is on
-    counter = 0
-    for i in bot.guilds:
-        counter += 1
-        print('We have logged in as {0.user}'.format(bot))
-    logging.info("We are in {0} server!".format(counter))
 
 
 @bot.event
@@ -94,6 +87,18 @@ async def on_ready():
             await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
     else:
         await bot.get_channel(error_channel).send(f"~~Started~~ woke up")
+
+    await bot.change_presence(activity=discord.Game("the sweet, sweet music of CodeDay!"))
+    # await bot.change_presence(activity=discord.CustomActivity(
+    #     name='Hello, Human!', type=discord.ActivityType.watching))
+    # Not an option yet, but watching would be a better choice for later on
+
+    # Counts servers the bot is on
+    counter = 0
+    for i in bot.guilds:
+        counter += 1
+        logging.info('We have logged in as {0.user}'.format(bot))
+    logging.info("We are in {0} server!".format(counter))
 
 
 @bot.event

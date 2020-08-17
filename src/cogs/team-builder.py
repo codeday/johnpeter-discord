@@ -1,6 +1,7 @@
 import logging
 from os import getenv
 from random import choice
+import re
 
 import discord
 from discord.ext import commands
@@ -76,13 +77,18 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     async def team(self, ctx):
         """Contains team subcommands, do '~help team' for more info"""
         if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid team command passed...")
+            await ctx.send(
+                "`~team` is a category, not a command. Run `~help team` for more info on what you can do."
+            )
 
     @team.group(name="broadcast")
     async def team_broadcast(self, ctx):
         """Contains broadcast subcommands, do '~help team broadcast' for more info"""
         if ctx.invoked_subcommand is None:
-            await ctx.send("Invalid team broadcast command passed...")
+            await ctx.send(
+                "`~team broadcast` is a category, not a command. "
+                "Run `~help team broadcast` for more info on what you can do."
+            )
 
     @team_broadcast.command(name="form")
     @commands.has_any_role("Employee", "Staff")
@@ -109,13 +115,17 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         if not form:
             await ctx.send("No form provided!")
             return
-        team = self.team_service.get_team_by_name(name)
+        session = session_creator()
+        team = self.team_service.get_team_by_name(name, session)
         if not team:
             await ctx.send("Could not find a team with that name!")
             return
         form = " ".join(form)
         if form in self.forms:
             await self.forms[form]["func_i"](self, ctx, team)
+            await ctx.send(
+                "Form is away!"
+            )
         else:
             await ctx.send(
                 "I'm sorry, but I do not know the form you are talking about"
@@ -129,25 +139,32 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             f'Are you sure you would like to send the message "{message}" to all teams?',
             bot=self.bot,
             ctx=ctx,
-            success_msg="Ok, I am will send the message",
+            success_msg="Ok, I will send the message",
             abort_msg="Ok, I will not send the message",
         ):
-            for team in self.team_service.get_all_teams():
+            session = session_creator()
+            for team in self.team_service.get_all_teams(session):
                 try:
-                    await ctx.guild.get_channel(team.tc_id).send(message)
+                    await ctx.guild.get_channel(int(team.tc_id)).send(message)
                 except Exception as ex:
-                    print("I have an exception!" + ex.__str__())
+                    raise ex
+            session.commit()
+            session.close()
 
     @team.command(name="add", aliases=["create"])
     @commands.has_any_role("Employee", "Staff")
-    async def team_add(self, ctx: commands.context.Context, team_name: str):
+    async def team_add(self, ctx: commands.context.Context, *, team_name: str):
         """Adds a new team with the provided name
-            Checks for duplicate names, then creates a TC for the team as well as an invite message, then
+            Checks for duplicate names, then creates a TC for the team as well as an invitation message, then
             adds the team to the database.
-            Does not add any team members, they must add themselves or be manually added separately
+            Does not add any team members, they must add themselves or be manually added separately.
+
+            See https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html#keyword-only-arguments for
+            explanation of *
         """
         logging.debug("Starting team creation...")
         team_emoji = get(ctx.guild.emojis, name="CODEDAY")
+        team_name = s = re.sub(r'^"|"$', '', team_name)
 
         # Checks if any teams with this name already exist, and fails if they do
         if self.team_service.get_team_by_name(team_name) is not None:
@@ -194,9 +211,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
     @team.command(name="project", aliases=["set-project", "setproject", "set_project"])
     @commands.has_any_role("Employee", "Staff")
-    async def team_project(
-        self, ctx, name: str, project: str
-    ):  # TODO: Verify that the typecasting of string works right
+    async def team_project(self, ctx, name: str, *, project: str):
         """Sets the team project description."""
         if not name:
             await ctx.send("No team name provided!")
@@ -204,6 +219,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         if not project:
             await ctx.send("No project description provided!")
             return
+        project = s = re.sub(r'^"|"$', '', project)
         team = self.team_service.edit_team(name, project)
         if team:
             # if not valid_team_string(project):
@@ -246,25 +262,33 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
     @team.command(name="delete")
     @commands.has_any_role("Employee", "Staff")
-    async def team_delete(self, ctx, name):
+    async def team_delete(self, ctx, *, name):
         """Deletes the specified team."""
-        team = self.team_service.get_team_by_name(name)
+        name = s = re.sub(r'^"|"$', '', name)
+        session = session_creator()
+        team = self.team_service.get_team_by_name(name, session)
+        team_channel_flag = False
+        team_join_message_flag = False
         if team is not False:
             try:
-                await ctx.guild.get_channel(team.tc_id).delete()
+                await ctx.guild.get_channel(int(team.tc_id)).delete()
+                team_channel_flag = True
             except:
                 pass
             try:
                 message = await ctx.guild.get_channel(
                     self.channel_gallery
-                ).fetch_message(team.join_message_id)
+                ).fetch_message(int(team.join_message_id))
                 await message.delete()
+                team_join_message_flag = True
             except:
                 pass
             self.team_service.delete_team_by_name(name)
-            await ctx.send("Deleted team: " + name)
+            await ctx.send(f"Deleted team, {'channel' if team_channel_flag else 'not channel'}, {'join_message' if team_join_message_flag else 'not join message'} for team: {name}")
         else:
             await ctx.send("Could not find team with the name: " + name)
+        session.commit()
+        session.close()
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):

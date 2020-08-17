@@ -11,7 +11,7 @@ class TeamService:
         """Takes a name, and a project description"""
         # TODO: does this need a try/catch??
         session = session_creator()
-        team = session.query(Team).filter(Team.team_name==name).first()
+        team = session.query(Team).filter(Team.team_name == name).first()
         if team is not None:
             team.project = project
             session.commit()
@@ -23,19 +23,29 @@ class TeamService:
             return False
 
     @staticmethod
-    def get_team_by_name(name) -> Optional[Team]:
+    def get_team_by_name(name, session=None) -> Optional[Team]:
         """Returns the team with the given name, or none if it doesn't exist"""
-        session = session_creator()
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
         team = session.query(Team).filter(Team.team_name == name).first()
-        session.commit()
-        session.close()
+        if sess_flag:
+            session.commit()
+            session.close()
         return team
 
     @staticmethod
     def get_team_by_join_message_id(id, session=None) -> Optional[Team]:
         """Returns the team with the given join message id, or none if it doesn't exist"""
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
         team = session.query(Team).filter(Team.join_message_id == id).first()
-
+        if sess_flag:
+            session.commit()
+            session.close()
         return team
 
     @staticmethod
@@ -61,7 +71,6 @@ class TeamService:
         if session is None:
             session = session_creator()
             sess_flag = True
-        session = session_creator()
         teams = session.query(Team).all()
         if sess_flag:
             session.commit()
