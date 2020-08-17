@@ -1,6 +1,6 @@
 FROM python:3.7-slim-buster
 
-RUN apt-get update && apt-get install ffmpeg postgresql-dev gcc python3-dev musl-dev -y
+RUN apt-get update && apt-get install ffmpeg libpq-dev gcc python3-dev musl-dev -y
 
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
