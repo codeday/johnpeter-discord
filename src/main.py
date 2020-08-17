@@ -3,6 +3,7 @@ import logging
 import sys
 import traceback
 from os import environ, getenv
+from random import choice
 
 import discord
 import requests
@@ -15,10 +16,10 @@ from utils.paginated_send import paginated_send
 
 has_bot_started = False
 
-BOT_TOKEN = environ['BOT_TOKEN']
+BOT_TOKEN = environ["BOT_TOKEN"]
 # Where errors go when reported
-error_channel = int(getenv('CHANNEL_ERRORS', 693223559387938817))
-raygun_key = getenv('RAYGUN_KEY', None)
+error_channel = int(getenv("CHANNEL_ERRORS", 693223559387938817))
+raygun_key = getenv("RAYGUN_KEY", None)
 
 
 def handle_exception(exc_type, exc_value, exc_traceback):
@@ -31,42 +32,51 @@ sys.excepthook = handle_exception
 
 
 def command_prefix(bot, message):
-    if message.content.startswith('~~'):
-        return 'j!'
-    if message.content.startswith('~'):
-        return '~'
+    if message.content.startswith("~~"):
+        return "j!"
+    if message.content.startswith("~"):
+        return "~"
     else:
-        return 'j!'
+        return "j!"
 
 
-bot = commands.Bot(command_prefix=command_prefix, command_not_found="Heck! That command doesn't exist!!",
-                   description="I am 100% authentic object:human")
+bot = commands.Bot(
+    command_prefix=command_prefix,
+    command_not_found="Heck! That command doesn't exist!!",
+    description="I am 100% authentic object:human",
+)
 logging.basicConfig(level=logging.INFO)
 
-initial_cogs = ['cogs.team-builder', 'cogs.cleverbot',
-                'cogs.admin-commands', 'cogs.tournament',
-                'cogs.fun-commands',
-                'cogs.reactions']
+initial_cogs = [
+    "cogs.team-builder",
+    "cogs.cleverbot",
+    "cogs.admin-commands",
+    "cogs.tournament",
+    "cogs.fun-commands",
+    "cogs.reactions",
+]
+
+statuses = [
+    discord.Game("the sweet, sweet music of CodeDay!"),
+    discord.Game("Global Thermonuclear War"),
+    discord.Game("Debugging Simulator 2020"),
+    discord.Game("with fire"),
+    discord.Activity(
+        name="people forget to add .gitignores", type=discord.ActivityType.watching
+    ),
+    discord.Game("CodeCup")
+]
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 for cog in initial_cogs:
     # noinspection PyBroadException
     try:
         bot.load_extension(cog)
-        logging.info(f'Successfully loaded extension {cog}')
+        logging.info(f"Successfully loaded extension {cog}")
     except Exception as e:
         logging.exception(
-            f'Failed to load extension {cog}.', exc_info=traceback.format_exc())
-
-
-@bot.event
-async def on_ready():
-    """Sets up the bot's nicknames and the game it is streaming"""
-
-    # Sets up the bot's "game"
-    # await bot.change_presence(activity=discord.CustomActivity(
-    #     name='Hello, Human!', type=discord.ActivityType.watching))
-
+            f"Failed to load extension {cog}.", exc_info=traceback.format_exc()
+        )
 
 
 @bot.event
@@ -75,29 +85,32 @@ async def on_ready():
     if has_bot_started:
         return
     has_bot_started = True
-    version = getenv('IMAGE_TAG')
+    version = getenv("IMAGE_TAG")
     if version:
         r = requests.get(
-            f'https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}')  # hardcode bad
+            f"https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}"
+        )  # hardcode bad
         if r.status_code == requests.codes.ok:
-            commit = json.loads(r.text)['commit']
+            commit = json.loads(r.text)["commit"]
             await bot.get_channel(error_channel).send(
-                f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`")
+                f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`"
+            )
         else:
-            await bot.get_channel(error_channel).send(f"~~Started~~ woke up with version `{version}`")
+            await bot.get_channel(error_channel).send(
+                f"~~Started~~ woke up with version `{version}`"
+            )
     else:
         await bot.get_channel(error_channel).send(f"~~Started~~ woke up")
 
-    await bot.change_presence(activity=discord.Game("the sweet, sweet music of CodeDay!"))
-    # await bot.change_presence(activity=discord.CustomActivity(
-    #     name='Hello, Human!', type=discord.ActivityType.watching))
+    await bot.change_presence(activity=choice(statuses))
+
     # Not an option yet, but watching would be a better choice for later on
 
     # Counts servers the bot is on
     counter = 0
     for i in bot.guilds:
         counter += 1
-        logging.info('We have logged in as {0.user}'.format(bot))
+        logging.info("We have logged in as {0.user}".format(bot))
     logging.info("We are in {0} server!".format(counter))
 
 
@@ -105,31 +118,43 @@ async def on_ready():
 async def on_command_error(ctx, error: commands.CommandError):
     """Specially handles some errors, all others take the unhandled route"""
     if isinstance(error, commands.CommandNotFound):
-        return await ctx.send('That command doesn\'t seem to exist! Please try again, and type `'
-                              'help` to view the help documentation.')
+        return await ctx.send(
+            "That command doesn't seem to exist! Please try again, and type `"
+            "help` to view the help documentation."
+        )
 
     if type(error) is OnlyAllowedInChannels:
-        return await ctx.send(f"You can only do that in {'/'.join([f'<#{cid}>' for cid in error.channels])}")
+        return await ctx.send(
+            f"You can only do that in {'/'.join([f'<#{cid}>' for cid in error.channels])}"
+        )
         # TODO: See if this works
 
     if type(error) is RequiresVoiceChannel:
         return await ctx.send(f"You're not in a voice channel!")
 
     if type(error) is MissingAnyRole:
-        return await ctx.send("You are not in the sudoers file. This incident will be reported.")
+        return await ctx.send(
+            "You are not in the sudoers file. This incident will be reported."
+        )
 
     if type(error) is BadArgument:
         if "Emoji" in error.args[0]:
-            return await ctx.send("Hmm, did you miss some quotes or use an emoji from another server?")
+            return await ctx.send(
+                "Hmm, did you miss some quotes or use an emoji from another server?"
+            )
 
     if type(error) is ExpectedClosingQuoteError:
-        return await ctx.send("Looks like you dropped something: \"")
+        return await ctx.send('Looks like you dropped something: "')
 
     else:
-        await ctx.send("Hmm, that's weird! You just hit an unhandled error! It has been reported.")
+        await ctx.send(
+            "Hmm, that's weird! You just hit an unhandled error! It has been reported."
+        )
 
-        await paginated_send(bot.get_channel(error_channel),
-                             f"New error! Yikes! \n\n Invoking message: ```{ctx.message.content}``` {ctx.message.jump_url} \n\n Traceback: ```{''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__)))}```")
+        await paginated_send(
+            bot.get_channel(error_channel),
+            f"New error! Yikes! \n\n Invoking message: ```{ctx.message.content}``` {ctx.message.jump_url} \n\n Traceback: ```{''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__)))}```",
+        )
         handle_exception(type(error), error, error.__traceback__)
     raise error
 
