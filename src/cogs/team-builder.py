@@ -286,7 +286,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 str(payload.message_id), session
             )
             await payload.member.guild.get_channel(int(team.tc_id)).set_permissions(
-                payload.member, read_messages=True, manage_messages=True, send_messages=True, read_message_history=True
+                payload.member, overwrite=discord.PermissionOverwrite(**dict(discord.Permissions.text()))
             )
             self.team_service.add_member(team, str(payload.user_id), session)
             session.commit()
@@ -306,7 +306,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             guild = self.bot.get_guild(payload.guild_id)
             member = guild.get_member(payload.user_id)
             await guild.get_channel(int(team.tc_id)).set_permissions(
-                member, read_messages=False, manage_messages=False, send_messages=False, read_message_history=False
+                member, overwrite=None
             )
             self.team_service.remove_member(team, str(payload.user_id), session)
             session.commit()
