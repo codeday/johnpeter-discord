@@ -53,9 +53,13 @@ class TeamService:
         # TODO: Confirm that member references are deleted as well
         """Deletes team with given id"""
         session = session_creator()
-        team = session.query(Team).filter(Team.team_name == name)
+        team = session.query(Team).filter(Team.team_name == name).first()
         if team is not None:
-            team.delete()
+            # if team.members is not None:
+            #     members = team.members
+            #     for member in members:
+            #         session.delete(member)
+            session.delete(team)
             session.commit()
             session.close()
             return True
