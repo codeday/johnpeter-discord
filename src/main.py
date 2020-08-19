@@ -13,6 +13,7 @@ from raygun4py import raygunprovider
 
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 from utils.paginated_send import paginated_send
+from utils.exceptions import BugReport
 
 has_bot_started = False
 
@@ -64,7 +65,7 @@ statuses = [
     discord.Activity(
         name="people forget to add .gitignores", type=discord.ActivityType.watching
     ),
-    discord.Game("CodeCup")
+    discord.Game("CodeCup"),
 ]
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
@@ -76,6 +77,22 @@ for cog in initial_cogs:
     except Exception as e:
         logging.exception(
             f"Failed to load extension {cog}.", exc_info=traceback.format_exc()
+        )
+
+
+@bot.command(
+        name="bug_report", aliases=["bug", "bug-report", "issue"]
+    )
+async def bug_report(ctx, *, issue):
+    """Allows users to file a bug report straight through John.
+    This will raise a new raygun issue and can be dealt with that way. """
+    client = raygunprovider.RaygunSender(raygun_key)
+    httpResult = client.send_exception(exception=BugReport(message=issue, context=ctx))
+    if httpResult[0] == 200:
+        await ctx.send("Report filed, thank you!")
+    else:
+        await ctx.send(
+            "Hmm, that didn't work. If the bug report failed, something is probaly very wrong, please @ a staff member!"
         )
 
 
