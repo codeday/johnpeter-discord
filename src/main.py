@@ -88,7 +88,7 @@ async def bug_report(ctx, *, issue):
     This will raise a new raygun issue and can be dealt with that way. """
     client = raygunprovider.RaygunSender(raygun_key)
     httpResult = client.send_exception(exception=BugReport(message=issue, context=ctx))
-    if httpResult[0] == 200:
+    if 200 <= httpResult[0]  <= 299:
         await ctx.send("Report filed, thank you!")
     else:
         await ctx.send(
