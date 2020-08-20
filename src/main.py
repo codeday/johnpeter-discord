@@ -80,15 +80,13 @@ for cog in initial_cogs:
         )
 
 
-@bot.command(
-        name="bug_report", aliases=["bug", "bug-report", "issue"]
-    )
+@bot.command(name="bug_report", aliases=["bug", "bug-report", "issue"])
 async def bug_report(ctx, *, issue):
     """Allows users to file a bug report straight through John.
     This will raise a new raygun issue and can be dealt with that way. """
     client = raygunprovider.RaygunSender(raygun_key)
     httpResult = client.send_exception(exception=BugReport(message=issue, context=ctx))
-    if 200 <= httpResult[0]  <= 299:
+    if 200 <= httpResult[0] <= 299:
         await ctx.send("Report filed, thank you!")
     else:
         await ctx.send(
@@ -106,7 +104,7 @@ async def on_ready():
     if version:
         r = requests.get(
             f"https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}"
-        )  # hardcode bad
+        )
         if r.status_code == requests.codes.ok:
             commit = json.loads(r.text)["commit"]
             await bot.get_channel(error_channel).send(
@@ -121,14 +119,12 @@ async def on_ready():
 
     await bot.change_presence(activity=choice(statuses))
 
-    # Not an option yet, but watching would be a better choice for later on
-
     # Counts servers the bot is on
     counter = 0
     for i in bot.guilds:
         counter += 1
-        logging.info("We have logged in as {0.user}".format(bot))
-    logging.info("We are in {0} server!".format(counter))
+        logging.info(f"We have logged in as {bot.user}")
+    logging.info(f"We are in {counter} server!")
 
 
 @bot.event
