@@ -22,6 +22,11 @@ class AdminCommands(commands.Cog, name="Administration"):
             ctx.send("goodbye :(")
         sys.exit()
 
+    @commands.command(name="throw_error")
+    @commands.has_any_role('Employee')
+    async def throw_error(self, ctx):
+        raise Exception
+
 
 def setup(bot):
     bot.add_cog(AdminCommands(bot))

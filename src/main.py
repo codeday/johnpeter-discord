@@ -164,10 +164,14 @@ async def on_command_error(ctx, error: commands.CommandError):
             "Hmm, that's weird! You just hit an unhandled error! It has been reported."
         )
 
-        await paginated_send(
-            bot.get_channel(error_channel),
-            f"New error! Yikes! \n\n Invoking message: ```{ctx.message.content}``` {ctx.message.jump_url} \n\n Traceback: ```{''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__)))}```",
+        await bot.get_channel(error_channel).send(
+            f"New error! Yikes! \n Invoking message: ```{ctx.message.content}``` {ctx.message.jump_url} \n\n Traceback:",
         )
+        p = discord.ext.commands.Paginator()
+        for line in ''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__))).splitlines():
+            p.add_line(line)
+        for page in p.pages:
+            await ctx.send(page)
         handle_exception(type(error), error, error.__traceback__)
     raise error
 
