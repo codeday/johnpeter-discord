@@ -75,20 +75,32 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
 
     @commands.group(name="team")
     async def team(self, ctx):
-        """Contains team subcommands, do '~help team' for more info"""
+        """*CATEGORY* Contains team subcommands, do '~help team' for more info"""
         if ctx.invoked_subcommand is None:
             await ctx.send(
                 "`~team` is a category, not a command. Run `~help team` for more info on what you can do."
             )
 
+    @team.command("help")
+    async def team_help_command(self, ctx):
+        help = self.bot.help_command
+        help.context = ctx
+        res = await help.send_group_help(group=self.team)
+
     @team.group(name="broadcast")
     async def team_broadcast(self, ctx):
-        """Contains broadcast subcommands, do '~help team broadcast' for more info"""
+        """*CATEGORY* Contains broadcast subcommands, do '~help team broadcast' for more info"""
         if ctx.invoked_subcommand is None:
             await ctx.send(
                 "`~team broadcast` is a category, not a command. "
                 "Run `~help team broadcast` for more info on what you can do."
             )
+
+    @team_broadcast.command("help")
+    async def team_broadcast_help_command(self, ctx):
+        help = self.bot.help_command
+        help.context = ctx
+        res = await help.send_group_help(group=self.team_broadcast)
 
     @team_broadcast.command(name="form")
     @commands.has_any_role("Employee", "Staff")
@@ -272,6 +284,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.send("Could not find team with the name: " + name)
         session.commit()
         session.close()
+
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):

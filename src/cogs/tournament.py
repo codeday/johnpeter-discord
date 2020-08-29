@@ -24,9 +24,15 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
 
     @commands.group(name="tournament")
     async def tournament(self, ctx):
-        """Contains tournament subcommands, do '~help tournament' for more info"""
+        """*CATEGORY* Contains tournament subcommands, do '~help tournament' for more info"""
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid tournament command passed...')
+
+    @tournament.command("help")
+    async def tournament_help_command(self, ctx):
+        help = self.bot.help_command
+        help.context = ctx
+        res = await help.send_group_help(group=self.tournament)
 
     @tournament.command(name="create")
     @commands.has_any_role('Tournament Master')
