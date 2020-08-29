@@ -16,7 +16,7 @@ class ReactionCommands(commands.Cog, name="Reactions"):
 
 
     @commands.command()
-    @commands.has_any_role('Employee')
+    @commands.has_any_role('Employee', 'Admin')
     async def reaction_groups(self, ctx: commands.Context, message_channel_id, message_id):
         message_channel_id = int(message_channel_id)
         message_id = int(message_id)
