@@ -253,7 +253,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 out += str(team) + "\n"
             session.commit()
             session.close()
-            await paginated_send(ctx, out)
+            await paginated_send(ctx, out, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
 
     @team.command(
         name="search", aliases=["find"]
@@ -273,7 +273,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 out = 'No teams found'
             session.commit()
             session.close()
-            await paginated_send(ctx, out)
+            await paginated_send(ctx, out, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
 
     @team.command(name="lookup")
     @commands.has_any_role("Employee", "Staff")
@@ -290,7 +290,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                     out = f'{member.mention} is not a member of any teams.'
                 session.commit()
                 session.close()
-                await paginated_send(ctx, out)
+                await paginated_send(ctx, out, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
 
     @team.command(name="delete")
     @commands.has_any_role("Employee", "Staff")
