@@ -42,7 +42,7 @@ class TeamService:
         if session is None:
             session = session_creator()
             sess_flag = True
-        teams = session.query(Team).filter(name in str(Team.team_name))
+        teams = session.query(Team).filter(name in str(Team.team_name)).all()
         if sess_flag:
             session.commit()
             session.close()
