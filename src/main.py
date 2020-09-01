@@ -12,7 +12,6 @@ from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuo
 from raygun4py import raygunprovider
 
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
-from utils.paginated_send import paginated_send
 from utils.exceptions import BugReport
 
 has_bot_started = False
@@ -45,6 +44,7 @@ bot = commands.Bot(
     command_prefix=command_prefix,
     command_not_found="Heck! That command doesn't exist!!",
     description="I am 100% authentic object:human",
+    allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False)
 )
 logging.basicConfig(level=logging.INFO)
 
