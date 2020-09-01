@@ -36,6 +36,16 @@ class TeamService:
         return team
 
     @staticmethod
+    def search_teams_by_name(name, session=None) -> list:
+        """Returns a list of teams that match the given name"""
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
+        teams = session.query(Team).filter(name in Team.team_name)
+        return teams
+
+    @staticmethod
     def get_team_by_join_message_id(id, session=None) -> Optional[Team]:
         """Returns the team with the given join message id, or none if it doesn't exist"""
         sess_flag = False
@@ -47,6 +57,7 @@ class TeamService:
             session.commit()
             session.close()
         return team
+
 
     @staticmethod
     def delete_team_by_name(name) -> bool:
