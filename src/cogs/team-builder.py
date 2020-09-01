@@ -264,7 +264,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         async with ctx.typing():
             name = re.sub(r'^"|"$', '', name)
             session = session_creator()
-            teams = self.team_service.search_teams_by_name(name, session)
+            teams = self.team_service.get_teams_by_name(name, session)
             if teams:
                 out = f'{len(teams)} result{"s" if len(teams) > 1 else ""}:\n'
                 for team in teams:

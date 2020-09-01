@@ -36,7 +36,7 @@ class TeamService:
         return team
 
     @staticmethod
-    def search_teams_by_name(name, session=None) -> list:
+    def get_teams_by_name(name, session=None) -> list:
         """Returns a list of teams that match the given name"""
         sess_flag = False
         if session is None:
