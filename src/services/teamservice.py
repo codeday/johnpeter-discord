@@ -43,6 +43,9 @@ class TeamService:
             session = session_creator()
             sess_flag = True
         teams = session.query(Team).filter(name in Team.team_name)
+        if sess_flag:
+            session.commit()
+            session.close()
         return teams
 
     @staticmethod
