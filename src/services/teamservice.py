@@ -61,6 +61,18 @@ class TeamService:
             session.close()
         return team
 
+    @staticmethod
+    def get_teams_by_member(member, session=None) -> Optional[list]:
+        """Returns a list of all teams the member is a part of"""
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
+        teams = session.query(Team).filter(Team.members.member_id == member).all()
+        if sess_flag:
+            session.commit()
+            session.close()
+        return teams
 
     @staticmethod
     def delete_team_by_name(name) -> bool:
