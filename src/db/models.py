@@ -34,7 +34,8 @@ class Team(Base):
         return f'''---
     {self.team_name} ({len(self.members)} members)
     Project: {self.project}
-    Channel: <#{self.tc_id}>'''
+    Channel: <#{self.tc_id}>
+    Members: {', '.join(f"<@{m.member_id}>" for m in self.members)}'''
 
 
 class Members(Base):
