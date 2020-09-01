@@ -282,9 +282,12 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             for member in ctx.message.mentions:
                 session = session_creator()
                 teams = self.team_service.get_teams_by_member(member.id, session)
-                out = f'{member.mention} is a member of {len(teams)} team{"s" if len(teams) > 1 else ""}:\n'
-                for team in teams:
-                    out += str(team)
+                if len(teams) >= 1:
+                    out = f'{member.mention} is a member of {len(teams)} team{"s" if len(teams) > 1 else ""}:\n'
+                    for team in teams:
+                        out += str(team)
+                else:
+                    out = f'{member.mention} is not a member of any teams.'
                 session.commit()
                 session.close()
                 await paginated_send(ctx, out)
