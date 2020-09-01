@@ -259,7 +259,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     @commands.has_any_role("Employee", "Staff")
     async def team_delete(self, ctx, *, name):
         """Deletes the specified team."""
-        name = s = re.sub(r'^"|"$', '', name)
+        name = re.sub(r'^"|"$', '', name)
         session = session_creator()
         team = self.team_service.get_team_by_name(name, session)
         team_channel_flag = False
