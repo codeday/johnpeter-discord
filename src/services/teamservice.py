@@ -42,7 +42,7 @@ class TeamService:
         if session is None:
             session = session_creator()
             sess_flag = True
-        teams = session.query(Team).filter(Team.team_name.ilike(name)).all()
+        teams = session.query(Team).filter(Team.team_name.contains(name)).all()
         if sess_flag:
             session.commit()
             session.close()
