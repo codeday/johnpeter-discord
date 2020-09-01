@@ -1,7 +1,7 @@
 import logging
+import re
 from os import getenv
 from random import choice
-import re
 
 import discord
 from discord.ext import commands
@@ -239,7 +239,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.send("Could not find team with the name: " + str(name))
 
     @team.command(
-        name="teams", aliases=["get_teams", "get-teams", "list_teams", "list-teams"]
+        name="teams", aliases=["get_teams", "get-teams", "list_teams", "list-teams", "list"]
     )
     @commands.has_any_role("Employee", "Staff")
     async def teams(self, ctx):
