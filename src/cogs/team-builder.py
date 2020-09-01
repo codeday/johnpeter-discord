@@ -255,6 +255,28 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             session.close()
             await paginated_send(ctx, out)
 
+    @team.command(
+        name="search", aliases=["find","lookup"]
+    )
+    @commands.has_any_role("Employee", "Staff")
+    async def search_teams(self, ctx, *, name):
+        """Returns teams that match the search string"""
+        async with ctx.typing():
+            name = re.sub(r'^"|"$', '', name)
+            session = session_creator()
+            teams = self.team_service.search_teams_by_name(name, session)
+            if teams:
+                if len(teams > 1):
+                    out = ''
+                else:
+                    out = f'{len(teams)} results:\n--------\n'
+                for team in teams:
+                    out += str(team) + "\n"
+            else:
+                out = 'No teams found'
+            session.commit()
+            session.close()
+            await paginated_send(ctx, out)
     @team.command(name="delete")
     @commands.has_any_role("Employee", "Staff")
     async def team_delete(self, ctx, *, name):
