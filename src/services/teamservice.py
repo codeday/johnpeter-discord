@@ -36,6 +36,19 @@ class TeamService:
         return team
 
     @staticmethod
+    def get_team_by_id(id, session=None) -> Optional[Team]:
+        """Returns the team with the given id, or none if it doesn't exist"""
+        sess_flag = False
+        if session is None:
+            session = session_creator()
+            sess_flag = True
+        team = session.query(Team).filter(Team.id == id).first()
+        if sess_flag:
+            session.commit()
+            session.close()
+        return team
+
+    @staticmethod
     def get_teams_by_name(name, session=None) -> list:
         """Returns a list of teams that match the given name"""
         sess_flag = False
@@ -68,7 +81,10 @@ class TeamService:
         if session is None:
             session = session_creator()
             sess_flag = True
-        teams = session.query(Team).filter(Team.members.member_id == member).all()
+        team_ids = session.query(Members).filter(Members.member_id == str(member)).all()
+        teams = []
+        for t in team_ids:
+            teams.append(session.query(Team).filter(Team.id == t.team_id).first())
         if sess_flag:
             session.commit()
             session.close()
