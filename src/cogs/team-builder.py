@@ -266,10 +266,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             session = session_creator()
             teams = self.team_service.search_teams_by_name(name, session)
             if teams:
-                if len(teams) <= 1:
-                    out = ''
-                else:
-                    out = f'{len(teams)} results:\n--------\n'
+                out = f'{len(teams)} result{"s" if len(teams) > 1 else ""}:\n'
                 for team in teams:
                     out += str(team) + "\n"
             else:
