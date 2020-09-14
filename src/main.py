@@ -171,7 +171,7 @@ async def on_command_error(ctx, error: commands.CommandError):
         for line in ''.join(map(str, traceback.format_exception(type(error), error, error.__traceback__))).splitlines():
             p.add_line(line)
         for page in p.pages:
-            await ctx.send(page)
+            await bot.get_channel(error_channel).send(page)
         handle_exception(type(error), error, error.__traceback__)
     raise error
 
