@@ -17,6 +17,7 @@ from utils.forms import (
     send_team_submit_forms,
 )
 from utils.paginated_send import paginated_send
+from utils import checks
 
 teamCreateMessages = [
     "Yeehaw! Looks like team **{0}** has joined CodeDay!",
@@ -42,9 +43,6 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         self.channel_gallery = int(
             getenv("CHANNEL_GALLERY", 743216998712082472)
         )  # channel to show teams
-        self.role_staff = int(
-            getenv("ROLE_STAFF", 689215241996730417)
-        )  # staff role also not used
         self.role_student = int(
             getenv("ROLE_STUDENT", 714577449408659567)
         )  # student role
@@ -103,7 +101,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         res = await help.send_group_help(group=self.team_broadcast)
 
     @team_broadcast.command(name="form")
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def team_broadcast_form(self, ctx: commands.context.Context, *form):
         form = " ".join(form)
         if form in self.forms:
@@ -119,7 +117,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await ctx.send("I'm sorry, but I don't know the form you are talking about")
 
     @team_broadcast.command(name="form-individual")
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def team_broadcast_form_individual(self, ctx, name=None, *form):
         if not name:
             await ctx.send("No team name provided!")
@@ -144,7 +142,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             )
 
     @team_broadcast.command(name="message")
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def team_broadcast_message(self, ctx: commands.context.Context, *message):
         message = " ".join(message)
         if await confirm(
@@ -164,7 +162,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             session.close()
 
     @team.command(name="add", aliases=["create"])
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def team_add(self, ctx: commands.context.Context, *, team_name: str):
         """Adds a new team with the provided name
             Checks for duplicate names, then creates a TC for the team as well as an invitation message, then
@@ -222,7 +220,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
         )
 
     @team.command(name="project", aliases=["set-project", "setproject", "set_project"])
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def team_project(self, ctx, name: str, *, project: str):
         """Sets the team project description."""
         if not name:
@@ -241,7 +239,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     @team.command(
         name="teams", aliases=["get_teams", "get-teams", "list_teams", "list-teams", "list"]
     )
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def teams(self, ctx):
         """Prints out the current teams."""
         # TODO: Check on how this is parsed, might need to write something to clean up the team data
@@ -258,7 +256,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
     @team.command(
         name="search", aliases=["find"]
     )
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def search_teams(self, ctx, *, name):
         """Returns teams that match the search string"""
         async with ctx.typing():
@@ -276,7 +274,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
             await paginated_send(ctx, out, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
 
     @team.command(name="lookup")
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def lookup_team_by_member(self, ctx):
         async with ctx.typing():
             for member in ctx.message.mentions:
@@ -293,7 +291,7 @@ class TeamBuilderCog(commands.Cog, name="Team Builder"):
                 await paginated_send(ctx, out, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
 
     @team.command(name="delete")
-    @commands.has_any_role("Employee", "Staff")
+    @checks.requires_staff_role()
     async def team_delete(self, ctx, *, name):
         """Deletes the specified team."""
         name = re.sub(r'^"|"$', '', name)

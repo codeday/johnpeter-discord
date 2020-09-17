@@ -8,6 +8,7 @@ from discord.ext import commands
 from database.tournaments import Tournament
 from services.tournamentservice import TournamentService
 from utils.person import id_from_mention
+from utils import checks
 
 
 class TournamentCog(commands.Cog, name="Tournament Helper"):
@@ -35,7 +36,7 @@ class TournamentCog(commands.Cog, name="Tournament Helper"):
         res = await help.send_group_help(group=self.tournament)
 
     @tournament.command(name="create")
-    @commands.has_any_role('Tournament Master')
+    @checks.requires_tournament_role()
     async def tourney_create(self, ctx: commands.context.Context, game_name: str, players_per_game: int):
         """Creates a tournament with the given name."""
         await ctx.message.delete()
@@ -89,7 +90,7 @@ If you have to leave, please inform the @Tournament Master'''
         TournamentService.store_tournaments(self.tournaments)
 
     @tournament.command(name="round")
-    @commands.has_any_role('Tournament Master')
+    @checks.requires_tournament_role()
     async def tourney_round(self, ctx: commands.context.Context, idx=None):
         """Creates the next round"""
         t = self.tournaments[0]
@@ -102,7 +103,7 @@ If you have to leave, please inform the @Tournament Master'''
 
     @tournament.command(name="winner-set", aliases=["winner_set", "round-winner-set", "round_winner_set", "set-winner",
                                                     "set-round-winner", "set_round_winner", "set_winner"])
-    @commands.has_any_role('Tournament Master')
+    @checks.requires_tournament_role()
     async def round_winner_set(self, ctx: commands.context.Context, winner):
         """Sets the winner of a round."""
         t = self.tournaments[0]
@@ -133,7 +134,7 @@ mentioning the person who won:
             return
 
     @tournament.command(name="delete")
-    @commands.has_any_role('Tournament Master')
+    @checks.requires_tournament_role()
     async def tourney_delete(self, ctx: commands.context.Context, idx):
         """Deletes the specified tournament."""
         idx = int(idx)
@@ -164,7 +165,7 @@ mentioning the person who won:
             await self.tourney_list(ctx)
 
     @tournament.command(name="list")
-    @commands.has_any_role('Tournament Master')
+    @checks.requires_tournament_role()
     async def tourney_list(self, ctx: commands.context.Context):
         out = f'```Running Tournaments ({len(self.tournaments)}):'
         for idx,tournament in enumerate(self.tournaments):
@@ -173,7 +174,7 @@ mentioning the person who won:
         await ctx.send(out)
 
     @tournament.command(name="broadcast")
-    @commands.has_any_role('Tournament Master')
+    @checks.requires_tournament_role()
     async def tourney_broadcast(self, ctx: commands.context.Context, *message):
         """Sends the message to all in-progress games."""
         t = self.tournaments[0]

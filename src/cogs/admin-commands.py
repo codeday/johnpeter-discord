@@ -1,6 +1,7 @@
 import sys
 
 from discord.ext import commands
+from utils import checks
 
 
 class AdminCommands(commands.Cog, name="Administration"):
@@ -16,14 +17,14 @@ class AdminCommands(commands.Cog, name="Administration"):
                 return await vc.disconnect()
 
     @commands.command(hidden=True)
-    @commands.has_any_role('Employee')
+    @checks.requires_staff_role()
     async def kill(self, ctx):
         await \
             ctx.send("goodbye :(")
         sys.exit()
 
     @commands.command(name="throw_error")
-    @commands.has_any_role('Employee')
+    @checks.requires_staff_role()
     async def throw_error(self, ctx):
         raise Exception
 
