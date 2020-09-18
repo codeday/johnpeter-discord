@@ -27,10 +27,10 @@ class FunCommands(commands.Cog, name="Fun"):
         if not os.path.isdir("./cache/sponsorships/"):
             os.makedirs("./cache/sponsorships/")
         for url in urls:
-            file_name = re.sub('(h.*\/)+', "", url)
+            file_name = re.sub("(h.*\/)+", "", url)
             urllib.request.urlretrieve(url, f"./cache/sponsorships/{file_name}")
 
-        file_name = re.sub('(h.*\/)+', "", get_sponsor_intro())
+        file_name = re.sub("(h.*\/)+", "", get_sponsor_intro())
         urllib.request.urlretrieve(get_sponsor_intro(), f"./cache/{file_name}")
 
         self.sponsorships = []
@@ -38,20 +38,20 @@ class FunCommands(commands.Cog, name="Fun"):
             print(file)
             self.sponsorships.append(file)
 
-    @commands.command(name="crab", aliases=['crabrave', 'crab_rave', 'crab-rave'])
+    @commands.command(name="crab", aliases=["crabrave", "crab_rave", "crab-rave"])
     @only_random
     async def crab(self, ctx, *, text: str = None):
         """Turns the text into a crab rave."""
         await ctx.message.delete()
         async with ctx.channel.typing():
             print("Downloading...")
-            url = f'https://adventurous-damselfly.glitch.me/video/{parse.quote(text)}.mp4?style=classic'
+            url = f"https://adventurous-damselfly.glitch.me/video/{parse.quote(text)}.mp4?style=classic"
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     if resp.status != 200:
                         return False
                     resp = io.BytesIO(await resp.read())
-            await ctx.send(file=discord.File(resp, f'{text}.mp4'))
+            await ctx.send(file=discord.File(resp, f"{text}.mp4"))
 
     @commands.command(name="owo")
     @only_random
@@ -59,15 +59,19 @@ class FunCommands(commands.Cog, name="Fun"):
         """owo"""
         await ctx.send(f"owo what's {ctx.author.mention}")
 
-    @commands.command(name="up-down-up-down-left-right-left-right-b-a-start", hidden=True,
-                      aliases=['updownupdownleftrightleftrightbastart'])
+    @commands.command(
+        name="up-down-up-down-left-right-left-right-b-a-start",
+        hidden=True,
+        aliases=["updownupdownleftrightleftrightbastart"],
+    )
     @only_random
-    async def updownupdownleftrightleftrightbastart(self, ctx, ):
+    async def updownupdownleftrightleftrightbastart(
+        self, ctx,
+    ):
         """A lot of typing for nothing."""
         await ctx.send("wow that's a long cheat code. You win 20 CodeCoin!!")
 
-
-    @commands.command(pass_context=True, aliases=['disconnect'])
+    @commands.command(pass_context=True, aliases=["disconnect"])
     async def disconnectvc(self, ctx):
         await ctx.message.delete()
         vc = ctx.message.guild.voice_client
@@ -76,8 +80,16 @@ class FunCommands(commands.Cog, name="Fun"):
         else:
             await vc.disconnect()
 
-
-    @commands.command(name="sponsorship", aliases=['sponsor', 'sponsormessage', 'sponsor-message', 'sponsor_message', "sponsors"])
+    @commands.command(
+        name="sponsorship",
+        aliases=[
+            "sponsor",
+            "sponsormessage",
+            "sponsor-message",
+            "sponsor_message",
+            "sponsors",
+        ],
+    )
     @require_vc
     async def sponsorship(self, ctx):
         """Says a message from a sponsor."""
