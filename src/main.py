@@ -56,7 +56,7 @@ initial_cogs = [
     "cogs.fun-commands",
     "cogs.reactions",
 ]
-
+loaded_cogs = []
 statuses = [
     discord.Game("the sweet, sweet music of CodeDay!"),
     discord.Game("Global Thermonuclear War"),
@@ -74,6 +74,7 @@ for cog in initial_cogs:
     try:
         bot.load_extension(cog)
         logging.info(f"Successfully loaded extension {cog}")
+        loaded_cogs.append(cog)
     except Exception as e:
         logging.exception(
             f"Failed to load extension {cog}.", exc_info=traceback.format_exc()
@@ -96,6 +97,9 @@ async def bug_report(ctx, *, issue):
 
 @bot.event
 async def on_ready():
+    cog_string = 'Loaded Cogs:\n'
+    for cog in initial_cogs:
+        cog_string+= f'{"✅" if cog in loaded_cogs else "❌"} {cog}\n'
     global has_bot_started
     if has_bot_started:
         return
@@ -103,19 +107,19 @@ async def on_ready():
     version = getenv("IMAGE_TAG")
     if version:
         r = requests.get(
-            f"https://api.github.com/repos/srnd/johnpeter-discord/commits/{version}"
+            f"https://api.github.com/repos/codeday/johnpeter-discord/commits/{version}"
         )
         if r.status_code == requests.codes.ok:
             commit = json.loads(r.text)["commit"]
             await bot.get_channel(error_channel).send(
-                f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`"
+                f"~~Started~~ woke up with version `{version[0:7]} - {commit['message']} ({commit['committer']['name']})`\n {cog_string}"
             )
         else:
             await bot.get_channel(error_channel).send(
-                f"~~Started~~ woke up with version `{version}`"
+                f"~~Started~~ woke up with version `{version}` \n {cog_string}"
             )
     else:
-        await bot.get_channel(error_channel).send(f"~~Started~~ woke up")
+        await bot.get_channel(error_channel).send(f"~~Started~~ woke up\n {cog_string}")
 
     await bot.change_presence(activity=choice(statuses))
 
