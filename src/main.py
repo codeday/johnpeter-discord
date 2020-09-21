@@ -8,7 +8,7 @@ from random import choice
 import discord
 import requests
 from discord.ext import commands
-from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError
+from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError, CommandInvokeError
 from raygun4py import raygunprovider
 
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
@@ -168,6 +168,13 @@ async def on_command_error(ctx, error: commands.CommandError):
 
     if isinstance(error, ExpectedClosingQuoteError):
         return await ctx.send('Looks like you dropped something: "')
+
+    if isinstance(error, CommandInvokeError):
+        if "Missing Permissions" in error.args[0]:
+            return await ctx.send(
+                "The bot does not have enough permissions to do what you asked. Consider checking the order of roles, "
+                "or give the bot's special role the permissions it needs. "
+            )
 
     else:
         await ctx.send(

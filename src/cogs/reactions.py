@@ -35,16 +35,17 @@ class ReactionCommands(commands.Cog, name="Reactions"):
             message = await ctx.guild.get_channel(values["channel_id"]).fetch_message(
                 msg_id
             )
-            user: Union[discord.User, discord.Member]
-            async for user in message.reactions.users():
-                if not any(
-                    role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
-                ):
-                    await user.add_roles(
-                        message.guild.get_role(
-                            random.choice(groupmsgs[msg_id]["role_ids"])
+            for reaction in message.reactions:
+                user: Union[discord.User, discord.Member]
+                async for user in reaction.users():
+                    if not any(
+                        role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
+                    ):
+                        await user.add_roles(
+                            message.guild.get_role(
+                                random.choice(groupmsgs[msg_id]["role_ids"])
+                            )
                         )
-                    )
 
     @commands.command()
     @checks.requires_staff_role()
@@ -61,7 +62,6 @@ class ReactionCommands(commands.Cog, name="Reactions"):
             )
             return
 
-        # TODO: Print the actual associations that will be deleted
         if await confirm(
             f"Ok, I'll delete {len(resp)} associations, for the roles {[message.guild.get_role(res.role_id).name for res in resp]}. "
             f"Please confirm this action:",
@@ -113,6 +113,13 @@ class ReactionCommands(commands.Cog, name="Reactions"):
                 )
             session.commit()
             session.close()
+
+        if await confirm(
+            f'Should I give the roles retroactively to people who have already reacted?',
+            ctx,
+            self.bot,
+        ):
+            await self.update_reaction_roles(ctx)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
