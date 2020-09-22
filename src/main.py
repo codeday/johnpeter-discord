@@ -8,7 +8,7 @@ from random import choice
 import discord
 import requests
 from discord.ext import commands
-from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError
+from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError, CommandInvokeError
 from raygun4py import raygunprovider
 
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
@@ -140,28 +140,41 @@ async def on_command_error(ctx, error: commands.CommandError):
             "help` to view the help documentation."
         )
 
-    if type(error) is OnlyAllowedInChannels:
+    if isinstance(error, OnlyAllowedInChannels):
         return await ctx.send(
             f"You can only do that in {'/'.join([f'<#{cid}>' for cid in error.channels])}"
         )
         # TODO: See if this works
 
-    if type(error) is RequiresVoiceChannel:
+    if isinstance(error, RequiresVoiceChannel):
         return await ctx.send(f"You're not in a voice channel!")
 
-    if type(error) is MissingAnyRole:
+    if isinstance(error, MissingAnyRole):
         return await ctx.send(
             "You are not in the sudoers file. This incident will be reported."
         )
 
-    if type(error) is BadArgument:
+    if isinstance(error, BadArgument):
         if "Emoji" in error.args[0]:
             return await ctx.send(
                 "Hmm, did you miss some quotes or use an emoji from another server?"
             )
+        if "Message" in error.args[0] and ctx.args[0].qualified_name == "Reactions":
+            return await ctx.send("I can't find that message! Please be sure it's given as **either** (1) {channel "
+                                  "ID}-{message ID} (retrieved by shift-clicking on “Copy ID”) **or** (2) the "
+                                  "message's URL. \nMore info: "
+                                  "https://discordpy.readthedocs.io/en/latest/ext/commands/api.html#discord.ext.commands.MessageConverter"
+                                  ".commands.MessageConverter")
 
-    if type(error) is ExpectedClosingQuoteError:
+    if isinstance(error, ExpectedClosingQuoteError):
         return await ctx.send('Looks like you dropped something: "')
+
+    if isinstance(error, CommandInvokeError):
+        if "Missing Permissions" in error.args[0]:
+            return await ctx.send(
+                "The bot does not have enough permissions to do what you asked. Consider checking the order of roles, "
+                "or give the bot's special role the permissions it needs. "
+            )
 
     else:
         await ctx.send(

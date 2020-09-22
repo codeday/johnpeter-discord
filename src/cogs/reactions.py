@@ -1,5 +1,6 @@
 import random
-from typing import Union
+from typing import Union, Optional
+import re
 
 import discord
 from discord.ext import commands
@@ -34,26 +35,54 @@ class ReactionCommands(commands.Cog, name="Reactions"):
             message = await ctx.guild.get_channel(values["channel_id"]).fetch_message(
                 msg_id
             )
-            user: Union[discord.User, discord.Member]
-            async for user in message.reactions.users():
-                if not any(
-                    role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
-                ):
-                    await user.add_roles(
-                        message.guild.get_role(
-                            random.choice(groupmsgs[msg_id]["role_ids"])
+            for reaction in message.reactions:
+                user: Union[discord.User, discord.Member]
+                async for user in reaction.users():
+                    if not any(
+                        role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
+                    ):
+                        await user.add_roles(
+                            message.guild.get_role(
+                                random.choice(groupmsgs[msg_id]["role_ids"])
+                            )
                         )
-                    )
-
-    async def clear(self):
-        # TODO: Lola you need to write this function to unlink a message, should just be database stuff
-        pass
 
     @commands.command()
     @checks.requires_staff_role()
-    async def reaction_groups(
-        self, ctx: commands.Context, message_channel_id, message_id
-    ):
+    async def clear(self, ctx, message: discord.Message):
+        """A command to unlink a message, deleting the database info about it and optionally the message itself"""
+        session = session_creator()
+        query = session.query(Reactions).filter_by(
+            channel_id=message.channel.id, message_id=message.id
+        )
+        resp = query.all()
+        if len(resp) == 0:
+            await ctx.send(
+                "Did not find an message with the provided IDs in the database! Maybe you copied one wrong?"
+            )
+            return
+
+        if await confirm(
+            f"Ok, I'll delete {len(resp)} associations, for the roles {[message.guild.get_role(res.role_id).name for res in resp]}. "
+            f"Please confirm this action:",
+            ctx,
+            self.bot,
+        ):
+            query.delete()
+            session.commit()
+            session.close()
+
+            if await confirm(
+                f"Should I also delete the message itself?", ctx, self.bot
+            ):
+                await message.delete()
+        else:
+            session.rollback()
+            session.close()
+
+    @commands.command()
+    @checks.requires_staff_role()
+    async def reaction_groups(self, ctx: commands.Context, message: discord.Message):
         """ Takes the students who have reacted to a message (and those who react later) and assigns them a random role
         from the corresponding roles in the command or database
 
@@ -61,10 +90,6 @@ class ReactionCommands(commands.Cog, name="Reactions"):
 
         TODO: Process existing reactions
         """
-        message_channel_id = int(message_channel_id)
-        message_id = int(message_id)
-        channel = ctx.guild.get_channel(message_channel_id)
-        message = await channel.fetch_message(message_id)
         roles = ctx.message.role_mentions
         if len(roles) == 0:
             await ctx.send(
@@ -82,12 +107,19 @@ class ReactionCommands(commands.Cog, name="Reactions"):
                 session.add(
                     Reactions(
                         role_id=role.id,
-                        message_id=message_id,
-                        channel_id=message_channel_id,
+                        message_id=message.id,
+                        channel_id=message.channel.id,
                     )
                 )
             session.commit()
             session.close()
+
+        if await confirm(
+            f'Should I give the roles retroactively to people who have already reacted?',
+            ctx,
+            self.bot,
+        ):
+            await self.update_reaction_roles(ctx)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
