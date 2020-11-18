@@ -1,13 +1,12 @@
 import random
-from typing import Union, Optional
-import re
+from typing import Union
 
 import discord
 from discord.ext import commands
 
-from utils.confirmation import confirm
-from utils import checks
 from db.models import session_creator, Reactions
+from utils import checks
+from utils.confirmation import confirm
 
 
 class ReactionCommands(commands.Cog, name="Reactions"):
@@ -38,14 +37,17 @@ class ReactionCommands(commands.Cog, name="Reactions"):
             for reaction in message.reactions:
                 user: Union[discord.User, discord.Member]
                 async for user in reaction.users():
-                    if not any(
-                        role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
-                    ):
-                        await user.add_roles(
-                            message.guild.get_role(
-                                random.choice(groupmsgs[msg_id]["role_ids"])
+                    try:
+                        if not any(
+                            role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
+                        ):
+                            await user.add_roles(
+                                message.guild.get_role(
+                                    random.choice(groupmsgs[msg_id]["role_ids"])
+                                )
                             )
-                        )
+                    except Exception as e:
+                        print(f'Error adding reaction role to user {user}: {e}')
 
     @commands.command()
     @checks.requires_staff_role()
