@@ -10,7 +10,7 @@ postgres_db = {
     "username": getenv("DB_USERNAME", "postgres"),
     "password": getenv("DB_PASSWORD"),
     "database": getenv("DB_DB", "johnpeter-discord"),
-    "host": getenv("DB_HOST", "10.0.3.34"),
+    "host": getenv("DB_HOST", "postgres-master.service.consul"),
     "port": 5432,
 }
 postgres_url = URL(**postgres_db)
