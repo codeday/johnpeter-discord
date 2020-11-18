@@ -37,15 +37,18 @@ class ReactionCommands(commands.Cog, name="Reactions"):
             for reaction in message.reactions:
                 user: Union[discord.User, discord.Member]
                 async for user in reaction.users():
+                    if type(user) == discord.User:
+                        user = message.guild.get_member(user.id)
                     try:
-                        if not any(
-                            role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
-                        ):
-                            await user.add_roles(
-                                message.guild.get_role(
-                                    random.choice(groupmsgs[msg_id]["role_ids"])
+                        if user is not None:
+                            if not any(
+                                    role.id in groupmsgs.get(msg_id)["role_ids"] for role in user.roles
+                            ):
+                                await user.add_roles(
+                                    message.guild.get_role(
+                                        random.choice(groupmsgs[msg_id]["role_ids"])
+                                    )
                                 )
-                            )
                     except Exception as e:
                         print(f'Error adding reaction role to user {user}: {e}')
 
