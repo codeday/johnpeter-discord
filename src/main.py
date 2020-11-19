@@ -55,6 +55,7 @@ initial_cogs = [
     "cogs.tournament",
     "cogs.fun-commands",
     "cogs.reactions",
+    "cogs.events",
 ]
 loaded_cogs = []
 statuses = [
