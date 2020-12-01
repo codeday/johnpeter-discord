@@ -56,7 +56,7 @@ class SnippetCog(commands.Cog, name="Guide"):
 
     @snippet.command(name='preview')
     @checks.requires_staff_role()
-    async def send(self, ctx, id):
+    async def preview(self, ctx, id):
         if not(id in self.snippets):
             await ctx.send('No such snippet!')
             return
