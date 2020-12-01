@@ -20,6 +20,13 @@ metadata = MetaData()
 Base = declarative_base(bind=engine, metadata=metadata)
 
 
+class ReadGuide(Base):
+    __tablename__ = "read_guides"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
+    channel_id = Column(String, nullable=False)
+
+
 class Team(Base):
     __tablename__ = "team"
 
@@ -28,7 +35,8 @@ class Team(Base):
     tc_id = Column(String, nullable=False)
     join_message_id = Column(String, nullable=False)
     project = Column(String)
-    members = relationship("Members", back_populates="team", cascade="all, delete")
+    members = relationship(
+        "Members", back_populates="team", cascade="all, delete")
     time = Column(DateTime, server_default=text('now()'))
 
     def __str__(self):
@@ -45,7 +53,8 @@ class Members(Base):
     id = Column(Integer, primary_key=True)
     team_id = Column(Integer, ForeignKey("team.id"))
     member_id = Column(String, nullable=False)
-    team = relationship("Team", back_populates="members", cascade="all, delete")
+    team = relationship("Team", back_populates="members",
+                        cascade="all, delete")
     time = Column(DateTime, server_default=text('now()'))
 
 
@@ -76,7 +85,8 @@ class Reactions(Base):
         }
         """
         session = session_creator()
-        groupmsgs_db = session.query(Reactions).filter(Reactions.reaction_type == 0).all()
+        groupmsgs_db = session.query(Reactions).filter(
+            Reactions.reaction_type == 0).all()
         groupmsgs = {}
 
         msg: Reactions
@@ -84,7 +94,8 @@ class Reactions(Base):
             # We're not sure if message IDs are actually unique or not, this assumes they are, but even still it's
             # not likely there will be a conflict, so we're probably fine...
             if groupmsgs.get(msg.message_id):
-                groupmsgs[msg.message_id]["role_ids"] = [*groupmsgs[msg.message_id]["role_ids"], msg.role_id]
+                groupmsgs[msg.message_id]["role_ids"] = [
+                    *groupmsgs[msg.message_id]["role_ids"], msg.role_id]
             else:
                 groupmsgs[msg.message_id] = {}
                 groupmsgs[msg.message_id]["channel_id"] = msg.channel_id

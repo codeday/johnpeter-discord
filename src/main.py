@@ -44,7 +44,8 @@ bot = commands.Bot(
     command_prefix=command_prefix,
     command_not_found="Heck! That command doesn't exist!!",
     description="I am 100% authentic object:human",
-    allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False)
+    allowed_mentions=discord.AllowedMentions(
+        everyone=False, users=False, roles=False)
 )
 logging.basicConfig(level=logging.INFO)
 
@@ -56,6 +57,7 @@ initial_cogs = [
     "cogs.fun-commands",
     "cogs.reactions",
     "cogs.events",
+    "cogs.guide",
 ]
 loaded_cogs = []
 statuses = [
@@ -87,7 +89,8 @@ async def bug_report(ctx, *, issue):
     """Allows users to file a bug report straight through John.
     This will raise a new raygun issue and can be dealt with that way. """
     client = raygunprovider.RaygunSender(raygun_key)
-    httpResult = client.send_exception(exception=BugReport(message=issue, context=ctx))
+    httpResult = client.send_exception(
+        exception=BugReport(message=issue, context=ctx))
     if 200 <= httpResult[0] <= 299:
         await ctx.send("Report filed, thank you!")
     else:
@@ -100,7 +103,7 @@ async def bug_report(ctx, *, issue):
 async def on_ready():
     cog_string = 'Loaded Cogs:\n'
     for cog in initial_cogs:
-        cog_string+= f'{"✅" if cog in loaded_cogs else "❌"} {cog}\n'
+        cog_string += f'{"✅" if cog in loaded_cogs else "❌"} {cog}\n'
     global has_bot_started
     if has_bot_started:
         return
