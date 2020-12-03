@@ -217,5 +217,5 @@ src/cache/*
 src/secrets/*
 cache/*
 src/secrets/*
-!/src/tourney_data/tourneys.tmt
-src/tourney_data/
+tourney_data/*
+src/tourney_data/*
