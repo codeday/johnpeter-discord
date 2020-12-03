@@ -51,7 +51,7 @@ class BadgeCog(commands.Cog, name="Guide"):
             await ctx.send('Invalid badge command passed...')
 
     @snippet.command(name='give')
-    # @checks.requires_staff_role()
+    @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
         if (await grant(self.bot, member, id)):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
@@ -71,6 +71,32 @@ class BadgeCog(commands.Cog, name="Guide"):
             return
         b = badges[0]
         await ctx.send(f"{b['emoji']} **{b['name']}**: {b['description']}")
+
+    @snippet.command(name='inspect')
+    async def give(self, ctx, member: discord.Member):
+        query = f"""{{
+            account {{
+                getUser(where: {{ discordId: "{member.id}"}}) {{
+                    badges {{
+                        details {{
+                            id
+                            name
+                            emoji
+                            description
+                        }}
+                    }}
+                }}
+            }}
+        }}
+        """
+        result = self.gql(query)
+        if not result["account"]["getUser"]:
+            await ctx.send("This user hasn't linked their CodeDay account.")
+            return
+
+        badges = result["account"]["getUser"]["badges"]
+
+        await ctx.send("\n".join([f"{b['details']['emoji']} **{b['details']['name']}** (`{b['details']['id']}`)" for b in badges]))
 
 
 def setup(bot):

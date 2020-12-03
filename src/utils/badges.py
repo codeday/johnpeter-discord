@@ -2,6 +2,7 @@ import json
 from jwt import encode
 import time
 import requests
+import logging
 from os import getenv
 
 
@@ -20,7 +21,7 @@ def gql(query):
                            headers={"Authorization": f"Bearer {gql_token()}"})
     data = json.loads(result.text)
     if "errors" in data:
-        print(data["errors"])
+        logging.error(result.text)
     return data["data"]
 
 
@@ -32,18 +33,24 @@ def get_username(member):
             }}
         }}
     }}"""
-    user = gql(query)["account"]["getUser"]
-    if user:
-        return user["username"]
+    result = gql(query)
+    try:
+        user = result["account"]["getUser"]
+        if user:
+            return user["username"]
+    except:
+        logging.error(
+            f"could not look up ${member.id}")
+        pass
     return None
 
 
 async def grant(bot, member, id):
-    print(f"granting badge {id}...")
+    logging.info(f"granting badge {id}...")
     username = get_username(member)
     if not username:
         return False
-    print(f"...to {username}")
+    logging.info(f"...to {username}")
 
     query = f"""mutation {{
         account {{
@@ -53,7 +60,10 @@ async def grant(bot, member, id):
 
     gql(query)
 
-    channel = await bot.fetch_channel(int(getenv("CHANNEL_A_UPDATE")))
-    await channel.send(f"a~update <@{member.id}>")
+    try:
+        channel = await bot.fetch_channel(int(getenv("CHANNEL_A_UPDATE")))
+        await channel.send(f"a~update <@{member.id}>")
+    except Exception as err:
+        logging.error(err)
 
     return True
