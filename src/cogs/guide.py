@@ -14,6 +14,7 @@ GUIDES_QUERY = """
       items {
         key
         value
+        json
       }
     }
   }
@@ -36,11 +37,14 @@ class GuideCog(commands.Cog, name="Guide"):
     @commands.Cog.listener()
     async def on_message(self, message):
         if not(self.was_notified(message.channel, message.author)) and str(message.channel.id) in self.guides:
-            await message.author.send(self.guides[str(message.channel.id)])
             self.set_notified(message.channel, message.author)
-            # TODO(@tylermenezes) improve this
-            if message.channel.id == "689541918178279589":
-                await grant(self.bot, message.author, "help-desk")
+            guide = self.guides[str(message.channel.id)]
+
+            if guide["value"]:
+                await message.author.send(guide["value"])
+
+            if guide["json"] and guide["json"]["badgeId"]:
+                await grant(self.bot, message.author, guide["json"]["badgeId"])
 
     @tasks.loop(minutes=30)
     async def update_guides(self):
@@ -49,7 +53,7 @@ class GuideCog(commands.Cog, name="Guide"):
                                json={"query": GUIDES_QUERY})
         data = json.loads(result.text)
         items = data["data"]["cms"]["strings"]["items"]
-        self.guides = {item["key"].split(".")[-1]: item["value"]
+        self.guides = {item["key"].split(".")[-1]: item
                        for item in items}
 
     def was_notified(self, channel, user):

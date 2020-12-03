@@ -4,6 +4,7 @@ import json
 import requests
 from utils import checks
 from utils.badges import grant
+from utils.paginated_send import paginated_send_multiline
 
 BADGES_QUERY = """
 {
@@ -14,6 +15,7 @@ BADGES_QUERY = """
         name
         emoji
         description
+        earnCriteria
       }
     }
   }
@@ -40,6 +42,19 @@ class BadgeCog(commands.Cog, name="Guide"):
             print(data["errors"])
         return data["data"]
 
+    def get_badge(self, id):
+        badges = [b for b in self.badges if (
+            b['id'] == id or b['emoji'] == id)]
+        if len(badges) > 0:
+            return badges[0]
+        return None
+
+    async def send_list_badges(self, ctx, badges):
+        await paginated_send_multiline(
+            ctx,
+            "\n".join([f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
+                       for b in badges]))
+
     @tasks.loop(minutes=10)
     async def update_badges(self):
         print("updating badges")
@@ -51,8 +66,18 @@ class BadgeCog(commands.Cog, name="Guide"):
             await ctx.send('Invalid badge command passed...')
 
     @snippet.command(name='give')
-    @checks.requires_staff_role()
+    # @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
+        b = self.get_badge(id)
+        if (not b):
+            await ctx.send("I have't heard of that one.")
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+
+        if (b["earnCriteria"] != "bestowed"):
+            await ctx.send("I'm not giving those away for free!")
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+            return
+
         if (await grant(self.bot, member, id)):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
         else:
@@ -60,16 +85,14 @@ class BadgeCog(commands.Cog, name="Guide"):
 
     @snippet.command(name='list')
     async def list(self, ctx):
-        await ctx.send("\n".join([f"{b['emoji']} **{b['name']}** (`{b['id']}`)" for b in self.badges]))
+        await self.send_list_badges(ctx, self.badges)
 
     @snippet.command(name='info')
     async def info(self, ctx, id):
-        badges = [b for b in self.badges if (
-            b['id'] == id or b['emoji'] == id)]
-        if len(badges) == 0:
+        b = self.get_badge(id)
+        if not b:
             await ctx.send("Never heard of it!")
             return
-        b = badges[0]
         await ctx.send(f"{b['emoji']} **{b['name']}**: {b['description']}")
 
     @snippet.command(name='inspect')
@@ -96,8 +119,7 @@ class BadgeCog(commands.Cog, name="Guide"):
 
         badges = result["account"]["getUser"]["badges"]
 
-        await ctx.send("\n".join([f"{b['details']['emoji']} **{b['details']['name']}** (`{b['details']['id']}`)"
-                                  for b in badges]))
+        await self.send_list_badges(ctx, [b['details'] for b in badges])
 
 
 def setup(bot):
