@@ -73,7 +73,7 @@ class BadgeCog(commands.Cog, name="Guide"):
         await ctx.send(f"{b['emoji']} **{b['name']}**: {b['description']}")
 
     @snippet.command(name='inspect')
-    async def give(self, ctx, member: discord.Member):
+    async def inspect(self, ctx, member: discord.Member):
         query = f"""{{
             account {{
                 getUser(where: {{ discordId: "{member.id}"}}) {{
@@ -96,7 +96,8 @@ class BadgeCog(commands.Cog, name="Guide"):
 
         badges = result["account"]["getUser"]["badges"]
 
-        await ctx.send("\n".join([f"{b['details']['emoji']} **{b['details']['name']}** (`{b['details']['id']}`)" for b in badges]))
+        await ctx.send("\n".join([f"{b['details']['emoji']} **{b['details']['name']}** (`{b['details']['id']})"
+                                  for b in badges]))
 
 
 def setup(bot):
