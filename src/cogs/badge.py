@@ -96,7 +96,7 @@ class BadgeCog(commands.Cog, name="Guide"):
 
         badges = result["account"]["getUser"]["badges"]
 
-        await ctx.send("\n".join([f"{b['details']['emoji']} **{b['details']['name']}** (`{b['details']['id']})"
+        await ctx.send("\n".join([f"{b['details']['emoji']} **{b['details']['name']}** (`{b['details']['id']}`)"
                                   for b in badges]))
 
 
