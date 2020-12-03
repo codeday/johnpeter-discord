@@ -3,6 +3,7 @@ import json
 import requests
 from dateutil import parser
 from pytz import timezone
+from utils.badges import grant
 
 from db.models import session_creator, ReadGuide
 
@@ -37,6 +38,9 @@ class GuideCog(commands.Cog, name="Guide"):
         if not(self.was_notified(message.channel, message.author)) and str(message.channel.id) in self.guides:
             await message.author.send(self.guides[str(message.channel.id)])
             self.set_notified(message.channel, message.author)
+            # TODO(@tylermenezes) improve this
+            if message.channel.id == "689541918178279589":
+                grant(self.bot, message.author, "help-desk")
 
     @tasks.loop(minutes=30)
     async def update_guides(self):
