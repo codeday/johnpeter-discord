@@ -56,3 +56,5 @@ raygun4py==4.3.0
     urllib3==1.25.8
 typing-extensions==3.7.4.1
 pytz==2020.1
+jwt==1.1.0
+  cryptography==3.2.1

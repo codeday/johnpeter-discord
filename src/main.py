@@ -59,6 +59,7 @@ initial_cogs = [
     "cogs.events",
     "cogs.guide",
     "cogs.snippet",
+    "cogs.badge",
 ]
 loaded_cogs = []
 statuses = [
