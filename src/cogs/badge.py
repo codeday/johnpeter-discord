@@ -66,7 +66,7 @@ class BadgeCog(commands.Cog, name="Guide"):
             await ctx.send('Invalid badge command passed...')
 
     @snippet.command(name='give')
-    # @checks.requires_staff_role()
+    @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
         b = self.get_badge(id)
         if (not b):
