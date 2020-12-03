@@ -40,7 +40,7 @@ class GuideCog(commands.Cog, name="Guide"):
             self.set_notified(message.channel, message.author)
             # TODO(@tylermenezes) improve this
             if message.channel.id == "689541918178279589":
-                grant(self.bot, message.author, "help-desk")
+                await grant(self.bot, message.author, "help-desk")
 
     @tasks.loop(minutes=30)
     async def update_guides(self):
