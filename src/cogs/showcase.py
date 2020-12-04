@@ -34,7 +34,7 @@ class ShowcaseCog(commands.Cog, name="Showcase"):
         return f"**{project['name']}** ({project['pod']})"
 
     def link(self, project):
-        return f"https://showcase.codeday.org/{project['id']}"
+        return f"https://showcase.codeday.org/project/{project['id']}"
 
     @subscribe(GQLService.member_added_listener)
     async def on_member_added(self, member):
