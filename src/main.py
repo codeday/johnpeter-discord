@@ -16,6 +16,8 @@ from utils.exceptions import BugReport
 
 has_bot_started = False
 
+logging.basicConfig(level=logging.WARNING)
+
 BOT_TOKEN = environ["BOT_TOKEN"]
 # Where errors go when reported
 error_channel = int(getenv("CHANNEL_ERRORS", 693223559387938817))
@@ -50,16 +52,17 @@ bot = commands.Bot(
 logging.basicConfig(level=logging.INFO)
 
 initial_cogs = [
-    "cogs.team-builder",
-    "cogs.cleverbot",
-    "cogs.admin-commands",
-    "cogs.tournament",
-    "cogs.fun-commands",
-    "cogs.reactions",
-    "cogs.events",
-    "cogs.guide",
-    "cogs.snippet",
-    "cogs.badge",
+    # "cogs.team-builder",
+    # "cogs.cleverbot",
+    # "cogs.admin-commands",
+    # "cogs.tournament",
+    # "cogs.fun-commands",
+    # "cogs.reactions",
+    # "cogs.events",
+    # "cogs.guide",
+    # "cogs.snippet",
+    # "cogs.badge",
+    "cogs.showcase",
 ]
 loaded_cogs = []
 statuses = [
