@@ -50,8 +50,12 @@ class ShowcaseCog(commands.Cog, name="Showcase"):
 
     @subscribe(GQLService.team_created_listener)
     async def on_project_created(self, project):
+        member_tag = ""
+        if ('members' in project and project['members'] is not None and len(project['members']) > 0 and
+                'account' in project['members'][0] and 'discordId' in project['members'][0]['account']):
+            member_tag = f"_To join, talk to: <@{project['members'][0]['account']['discordId']}>_\n"
         await (await self.get_gallery_channel()).send(
-            f"**{project['name']}** ({project['type'].lower()})\n{self.link(project)}\n{project['description']}"
+            f"**{project['name']}** ({project['type'].lower()})\n{member_tag}{self.link(project)}\n{project['description']}"
         )
         await (await self.get_log_channel()).send(
             f"{self.name(project)} `create` {self.link(project)}"
