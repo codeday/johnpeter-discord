@@ -4,6 +4,7 @@ import json
 import requests
 from utils import checks
 from utils.badges import grant
+from utils.confirmation import confirm
 from utils.paginated_send import paginated_send_multiline
 
 BADGES_QUERY = """
@@ -69,17 +70,36 @@ class BadgeCog(commands.Cog, name="Guide"):
     @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
         b = self.get_badge(id)
-        if (not b):
+        if not b:
             await ctx.send("I have't heard of that one.")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-
-        if (b["earnCriteria"] != "bestowed"):
+        if b["earnCriteria"] != "bestowed":
             await ctx.send("I'm not giving those away for free!")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
             return
-
-        if (await grant(self.bot, member, id)):
+        if await grant(self.bot, member, id):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+        else:
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+
+    @snippet.command(name='give_role')
+    @checks.requires_staff_role()
+    async def give_role(self, ctx, role: discord.Role, id):
+        print(role)
+        print(role.members)
+        b = self.get_badge(id)
+        if not b:
+            await ctx.send("I have't heard of that one.")
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        elif b["earnCriteria"] != "bestowed":
+            await ctx.send("I'm not giving those away for free!")
+            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        elif await confirm(f'Are you sure, this will add a badge to {len(role.members)} person(s)', ctx, self.bot, ):
+            await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+            for member in role.members:
+                if not (await grant(self.bot, member, id)):
+                    await ctx.message.remove_reaction('\N{THUMBS UP SIGN}', self.bot.user)
+                    await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
         else:
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
@@ -106,6 +126,7 @@ class BadgeCog(commands.Cog, name="Guide"):
                             name
                             emoji
                             description
+                            earnCriteria
                         }}
                     }}
                 }}

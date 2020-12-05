@@ -147,6 +147,27 @@ class ReactionCommands(commands.Cog, name="Reactions"):
                     )
                 )
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
+        groupmsgs = Reactions.groupmsgs()
+        if (
+            payload.event_type == "REACTION_REMOVE"
+            and payload.message_id in groupmsgs
+            and payload.user_id != self.bot.user.id
+        ):
+            guild = self.bot.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
+
+            if any(
+                role.id in groupmsgs.get(payload.message_id)["role_ids"]
+                for role in member.roles
+            ):
+                await member.remove_roles(
+                    guild.get_role(
+                        random.choice(groupmsgs[payload.message_id]["role_ids"])
+                    )
+                )
+
 
 def setup(bot):
     bot.add_cog(ReactionCommands(bot))

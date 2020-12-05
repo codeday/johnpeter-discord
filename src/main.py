@@ -42,8 +42,11 @@ def command_prefix(bot, message):
         return "j!"
 
 
+intents = discord.Intents(messages=True, guilds=True, members=True, emojis=True, reactions=True, webhooks=True)
+
 bot = commands.Bot(
     command_prefix=command_prefix,
+    intents=intents,
     command_not_found="Heck! That command doesn't exist!!",
     description="I am 100% authentic object:human",
     allowed_mentions=discord.AllowedMentions(
