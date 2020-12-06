@@ -56,17 +56,17 @@ bot = commands.Bot(
 logging.basicConfig(level=logging.INFO)
 
 initial_cogs = [
-    # "cogs.team-builder",
-    # "cogs.cleverbot",
-    # "cogs.admin-commands",
-    # "cogs.tournament",
-    # "cogs.fun-commands",
-    # "cogs.reactions",
-    # "cogs.events",
-    # "cogs.guide",
-    # "cogs.snippet",
-    # "cogs.badge",
-    # "cogs.showcase",
+    "cogs.team-builder",
+    "cogs.cleverbot",
+    "cogs.admin-commands",
+    "cogs.tournament",
+    "cogs.fun-commands",
+    "cogs.reactions",
+    "cogs.events",
+    "cogs.guide",
+    "cogs.snippet",
+    "cogs.badge",
+    "cogs.showcase",
     "cogs.gold",
 ]
 loaded_cogs = []
