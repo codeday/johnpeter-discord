@@ -66,6 +66,11 @@ class BadgeCog(commands.Cog, name="Guide"):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid badge command passed...')
 
+    @snippet.command(name="refresh")
+    @checks.requires_staff_role()
+    async def refresh(self, ctx):
+        self.badges = self.gql(BADGES_QUERY)["cms"]["badges"]["items"]
+
     @snippet.command(name='give')
     @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
