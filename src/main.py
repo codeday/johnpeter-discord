@@ -151,7 +151,7 @@ async def on_command_error(ctx, error: commands.CommandError):
     if isinstance(error, commands.CommandNotFound):
         return await ctx.send(
             "That command doesn't seem to exist! Please try again, and type `"
-            "help` to view the help documentation."
+            "~help` to view the help documentation."
         )
 
     if isinstance(error, OnlyAllowedInChannels):
