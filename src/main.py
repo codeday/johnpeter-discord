@@ -161,7 +161,7 @@ async def on_ready():
     for i in bot.guilds:
         counter += 1
         logging.info(f"We have logged in as {bot.user}")
-        await i.get_member(await bot.user.id).edit(nick=(f"John \"{choice(names)}\" Peter"))
+        await i.get_member(bot.user.id).edit(nick=(f"John \"{choice(names)}\" Peter"))
     logging.info(f"We are in {counter} server!")
 
 
