@@ -61,7 +61,7 @@ loaded_cogs = []
 statuses = [
     discord.Game("the sweet, sweet music of CodeDay!"),
     discord.Game("Global Thermonuclear War"),
-    discord.Game("Debugging Simulator 2020"),
+    discord.Game("Debugging Simulator 2021"),
     discord.Game("with fire"),
     discord.Activity(
         name="people forget to add .gitignores", type=discord.ActivityType.watching
