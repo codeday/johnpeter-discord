@@ -16,6 +16,7 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
         self.bot = bot
         self.states = {}
         self.dmstates = {}
+        self.dminit = []
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -24,7 +25,8 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
             and message.channel.name == "random"
             and message.content.lower().startswith("john ")
         ):
-            state_id = str(message.channel.name)  # each channel has unique state
+            # each channel has unique state
+            state_id = str(message.channel.name)
 
             if state_id not in self.states:
                 self.states[state_id] = None
@@ -40,6 +42,13 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
             type(message.channel) == discord.channel.DMChannel
             and message.author is not message.channel.me
         ):
+            if not(message.author.id in self.dminit):
+                await message.channel.send(
+                    "Hey, let me tell you a secret. ***I'm actually a robot.*** I respond to messages by AI.\n\n"
+                    + "**If you need help, please message a staff member. (Someone with a red name.)**"
+                )
+                self.dminit.append(message.author.id)
+                return
             state_id = str(message.channel.id)  # each channel has unique state
 
             if state_id not in self.dmstates:
