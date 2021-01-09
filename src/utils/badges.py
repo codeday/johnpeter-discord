@@ -54,7 +54,7 @@ async def grant(bot, member, id):
 
     query = f"""mutation {{
         account {{
-            grantBadge(username: "{username}", badge: {{ id: "{id}" }})
+            grantBadge(where: {{username: "{username}"}}, badge: {{ id: "{id}" }})
         }}
     }}"""
 
