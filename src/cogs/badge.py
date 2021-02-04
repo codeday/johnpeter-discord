@@ -124,7 +124,7 @@ class BadgeCog(commands.Cog, name="Guide"):
     async def inspect(self, ctx, member: discord.Member):
         query = f"""{{
             account {{
-                getUser(where: {{ discordId: "{member.id}"}}) {{
+                getUser(where: {{ discordId: "{member.id}"}}, fresh: true) {{
                     badges {{
                         details {{
                             id
