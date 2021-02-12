@@ -39,7 +39,13 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
         self.cogs = [c for c in self.client.cogs.keys()]
 
     async def help(self, context):
-        fields = [[f"All `{cog}` Commands:", "".join([f" • `{cmd}`\n" for cmd in self.client.get_cog(cog).get_commands()]).rstrip()] for cog in self.cogs]
+        fields = []
+        for cog in self.cogs:
+            cmds = []
+            if self.client.get_cog(cog).get_commands():
+                for cmd in self.client.get_cog(cog).get_commands():
+                    cmds.append(f" • `{cmd}`\n")
+                fields.append([f"All `{cog}` commands:", "".join(cmds).rstrip()])
         embed = create_embed(
             f"{self.client.user}: Help",
             description=self.client.description,
