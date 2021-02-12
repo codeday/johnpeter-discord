@@ -14,6 +14,8 @@ from raygun4py import raygunprovider
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 from utils.exceptions import BugReport
 
+from cogs.help import BotHelpCommand
+
 has_bot_started = False
 
 logging.basicConfig(level=logging.WARNING)
@@ -54,6 +56,8 @@ bot = commands.Bot(
         everyone=False, users=False, roles=False)
 )
 logging.basicConfig(level=logging.INFO)
+
+bot.help_command = BotHelpCommand()
 
 initial_cogs = [
     "cogs.team-builder",
