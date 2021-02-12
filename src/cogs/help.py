@@ -1,8 +1,9 @@
 from typing import Optional
 
+import discord
 from discord.ext import commands
 from discord.utils import get
-import discord
+
 
 def create_embed(title=None, description=None, author=None, fields=None, image=None, thumbnail=None, color=discord.Color.teal()):
     if title:
@@ -38,7 +39,7 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
         self.client.remove_command("help")
         self.cogs = [c for c in self.client.cogs.keys()]
 
-    async def help(self, context):
+    async def help(self, ctx):
         fields = []
         for cog in self.cogs:
             cmds = []
@@ -51,9 +52,9 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
             description=self.client.description,
             fields=fields
         )
-        await context.send(embed=embed)
+        await ctx.send(embed=embed)
 
-    async def cmd_help(self, client, context, command):
+    async def cmd_help(self, client, ctx, command):
         command = get(self.client.commands, name=command)
         embed = create_embed(f"{self.client.user}: Help", description=f"Help with the `{command}` command", fields=[
             ["Syntax", syntax(client, command)],
@@ -61,9 +62,9 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
             ["Description", command.description if command.description else "None"],
             ["Aliases", ", ".join(command.aliases) if command.aliases else "None"]
         ])
-        await context.send(embed=embed)
+        await ctx.send(embed=embed)
 
-    async def cat_help(self, context, category):
+    async def cat_help(self, ctx, category):
         embed = create_embed(
             f"{self.client.user}: Help",
             description=f"Help with the `{category}` category",
@@ -72,20 +73,20 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
                 ["Commands", "".join([f" • `{cmd}` - {cmd.brief}\n" for cmd in self.client.get_cog(category).get_commands()]).rstrip()]
             ]
         )
-        await context.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(name="help", brief="Get help about the commands and categories of the bot", description="This will allow you to get the descriptions, aliases, and syntax of commands, and the description and list of commands in a category. This command can optionally be used with a command or category name.")
-    async def show_help(self, context, name: Optional[str]):
+    async def show_help(self, ctx, name: Optional[str]):
         self.cogs = [c for c in self.client.cogs.keys()]
         if name is None:
-            await self.help(context)
+            await self.help(ctx)
             return
         if name in self.cogs:
-            await self.cat_help(context, name)
+            await self.cat_help(ctx, name)
         if get(self.client.commands, name=name):
-            await self.cmd_help(self.client, context, name)
+            await self.cmd_help(self.client, ctx, name)
         else:
-            await context.send(embed=create_embed(f"{self.client.user}: Help", description=f"The command `{name}` does not exist!"))
+            await ctx.send(embed=create_embed(f"{self.client.user}: Help", description=f"The command `{name}` does not exist!"))
 
 
 def setup(client):
