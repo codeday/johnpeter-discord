@@ -41,7 +41,7 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
     async def help(self, context):
         fields = [[f"All `{cog}` Commands:", "".join([f" • `{cmd}`\n" for cmd in self.client.get_cog(cog).get_commands()]).rstrip()] for cog in self.cogs]
         embed = create_embed(
-            "John \"Not a robot\" Peter: Help",
+            f"{self.client.user}: Help",
             description=self.client.description,
             fields=fields
         )
@@ -49,7 +49,7 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
 
     async def cmd_help(self, client, context, command):
         command = get(self.client.commands, name=command)
-        embed = create_embed("John \"Not a robot\" Peter: Help", description=f"Help with the `{command}` command", fields=[
+        embed = create_embed(f"{self.client.user}: Help", description=f"Help with the `{command}` command", fields=[
             ["Syntax", syntax(client, command)],
             ["Brief Description", command.brief if command.brief else "None"],
             ["Description", command.description if command.description else "None"],
@@ -59,7 +59,7 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
 
     async def cat_help(self, context, category):
         embed = create_embed(
-            "John \"Not a robot\" Peter: Help",
+            f"{self.client.user}: Help",
             description=f"Help with the `{category}` category",
             fields=[
                 ["Description:", self.client.get_cog(category).description if self.client.get_cog(category).description else None],
@@ -79,7 +79,7 @@ class Help(commands.Cog, name="help", description="Get info about the bot and ho
         if get(self.client.commands, name=name):
             await self.cmd_help(self.client, context, name)
         else:
-            await context.send(embed=create_embed("John \"Not a robot\" Peter: Help", description=f"The command `{name}` does not exist!"))
+            await context.send(embed=create_embed(f"{self.client.user}: Help", description=f"The command `{name}` does not exist!"))
 
 
 def setup(client):
