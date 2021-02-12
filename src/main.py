@@ -11,10 +11,9 @@ from discord.ext import commands
 from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError, CommandInvokeError
 from raygun4py import raygunprovider
 
+from cogs.help import BotHelpCommand
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 from utils.exceptions import BugReport
-
-from cogs.help import BotHelpCommand
 
 has_bot_started = False
 
@@ -72,7 +71,6 @@ initial_cogs = [
     "cogs.badge",
     "cogs.showcase",
     "cogs.gold",
-    "cogs.help"
 ]
 loaded_cogs = []
 statuses = [
