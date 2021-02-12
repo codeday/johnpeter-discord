@@ -1,5 +1,6 @@
-from discord.ext import commands
 import discord
+from discord.ext import commands
+
 
 def create_embed(title=None, description=None, author=None, fields=None, image=None, thumbnail=None,
                  color=discord.Color.teal()):
@@ -23,5 +24,5 @@ def create_embed(title=None, description=None, author=None, fields=None, image=N
 class BotHelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
         destination = self.get_destination()
-        embed = create_embed("SOBot: Help", description="".join(self.paginator.pages))
+        embed = create_embed("John Peter: Help", description="".join(self.paginator.pages))
         await destination.send(embed=embed)
