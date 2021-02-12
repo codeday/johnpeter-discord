@@ -2,8 +2,25 @@ from typing import Optional
 
 from discord.ext import commands
 from discord.utils import get
-from helpers.helper_funcs import create_embed
+import discord
 
+def create_embed(title=None, description=None, author=None, fields=None, image=None, thumbnail=None, color=discord.Color.teal()):
+    if title:
+        embed = discord.Embed(title=title, color=color)
+    else:
+        embed = discord.Embed(color=color)
+    if description:
+        embed.description = description
+    if author:
+        embed.set_author(name="For " + author.name, icon_url=author.avatar_url)
+    if fields:
+        for field in fields:
+            embed.add_field(name=field[0], value=field[1], inline=field[2] if len(field) > 2 else False)
+    if image:
+        embed.set_image(url=image)
+    if thumbnail:
+        embed.set_thumbnail(url=thumbnail)
+    return embed
 
 def syntax(client, command):
     cmd_and_aliases = client.command_prefix[0] + "|".join([str(command), *command.aliases])
