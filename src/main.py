@@ -11,6 +11,7 @@ from discord.ext import commands
 from discord.ext.commands import MissingAnyRole, BadArgument, ExpectedClosingQuoteError, CommandInvokeError
 from raygun4py import raygunprovider
 
+from cogs.help import BotHelpCommand
 from utils.commands import OnlyAllowedInChannels, RequiresVoiceChannel
 from utils.exceptions import BugReport
 
@@ -54,6 +55,8 @@ bot = commands.Bot(
         everyone=False, users=False, roles=False)
 )
 logging.basicConfig(level=logging.INFO)
+
+bot.help_command = BotHelpCommand()
 
 initial_cogs = [
     "cogs.team-builder",
