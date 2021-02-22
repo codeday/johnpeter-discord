@@ -8,13 +8,14 @@ from glob import glob
 from os import getenv
 from random import choice
 from urllib import parse, request
-
+import urllib.request,json
 import aiohttp
 import discord
 from discord.ext import commands
 
 from utils.cms import get_sponsor_intro, get_sponsor_audio
 from utils.commands import only_random, require_vc
+import json
 
 
 class FunCommands(commands.Cog, name="Fun"):
@@ -52,6 +53,13 @@ class FunCommands(commands.Cog, name="Fun"):
                         return False
                     resp = io.BytesIO(await resp.read())
             await ctx.send(file=discord.File(resp, f"{text}.mp4"))
+
+    @commands.command(name="doggo",aliases=["dog"])
+    @only_random
+    async def doggo(self,ctx):
+        with urllib.request.urlopen("https://dog.ceo/api/breeds/image/random") as url:
+            data = json.loads(url.read().decode())
+            await ctx.send(data.get('message'))
 
     @commands.command(name="owo")
     @only_random
