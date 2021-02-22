@@ -19,7 +19,11 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
         self.dminit = []
 
     @commands.command(name="john", aliases=["John"]) # given it depends on just starting with 'john', seems more prudent to move to command rather than overhead from on_message
-    async def john(self, ctx, *, message):
+    async def john(self, ctx, *, message=None):
+
+        if message is None:
+            await ctx.send("Sorry, what was that?")
+
         if (
             isinstance(ctx.channel,discord.channel.TextChannel) # isinstance more pythonic than type equality
             and ctx.channel.name == "random"
