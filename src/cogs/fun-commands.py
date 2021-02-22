@@ -39,21 +39,6 @@ class FunCommands(commands.Cog, name="Fun"):
             print(file)
             self.sponsorships.append(file)
 
-    @commands.command(name="crab", aliases=["crabrave", "crab_rave", "crab-rave"])
-    @only_random
-    async def crab(self, ctx, *, text: str = None):
-        """Turns the text into a crab rave."""
-        await ctx.message.delete()
-        async with ctx.channel.typing():
-            print("Downloading...")
-            url = f"https://adventurous-damselfly.glitch.me/video/{parse.quote(text)}.mp4?style=classic"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
-                    if resp.status != 200:
-                        return False
-                    resp = io.BytesIO(await resp.read())
-            await ctx.send(file=discord.File(resp, f"{text}.mp4"))
-
     @commands.command(name="doggo",aliases=["dog"])
     @only_random
     async def doggo(self,ctx):

@@ -110,7 +110,7 @@ async def bug_report(ctx, *, issue):
         await ctx.send("Report filed, thank you!")
     else:
         await ctx.send(
-            "Hmm, that didn't work. If the bug report failed, something is probaly very wrong, please @ a staff member!"
+            "Hmm, that didn't work. If the bug report failed, something is probably very wrong, please @ a staff member!"
         )
 
 
