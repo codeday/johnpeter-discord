@@ -18,14 +18,14 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
         self.dmstates = {}
         self.dminit = []
 
-    @commands.command(name="john", aliases=["John"]) # given it depends on just starting with 'john', seems more prudent to move to command rather than overhead from on_message
+    @commands.command(name="john", aliases=["John"], hidden=True)
     async def john(self, ctx, *, message=None):
 
         if message is None:
             await ctx.send("Sorry, what was that?")
 
         if (
-            isinstance(ctx.channel,discord.channel.TextChannel) # isinstance more pythonic than type equality
+            isinstance(ctx.channel,discord.channel.TextChannel)
             and ctx.channel.name == "random"
         ):
             # each channel has unique state
@@ -55,9 +55,8 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
 
             if state_id not in self.dmstates:
                 self.dmstates[state_id] = None
-            # input = message.content.split(' ', 1)[1]
             r = requests.get(
-                url=f"http://www.cleverbot.com/getreply?key={API_KEY}&input={message}&cs={self.dmstates[state_id]}", # consistency with f-string above
+                url=f"http://www.cleverbot.com/getreply?key={API_KEY}&input={message}&cs={self.dmstates[state_id]}",
                 verify=False,
             )
             msg_out = json.loads(r.text)["output"]
