@@ -18,52 +18,47 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
         self.dmstates = {}
         self.dminit = []
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @commands.command(name="john", aliases=["John"]) # given it depends on just starting with 'john', seems more prudent to move to command rather than overhead from on_message
+    async def john(self, ctx, *, message):
         if (
-            type(message.channel) == discord.channel.TextChannel
-            and message.channel.name == "random"
-            and message.content.lower().startswith("john ")
+            isinstance(ctx.channel,discord.channel.TextChannel) # isinstance more pythonic than type equality
+            and ctx.channel.name == "random"
         ):
             # each channel has unique state
-            state_id = str(message.channel.name)
+            state_id = ctx.channel.name
 
             if state_id not in self.states:
                 self.states[state_id] = None
-            input = message.content.split(" ", 1)[1]
             r = requests.get(
-                url=f"http://www.cleverbot.com/getreply?key={API_KEY}&input={input}&cs={self.states[state_id]}",
+                url=f"http://www.cleverbot.com/getreply?key={API_KEY}&input={message}&cs={self.states[state_id]}",
                 verify=False,
             )
             msg_out = json.loads(r.text)["output"]
             self.states[state_id] = json.loads(r.text)["cs"]
-            await message.channel.send(content=str(msg_out))
+            await ctx.send(content=str(msg_out))
         if (
-            type(message.channel) == discord.channel.DMChannel
-            and message.author is not message.channel.me
+            isinstance(ctx.channel, discord.channel.DMChannel)
+            and ctx.author is not ctx.channel.me
         ):
-            if not(message.author.id in self.dminit):
-                await message.channel.send(
+            if not(ctx.author.id in self.dminit):
+                await ctx.send(
                     "Hey, let me tell you a secret. ***I'm actually a robot.*** I respond to messages by AI.\n\n"
-                    + "**If you need help, please message a staff member. (Someone with a red name.)**"
+                    + "**If you need help, please message a staff member. (Someone with the Staff role.)**"
                 )
-                self.dminit.append(message.author.id)
+                self.dminit.append(ctx.author.id)
                 return
-            state_id = str(message.channel.id)  # each channel has unique state
+            state_id = str(ctx.channel.id)  # each channel has unique state
 
             if state_id not in self.dmstates:
                 self.dmstates[state_id] = None
             # input = message.content.split(' ', 1)[1]
-            input = message.content
             r = requests.get(
-                url="http://www.cleverbot.com/getreply?key={}&input={}&cs={}".format(
-                    API_KEY, input, self.dmstates[state_id]
-                ),
+                url=f"http://www.cleverbot.com/getreply?key={API_KEY}&input={message}&cs={self.dmstates[state_id]}", # consistency with f-string above
                 verify=False,
             )
             msg_out = json.loads(r.text)["output"]
             self.dmstates[state_id] = json.loads(r.text)["cs"]
-            await message.channel.send(content=str(msg_out))
+            await ctx.send(content=str(msg_out))
 
 
 def setup(bot):
