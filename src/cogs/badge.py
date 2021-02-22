@@ -76,7 +76,7 @@ class BadgeCog(commands.Cog, name="Guide"):
     async def give(self, ctx, member: discord.Member, id):
         b = self.get_badge(id)
         if not b:
-            await ctx.send("I have't heard of that one.")
+            await ctx.send("I haven't heard of that one.")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
         if b["earnCriteria"] != "bestowed":
             await ctx.send("I'm not giving those away for free!")
@@ -94,7 +94,7 @@ class BadgeCog(commands.Cog, name="Guide"):
         print(role.members)
         b = self.get_badge(id)
         if not b:
-            await ctx.send("I have't heard of that one.")
+            await ctx.send("I haven't heard of that one.")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
         elif b["earnCriteria"] != "bestowed":
             await ctx.send("I'm not giving those away for free!")
