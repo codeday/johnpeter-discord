@@ -39,6 +39,8 @@ def command_prefix(bot, message):
         return "j!"
     if message.content.startswith("~"):
         return "~"
+    elif message.content.upper().startswith("JOHN"):
+        return ""
     else:
         return "j!"
 
