@@ -2,10 +2,11 @@ import discord
 from discord.ext import commands, tasks
 import json
 import requests
+from math import ceil
 from utils import checks
 from utils.badges import grant
 from utils.confirmation import confirm
-from utils.paginated_send import paginated_send_multiline
+from utils.paginated_send import paginated_send_multiline, paginate_reaction
 
 BADGES_QUERY = """
 {
@@ -51,10 +52,34 @@ class BadgeCog(commands.Cog, name="Guide"):
         return None
 
     async def send_list_badges(self, ctx, badges):
-        await paginated_send_multiline(
-            ctx,
-            "\n".join([f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
-                       for b in badges]))
+        # await paginated_send_multiline(
+        #     ctx,
+        #     "\n".join([f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
+        #                for b in badges]))
+        all_badges = [f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
+                       for b in badges]
+        
+
+        def generate_badge_page_embed(badgelist, index, numPages, origlist):
+            return discord.Embed.from_dict({
+                "title": "Listing all badges",
+                "description": "\n".join(badgelist),
+                "footer": {
+                    "icon_url": str(ctx.author.avatar_url),
+                    "text": f"Page {1+index}/{numPages} | {len(origlist)} results | Searched by {ctx.author.name}#{ctx.author.discriminator}"
+                }
+            })
+        
+        perPage = 15
+        pages = [{"content":"","embed":generate_badge_page_embed(
+            badgelist=all_badges[i:i+perPage], 
+            index=n,
+            numPages=ceil(len(all_badges)/perPage),
+            origlist=all_badges)
+        } for n,i in enumerate(range(0, len(all_badges), perPage))]
+
+        await paginate_reaction(pages, ctx)
+        
 
     @tasks.loop(minutes=10)
     async def update_badges(self):
