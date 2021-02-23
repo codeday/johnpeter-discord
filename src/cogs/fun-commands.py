@@ -37,26 +37,14 @@ class FunCommands(commands.Cog, name="Fun"):
             print(file)
             self.sponsorships.append(file)
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        msg = message.content
-
-        manyAnimalsRegex = re.compile(f"{await self.bot.get_prefix(message)}(cat|dog)((?:n't)+)")
-        if match := manyAnimalsRegex.match(msg):
-            animal,nts = match.group(1,2)
-
-            animal_commands = ["cat","dog"]
-            command_to_call = animal_commands[(animal_commands.index(animal) + nts.count("n't"))%2]
-            await self.bot.get_command(command_to_call)(message.channel)
-
-    @commands.command(name="cat",aliases=["kitten", "kitty","catto"])
+    @commands.command(name="cat",aliases=["kitten", "kitty", "dogn't","catto"])
     @only_random
     async def cat(self, ctx):
         with urllib.request.urlopen("https://aws.random.cat/meow") as url:
             data = json.loads(url.read().decode())
             await ctx.send(data.get('file'))
     
-    @commands.command(name="dog",aliases=["doggo", "puppy", "pupper"])
+    @commands.command(name="doggo",aliases=["dog", "puppy", "pupper", "catn't"])
     @only_random
     async def doggo(self,ctx):
         with urllib.request.urlopen("https://dog.ceo/api/breeds/image/random") as url:
