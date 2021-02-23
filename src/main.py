@@ -154,6 +154,10 @@ async def on_ready():
 async def on_command_error(ctx, error: commands.CommandError):
     """Specially handles some errors, all others take the unhandled route"""
     if isinstance(error, commands.CommandNotFound):
+
+        if "n't" in ctx.message.content:
+            return
+
         return await ctx.send(
             "That command doesn't seem to exist! Please try again, and type `"
             "~help` to view the help documentation."
