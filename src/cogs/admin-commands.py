@@ -23,6 +23,12 @@ class AdminCommands(commands.Cog, name="Administration"):
             ctx.send("goodbye :(")
         sys.exit()
 
+    @commands.command(hidden=True)
+    @commands.has_permissions(administrator=True)
+    async def status(self, ctx, *, message):
+        if ctx.message.author.guild_permissions.administrator:
+            await self.bot.change_presence(activity=discord.Game(name=message))
+
     @commands.command(name="throw_error")
     @checks.requires_staff_role()
     async def throw_error(self, ctx):
