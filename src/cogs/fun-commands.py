@@ -39,6 +39,13 @@ class FunCommands(commands.Cog, name="Fun"):
             print(file)
             self.sponsorships.append(file)
 
+    @commands.command(name="cat",aliases=["kitten"])
+    @only_random
+    async def cat(self, ctx):
+        with urllib.request.urlopen("https://aws.random.cat/meow") as url:
+            data = json.loads(url.read().decode())
+            await ctx.send(data.get('file'))
+    
     @commands.command(name="doggo",aliases=["dog"])
     @only_random
     async def doggo(self,ctx):
