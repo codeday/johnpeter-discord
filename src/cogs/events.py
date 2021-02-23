@@ -10,6 +10,7 @@ import requests
 
 # noinspection PyPackageRequirements
 from discord.ext import commands, tasks
+from discord import AllowedMentions
 
 ROLE_NOTIFY_EVENT = os.getenv("ROLE_NOTIFY_EVENT")
 CHANNEL_EVENT_ANNOUNCE = int(os.getenv("CHANNEL_EVENT_ANNOUNCE"))
@@ -95,7 +96,10 @@ class EventsCog(commands.Cog, name="Events"):
         for event in events_soon:
             self.already_notified.append(event["id"])
             description = event['description'].replace(
-                "&nbsp;", " ").replace("<br />", "\n").replace("<br>", "\n")
+                "&nbsp;", " ").replace("<br />", "\n").replace(
+                    "<br>", "\n").replace("<ul>","").replace(
+                        "<li>","- ").replace("</li>","\n").replace(
+                            "<b>","**").replace("</b>","**")
             msg = f"**Starting soon: {event['title']}** ({self.format_start(event['start'])})"
             if event['location']:
                 msg += f"\n{event['location']}"
@@ -103,7 +107,7 @@ class EventsCog(commands.Cog, name="Events"):
             if description and len(description) > 0:
                 msg += f"\n\n{description}"
             channel = await self.bot.fetch_channel(CHANNEL_EVENT_ANNOUNCE)
-            await channel.send(msg)
+            await channel.send(msg, allowed_mentions=AllowedMentions(roles=True))
 
 
 def setup(bot):
