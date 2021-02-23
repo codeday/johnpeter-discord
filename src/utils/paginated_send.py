@@ -78,7 +78,6 @@ async def paginate_reaction(content, ctx, timeout=120, deleteMessage="This messa
         # delete message after `timeout` seconds
         except asyncio.TimeoutError:
             try:
-                await msg.edit(content=deleteMessage,embed=None)
                 await msg.clear_reactions()
             except:
                 pass
