@@ -50,14 +50,14 @@ class FunCommands(commands.Cog, name="Fun"):
             command_to_call = animal_commands[(animal_commands.index(animal) + nts.count("n't"))%2]
             await self.bot.get_command(command_to_call)(message.channel)
 
-    @commands.command(name="cat",aliases=["kitten", "kitty", "dogn't","catto"])
+    @commands.command(name="cat",aliases=["kitten", "kitty", "catto"])
     @only_random
     async def cat(self, ctx):
         with urllib.request.urlopen("https://aws.random.cat/meow") as url:
             data = json.loads(url.read().decode())
             await ctx.send(data.get('file'))
     
-    @commands.command(name="doggo",aliases=["dog", "puppy", "pupper", "catn't"])
+    @commands.command(name="doggo",aliases=["dog", "puppy", "pupper"])
     @only_random
     async def doggo(self,ctx):
         with urllib.request.urlopen("https://dog.ceo/api/breeds/image/random") as url:
