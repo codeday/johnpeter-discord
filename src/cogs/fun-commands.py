@@ -1,21 +1,20 @@
 import asyncio
-import io
+import json
 import os
 import random
 import re
 import urllib
+import urllib.request
 from glob import glob
 from os import getenv
 from random import choice
-from urllib import parse, request
-import urllib.request,json
-import aiohttp
+from urllib import request
+
 import discord
 from discord.ext import commands
 
 from utils.cms import get_sponsor_intro, get_sponsor_audio
 from utils.commands import only_random, require_vc
-import json
 
 
 class FunCommands(commands.Cog, name="Fun"):
@@ -39,19 +38,25 @@ class FunCommands(commands.Cog, name="Fun"):
             print(file)
             self.sponsorships.append(file)
 
-    @commands.command(name="cat",aliases=["kitten"])
+    @commands.command(name="cat",aliases=["kitten", "kitty", "dogn't","catto"])
     @only_random
     async def cat(self, ctx):
         with urllib.request.urlopen("https://aws.random.cat/meow") as url:
             data = json.loads(url.read().decode())
             await ctx.send(data.get('file'))
     
-    @commands.command(name="doggo",aliases=["dog"])
+    @commands.command(name="doggo",aliases=["dog", "puppy", "pupper"])
     @only_random
     async def doggo(self,ctx):
         with urllib.request.urlopen("https://dog.ceo/api/breeds/image/random") as url:
             data = json.loads(url.read().decode())
             await ctx.send(data.get('message'))
+
+    @commands.command(name="floof", aliases=["floofer","floofo"])
+    @only_random
+    async def floof(self, ctx):
+        func = random.choice([self.doggo, self.cat])
+        await func(self,ctx)
 
     @commands.command(name="owo")
     @only_random
