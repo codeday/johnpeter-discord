@@ -36,6 +36,19 @@ class FunCommands(commands.Cog, name="Fun"):
         for file in glob("./cache/sponsorships/*.mp3"):
             print(file)
             self.sponsorships.append(file)
+    
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        msg = message.content
+
+        manyAnimalsRegex = re.compile(f"{await self.bot.get_prefix(message)}(cat|dog)((?:n't)+)")
+        match = manyAnimalsRegex.match(msg)
+        if match:
+            animal,nts = match.group(1,2)
+
+            animal_commands = ["cat","dog"]
+            command_to_call = animal_commands[(animal_commands.index(animal) + nts.count("n't"))%2]
+            await self.bot.get_command(command_to_call)(message.channel)
 
     @commands.command(name="cat",aliases=["kitten", "kitty", "dogn't","catto"])
     @only_random
