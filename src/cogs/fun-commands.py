@@ -44,7 +44,7 @@ class FunCommands(commands.Cog, name="Fun"):
             data = json.loads(url.read().decode())
             await ctx.send(data.get('file'))
     
-    @commands.command(name="doggo",aliases=["dog", "puppy", "pupper"])
+    @commands.command(name="doggo",aliases=["dog", "puppy", "pupper", "catn't"])
     @only_random
     async def doggo(self,ctx):
         with urllib.request.urlopen("https://dog.ceo/api/breeds/image/random") as url:
