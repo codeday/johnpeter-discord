@@ -8,7 +8,6 @@ import urllib.request
 from glob import glob
 from os import getenv
 from random import choice
-from urllib import request
 
 import discord
 from discord.ext import commands
@@ -55,8 +54,7 @@ class FunCommands(commands.Cog, name="Fun"):
     @commands.command(name="floof", aliases=["floofer","floofo"])
     @only_random
     async def floof(self, ctx):
-        func = random.choice([self.doggo, self.cat])
-        await func(self,ctx)
+        await ctx.invoke(self.bot.get_command(random.choice(['doggo', 'cat'])))
 
     @commands.command(name="owo")
     @only_random
