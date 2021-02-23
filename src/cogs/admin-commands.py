@@ -2,6 +2,7 @@ import sys
 
 from discord.ext import commands
 from utils import checks
+import discord
 
 
 class AdminCommands(commands.Cog, name="Administration"):
