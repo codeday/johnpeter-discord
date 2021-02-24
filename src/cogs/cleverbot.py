@@ -39,7 +39,7 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
             )
             msg_out = json.loads(r.text)["output"]
             self.states[state_id] = json.loads(r.text)["cs"]
-            await ctx.reply(content=str(msg_out))
+            await ctx.reply(content=str(msg_out), replied_user=False)
         if (
             isinstance(ctx.channel, discord.channel.DMChannel)
             and ctx.author is not ctx.channel.me
