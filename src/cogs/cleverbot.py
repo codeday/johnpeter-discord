@@ -8,6 +8,8 @@ import requests
 # noinspection PyPackageRequirements
 from discord.ext import commands
 
+from utils.commands import only_random
+
 API_KEY = os.getenv("CLEVERBOT_API_KEY")
 
 
@@ -18,7 +20,10 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
         self.dmstates = {}
         self.dminit = []
 
+    
+    
     @commands.command(name="john", aliases=["John"], hidden=True)
+    @only_random
     async def john(self, ctx, *, message=None):
 
         if message is None:
