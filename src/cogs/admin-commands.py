@@ -32,7 +32,6 @@ class AdminCommands(commands.Cog, name="Administration"):
             success_message = "goodbye :(",
             delete_messages = False
         ):
-            await ctx.send("goodbye :(")
             await self.bot.logout()
             sys.exit()
 
