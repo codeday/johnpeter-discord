@@ -13,7 +13,7 @@ import discord
 from discord.ext import commands
 
 from utils.cms import get_sponsor_intro, get_sponsor_audio
-from utils.commands import only_random, require_vc
+from utils.commands import only_random, require_vc, OnlyAllowedInChannels
 
 
 class FunCommands(commands.Cog, name="Fun"):
@@ -39,6 +39,11 @@ class FunCommands(commands.Cog, name="Fun"):
     
     @commands.Cog.listener()
     async def on_message(self, message):
+
+        if message.channel.id != int(getenv("CHANNEL_RANDOM", 689534362760642676)): # hacky @only_random replacement
+            raise OnlyAllowedInChannels([int(getenv("CHANNEL_RANDOM", 689534362760642676))])
+            return
+
         msg = message.content
 
         manyAnimalsRegex = re.compile(f"{await self.bot.get_prefix(message)}(cat|dog)((?:n't)+)")
