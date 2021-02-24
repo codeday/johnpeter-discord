@@ -40,15 +40,16 @@ class FunCommands(commands.Cog, name="Fun"):
     @commands.Cog.listener()
     async def on_message(self, message):
 
-        if message.channel.id != int(getenv("CHANNEL_RANDOM", 689534362760642676)): # hacky @only_random replacement
-            await message.channel.send(f"You can only do that in <#{getenv('CHANNEL_RANDOM', 689534362760642676)}>")
-            return
-
         msg = message.content
 
         manyAnimalsRegex = re.compile(f"{await self.bot.get_prefix(message)}(cat|dog)((?:n't)+)")
         match = manyAnimalsRegex.match(msg)
         if match:
+
+            if message.channel.id != int(getenv("CHANNEL_RANDOM", 689534362760642676)): # hacky @only_random replacement
+                await message.channel.send(f"You can only do that in <#{getenv('CHANNEL_RANDOM', 689534362760642676)}>")
+                return
+
             animal,nts = match.group(1,2)
 
             animal_commands = ["cat","dog"]
