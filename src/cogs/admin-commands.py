@@ -2,9 +2,11 @@ import sys
 
 from discord.ext import commands
 from utils import checks
+from utils.confirmation import confirm 
+
 import discord
 
-from asyncio import TimeoutError
+
 
 class AdminCommands(commands.Cog, name="Administration"):
     """A cog where all the server admin commands live"""
@@ -22,23 +24,17 @@ class AdminCommands(commands.Cog, name="Administration"):
     @checks.requires_staff_role()
     async def kill(self, ctx):
 
-        msg = await ctx.send(f"Are you sure you want to kill me in cold blood? React with \N{WHITE HEAVY CHECK MARK} to confirm!")
-
-        while True:
-            try:
-                check = lambda reaction, user: reaction.message.id == msg.id and user.id == ctx.author.id
-
-                reaction, _ = await self.bot.wait_for('reaction_add', timeout=60, check=check)
-
-                if reaction.emoji == "\N{WHITE HEAVY CHECK MARK}":
-                    break
-            except TimeoutError:
-                await msg.edit("Kill cancelled :)")
-                return
-
-        await ctx.send("goodbye :(")
-        await self.bot.logout()
-        sys.exit()
+        if await confirm(
+            confirmation="Are you sure you want to kill me in cold blood?", 
+            ctx=ctx,
+            bot=self.bot,
+            abort_message = "Thank you for sparing my life :)",
+            success_message = "goodbye :(",
+            delete_messages = False
+        ):
+            await ctx.send("goodbye :(")
+            await self.bot.logout()
+            sys.exit()
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
