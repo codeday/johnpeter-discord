@@ -1,16 +1,14 @@
 # noinspection PyPackageRequirements
+import datetime
 import json
 import os
+
 import requests
-import datetime
 from dateutil import parser
-from pytz import timezone
-
-import requests
-
+from discord import AllowedMentions
 # noinspection PyPackageRequirements
 from discord.ext import commands, tasks
-from discord import AllowedMentions
+from pytz import timezone
 
 ROLE_NOTIFY_EVENT = os.getenv("ROLE_NOTIFY_EVENT")
 CHANNEL_EVENT_ANNOUNCE = int(os.getenv("CHANNEL_EVENT_ANNOUNCE"))
@@ -84,7 +82,7 @@ class EventsCog(commands.Cog, name="Events"):
             if (len(event_strs) > 0):
                 msg = f":date: **__Events today__**:\n<@&{ROLE_NOTIFY_EVENT}>\n\n{event_list}"
                 channel = await self.bot.fetch_channel(CHANNEL_EVENT_ANNOUNCE)
-                await channel.send(msg[0:2000])
+                await channel.send(msg[0:2000], allowed_mentions=AllowedMentions(roles=True))
 
     @tasks.loop(seconds=60.0)
     async def event_check(self):
