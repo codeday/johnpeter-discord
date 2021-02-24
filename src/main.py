@@ -61,10 +61,8 @@ logging.basicConfig(level=logging.INFO)
 bot.help_command = BotHelpCommand()
 
 initial_cogs = [
-    "cogs.team-builder",
     "cogs.cleverbot",
     "cogs.admin-commands",
-    "cogs.tournament",
     "cogs.fun-commands",
     "cogs.reactions",
     "cogs.events",
