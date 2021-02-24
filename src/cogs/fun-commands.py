@@ -41,7 +41,7 @@ class FunCommands(commands.Cog, name="Fun"):
     async def on_message(self, message):
 
         if message.channel.id != int(getenv("CHANNEL_RANDOM", 689534362760642676)): # hacky @only_random replacement
-            raise OnlyAllowedInChannels([int(getenv("CHANNEL_RANDOM", 689534362760642676))])
+            await message.channel.send(f"You can only do that in <#{getenv('CHANNEL_RANDOM', 689534362760642676)}>")
             return
 
         msg = message.content

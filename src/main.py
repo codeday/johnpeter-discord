@@ -152,7 +152,6 @@ async def on_ready():
         logging.info(f"We have logged in as {bot.user}")
     logging.info(f"We are in {counter} server!")
 
-
 @bot.event
 async def on_command_error(ctx, error: commands.CommandError):
     """Specially handles some errors, all others take the unhandled route"""
