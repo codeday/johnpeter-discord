@@ -63,6 +63,7 @@ class FunCommands(commands.Cog, name="Fun"):
             data = json.loads(url.read().decode())
             await ctx.send(data.get('file'))
     
+    
     @commands.command(name="doggo",aliases=["dog", "puppy", "pupper"])
     @only_random
     async def doggo(self,ctx):
@@ -75,11 +76,18 @@ class FunCommands(commands.Cog, name="Fun"):
     async def floof(self, ctx):
         await ctx.invoke(self.bot.get_command(random.choice(['doggo', 'cat'])))
 
+    @commands.command(name="bird", aliases=["birb","birdy","birdie"])
+    @only_random
+    async def bird(self, ctx):
+        with urllib.request.urlopen("https://some-random-api.ml/img/birb") as url:
+            data = json.loads(url.read().decode())
+            await ctx.send(data.get('link'))
+
     @commands.command(name="owo")
     @only_random
     async def owo(self, ctx):
         """owo"""
-        await ctx.send(f"owo what's {ctx.author.mention}")
+        await ctx.send(f"owo what's {ctx.author.mention}?")
 
     @commands.command(
         name="up-down-up-down-left-right-left-right-b-a-start",
