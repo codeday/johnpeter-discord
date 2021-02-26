@@ -39,7 +39,7 @@ class EventsCog(commands.Cog, name="Events"):
         return f"""
             query {{
                 calendar {{
-                    events(after:"{after.isoformat()}", before:"{before.isoformat()}", format: MARKDOWN) {{
+                    events(after:"{after.isoformat()}", before:"{before.isoformat()}") {{
                         id
                         start
                         title
