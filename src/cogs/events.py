@@ -97,7 +97,7 @@ class EventsCog(commands.Cog, name="Events"):
                 "&nbsp;", " ").replace("<br />", "\n").replace(
                     "<br>", "\n").replace("<ul>","").replace(
                         "<li>","- ").replace("</li>","\n").replace(
-                            "<b>","**").replace("</b>","**")
+                            "<b>","**").replace("</b>","**").replace('<span>','').replace('</span>','')
             msg = f"**Starting soon: {event['title']}** ({self.format_start(event['start'])})"
             if event['location']:
                 msg += f"\n{event['location']}"
