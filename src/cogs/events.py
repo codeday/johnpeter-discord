@@ -39,7 +39,7 @@ class EventsCog(commands.Cog, name="Events"):
         return f"""
             query {{
                 calendar {{
-                    events(after:"{after.isoformat()}", before:"{before.isoformat()}", format: MARKDOWN) {{
+                    events(after:"{after.isoformat()}", before:"{before.isoformat()}") {{
                         id
                         start
                         title
@@ -97,7 +97,7 @@ class EventsCog(commands.Cog, name="Events"):
                 "&nbsp;", " ").replace("<br />", "\n").replace(
                     "<br>", "\n").replace("<ul>","").replace(
                         "<li>","- ").replace("</li>","\n").replace(
-                            "<b>","**").replace("</b>","**")
+                            "<b>","**").replace("</b>","**").replace('<span>','').replace('</span>','')
             msg = f"**Starting soon: {event['title']}** ({self.format_start(event['start'])})"
             if event['location']:
                 msg += f"\n{event['location']}"
