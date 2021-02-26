@@ -3,6 +3,8 @@ import datetime
 import json
 import os
 
+import re
+
 import requests
 from dateutil import parser
 from discord import AllowedMentions
@@ -97,7 +99,14 @@ class EventsCog(commands.Cog, name="Events"):
                 "&nbsp;", " ").replace("<br />", "\n").replace(
                     "<br>", "\n").replace("<ul>","").replace(
                         "<li>","- ").replace("</li>","\n").replace(
-                            "<b>","**").replace("</b>","**").replace('<span>','').replace('</span>','')
+                            "<b>","**").replace("</b>","**").replace(
+                                '<span>','').replace('</span>','')
+
+            anchor_expr = re.compile(R'<a\s+(?:[^>]*?\s+)?href="([^"]*)">(.+?)<\/a>')
+            for _ in anchor_expr.findall(description):
+                match = anchor_expr.search(description)
+                description = description.replace(match.group(0), f"<{match.group(1)}>")
+            
             msg = f"**Starting soon: {event['title']}** ({self.format_start(event['start'])})"
             if event['location']:
                 msg += f"\n{event['location']}"

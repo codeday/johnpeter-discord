@@ -14,7 +14,7 @@ postgres_db = {
     "port": 5432,
 }
 postgres_url = URL(**postgres_db)
-engine = create_engine(postgres_url)
+engine = create_engine(postgres_url, pool_size=20, max_overflow=20)
 metadata = MetaData()
 
 Base = declarative_base(bind=engine, metadata=metadata)
