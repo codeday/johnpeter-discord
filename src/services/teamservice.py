@@ -32,7 +32,7 @@ class TeamService:
         team = session.query(Team).filter(Team.team_name == name).first()
         if sess_flag:
             session.commit()
-            session.close()
+        session.close()
         return team
 
     @staticmethod
@@ -45,7 +45,7 @@ class TeamService:
         team = session.query(Team).filter(Team.id == id).first()
         if sess_flag:
             session.commit()
-            session.close()
+        session.close()
         return team
 
     @staticmethod

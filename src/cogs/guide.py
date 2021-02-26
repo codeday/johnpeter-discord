@@ -68,8 +68,9 @@ class GuideCog(commands.Cog, name="Guide"):
         resp = query.all()
         if len(resp) > 0:
             self.cache_notified(channel, user)
+            session.close()
             return True
-
+        session.close()
         return False
 
     def cache_notified(self, channel, user):
