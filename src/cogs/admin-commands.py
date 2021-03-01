@@ -2,10 +2,9 @@ import sys
 
 from discord.ext import commands
 from utils import checks
-from utils.confirmation import confirm 
+from utils.confirmation import confirm
 
 import discord
-
 
 
 class AdminCommands(commands.Cog, name="Administration"):
@@ -25,12 +24,12 @@ class AdminCommands(commands.Cog, name="Administration"):
     async def kill(self, ctx):
 
         if await confirm(
-            confirmation="Are you sure you want to kill me in cold blood?", 
-            ctx=ctx,
-            bot=self.bot,
-            abort_message = "Thank you for sparing my life :)",
-            success_message = "goodbye :(",
-            delete_messages = False
+                confirmation="Are you sure you want to kill me in cold blood?",
+                ctx=ctx,
+                bot=self.bot,
+                abort_message="Thank you for sparing my life :)",
+                success_message="goodbye :(",
+                delete_messages=False
         ):
             await self.bot.logout()
             sys.exit()

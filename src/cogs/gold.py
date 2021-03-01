@@ -9,7 +9,7 @@ from os import getenv
 # noinspection PyPackageRequirements
 
 
-class BadgeCog(commands.Cog, name="Guide"):
+class GoldCog(commands.Cog, name="Gold"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -31,4 +31,4 @@ class BadgeCog(commands.Cog, name="Guide"):
 
 
 def setup(bot):
-    bot.add_cog(BadgeCog(bot))
+    bot.add_cog(GoldCog(bot))

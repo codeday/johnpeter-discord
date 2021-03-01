@@ -27,7 +27,7 @@ BADGES_QUERY = """
 # noinspection PyPackageRequirements
 
 
-class BadgeCog(commands.Cog, name="Guide"):
+class BadgeCog(commands.Cog, name="Badge"):
     def __init__(self, bot):
         self.bot = bot
         self.update_badges.start()
