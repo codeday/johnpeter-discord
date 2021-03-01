@@ -45,8 +45,7 @@ def command_prefix(bot, message):
         return "j!"
 
 
-intents = discord.Intents(messages=True, guilds=True,
-                          members=True, emojis=True, reactions=True, webhooks=True)
+intents = discord.Intents.all()
 
 bot = commands.Bot(
     command_prefix=command_prefix,
