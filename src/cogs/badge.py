@@ -146,7 +146,10 @@ class BadgeCog(commands.Cog, name="Guide"):
         await ctx.send(f"{b['emoji']} **{b['name']}**: {b['description']}")
 
     @snippet.command(name='inspect')
-    async def inspect(self, ctx, member: discord.Member):
+    async def inspect(self, ctx, member: discord.Member = None):
+
+        if member is None: member = ctx.author
+
         query = f"""{{
             account {{
                 getUser(where: {{ discordId: "{member.id}"}}, fresh: true) {{
