@@ -20,7 +20,7 @@ GUIDES_QUERY = """
 # noinspection PyPackageRequirements
 
 
-class SnippetCog(commands.Cog, name="Guide"):
+class SnippetCog(commands.Cog, name="Snippet"):
     def __init__(self, bot):
         self.bot = bot
         self.update_snippets.start()
