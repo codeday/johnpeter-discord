@@ -46,7 +46,7 @@ def command_prefix(bot, message):
 
 
 intents = discord.Intents(messages=True, guilds=True,
-                          members=True, emojis=True, reactions=True, webhooks=True)
+                          members=True, emojis=True, reactions=True, webhooks=True, voice_states=True)
 
 bot = commands.Bot(
     command_prefix=command_prefix,

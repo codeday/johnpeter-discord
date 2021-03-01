@@ -123,7 +123,6 @@ class FunCommands(commands.Cog, name="Fun"):
     @require_vc
     async def sponsorship(self, ctx):
         """Says a message from a sponsor."""
-        await ctx.message.delete()
         retval = os.getcwd()
         vc = await ctx.message.author.voice.channel.connect()
         try:
