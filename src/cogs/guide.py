@@ -44,7 +44,7 @@ class GuideCog(commands.Cog, name="Guide"):
                 await message.author.send(guide["value"])
 
             if guide["json"] and guide["json"]["badgeId"]:
-                await grant(self.bot, message.author, guide["json"]["badgeId"])
+                await grant(message.author, guide["json"]["badgeId"])
 
     @tasks.loop(minutes=30)
     async def update_guides(self):

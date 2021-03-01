@@ -1,10 +1,13 @@
+import asyncio
+
 import discord
 from discord.ext import commands, tasks
 import json
 import requests
 from math import ceil
 from utils import checks
-from utils.badges import grant
+from utils.badges import grant, choose_cult
+from utils.commands import only_random
 from utils.confirmation import confirm
 from utils.paginated_send import paginated_send_multiline, paginate_reaction
 
@@ -23,6 +26,7 @@ BADGES_QUERY = """
   }
 }
 """
+
 
 # noinspection PyPackageRequirements
 
@@ -46,7 +50,7 @@ class BadgeCog(commands.Cog, name="Badge"):
 
     def get_badge(self, id):
         badges = [b for b in self.badges if (
-            b['id'] == id or b['emoji'] == id)]
+                b['id'] == id or b['emoji'] == id)]
         if len(badges) > 0:
             return badges[0]
         return None
@@ -57,8 +61,7 @@ class BadgeCog(commands.Cog, name="Badge"):
         #     "\n".join([f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
         #                for b in badges]))
         all_badges = [f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
-                       for b in badges]
-        
+                      for b in badges]
 
         def generate_badge_page_embed(badgelist, index, numPages, origlist):
             return discord.Embed.from_dict({
@@ -66,20 +69,19 @@ class BadgeCog(commands.Cog, name="Badge"):
                 "description": "\n".join(badgelist),
                 "footer": {
                     "icon_url": str(ctx.author.avatar_url),
-                    "text": f"Page {1+index}/{numPages} | {len(origlist)} results | Searched by {ctx.author.name}#{ctx.author.discriminator}"
+                    "text": f"Page {1 + index}/{numPages} | {len(origlist)} results | Searched by {ctx.author.name}#{ctx.author.discriminator}"
                 }
             })
-        
+
         perPage = 15
-        pages = [{"content":"","embed":generate_badge_page_embed(
-            badgelist=all_badges[i:i+perPage], 
+        pages = [{"content": "", "embed": generate_badge_page_embed(
+            badgelist=all_badges[i:i + perPage],
             index=n,
-            numPages=ceil(len(all_badges)/perPage),
+            numPages=ceil(len(all_badges) / perPage),
             origlist=all_badges)
-        } for n,i in enumerate(range(0, len(all_badges), perPage))]
+                  } for n, i in enumerate(range(0, len(all_badges), perPage))]
 
         await paginate_reaction(pages, ctx)
-        
 
     @tasks.loop(minutes=10)
     async def update_badges(self):
@@ -87,16 +89,16 @@ class BadgeCog(commands.Cog, name="Badge"):
         self.badges = self.gql(BADGES_QUERY)["cms"]["badges"]["items"]
 
     @commands.group(name="badge")
-    async def snippet(self, ctx):
+    async def badge(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid badge command passed...')
 
-    @snippet.command(name="refresh")
+    @badge.command(name="refresh")
     @checks.requires_staff_role()
     async def refresh(self, ctx):
         self.badges = self.gql(BADGES_QUERY)["cms"]["badges"]["items"]
 
-    @snippet.command(name='give')
+    @badge.command(name='give')
     @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
         b = self.get_badge(id)
@@ -107,12 +109,12 @@ class BadgeCog(commands.Cog, name="Badge"):
             await ctx.send("I'm not giving those away for free!")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
             return
-        if await grant(self.bot, member, id):
+        if await grant(member, id):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
         else:
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-    @snippet.command(name='give_role')
+    @badge.command(name='give_role')
     @checks.requires_staff_role()
     async def give_role(self, ctx, role: discord.Role, id):
         print(role)
@@ -127,17 +129,17 @@ class BadgeCog(commands.Cog, name="Badge"):
         elif await confirm(f'Are you sure, this will add a badge to {len(role.members)} person(s)', ctx, self.bot, ):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
             for member in role.members:
-                if not (await grant(self.bot, member, id)):
+                if not (await grant(member, id)):
                     await ctx.message.remove_reaction('\N{THUMBS UP SIGN}', self.bot.user)
                     await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
         else:
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-    @snippet.command(name='list')
+    @badge.command(name='list')
     async def list(self, ctx):
         await self.send_list_badges(ctx, self.badges)
 
-    @snippet.command(name='info')
+    @badge.command(name='info')
     async def info(self, ctx, id):
         b = self.get_badge(id)
         if not b:
@@ -145,7 +147,7 @@ class BadgeCog(commands.Cog, name="Badge"):
             return
         await ctx.send(f"{b['emoji']} **{b['name']}**: {b['description']}")
 
-    @snippet.command(name='inspect')
+    @badge.command(name='inspect')
     async def inspect(self, ctx, member: discord.Member = None):
 
         if member is None: member = ctx.author
@@ -174,6 +176,54 @@ class BadgeCog(commands.Cog, name="Badge"):
         badges = result["account"]["getUser"]["badges"]
 
         await self.send_list_badges(ctx, [b['details'] for b in badges])
+
+    @badge.command()
+    @only_random
+    async def cult(self, ctx):
+        query = f"""{{
+            account {{
+                getUser(where: {{ discordId: "{ctx.author.id}"}}, fresh: true) {{
+                    badges {{
+                        id
+                    }}
+                }}
+            }}
+        }}
+        """
+        result = self.gql(query)
+        if not result["account"]["getUser"]:
+            await ctx.send("You haven't linked your CodeDay account.")
+            return
+        badges = result["account"]["getUser"]["badges"]
+        if any((badge['id'] == 'pizza' or badge['id'] == 'turtle') for badge in badges):
+            await ctx.send("You are already apart of a cult!")
+            return
+
+        initiation_message = await ctx.send("Welcome to the CodeDay Badge Cult Initiation.\nChoose your cult: :turtle: "
+                                            "or :pizza:.")
+
+        await initiation_message.add_reaction('\N{TURTLE}')
+        await initiation_message.add_reaction('\N{Slice of Pizza}')
+
+        def check(reaction, user):
+            return user == ctx.author and reaction.message.id == initiation_message.id
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+            badge_id = ""
+            if reaction.emoji == '\N{TURTLE}':
+                badge_id = "turtle"
+            if reaction.emoji == '\N{Slice of Pizza}':
+                badge_id = "pizza"
+            response = await choose_cult(ctx, ctx.author, badge_id)
+            if not response:
+                await initiation_message.delete()
+            else:
+                await ctx.send(f"Welcome to the {badge_id} cult!")
+        except asyncio.TimeoutError:
+            await initiation_message.delete()
+        else:
+            await ctx.message.add_reaction('👍')
 
 
 def setup(bot):

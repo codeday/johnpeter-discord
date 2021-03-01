@@ -10,7 +10,7 @@ def gql_token():
     secret = getenv("GQL_ACCOUNT_SECRET")
     message = {
         "scopes": "write:users",
-        "exp": int(time.time()) + (60*60*24)
+        "exp": int(time.time()) + (60 * 60 * 24)
     }
     return encode(message, secret, algorithm='HS256').decode("utf-8")
 
@@ -21,7 +21,8 @@ def gql(query):
                            headers={"Authorization": f"Bearer {gql_token()}"})
     data = json.loads(result.text)
     if "errors" in data:
-        logging.error(result.text)
+        # logging.error(result.text)
+        raise Exception(data["errors"][0]["message"])
     return data["data"]
 
 
@@ -45,7 +46,28 @@ def get_username(member):
     return None
 
 
-async def grant(bot, member, id):
+async def choose_cult(ctx, member, id):
+    id = id.lower()
+    if id != "pizza" and id != "turtle":
+        return False
+    username = get_username(member)
+    if not username:
+        return False
+    logging.info(f"granting badge {id} to {username}")
+    query = f"""mutation {{
+        account {{
+            pizzaOrTurtleCult(where: {{username: "{username}"}}, pizzaOrTurtle: {id.upper()})
+        }}
+    }}"""
+    try:
+        gql(query)
+        return True
+    except Exception as e:
+        await ctx.send(str(e))
+        return False
+
+
+async def grant(member, id):
     logging.info(f"granting badge {id}...")
     username = get_username(member)
     if not username:
@@ -59,11 +81,5 @@ async def grant(bot, member, id):
     }}"""
 
     gql(query)
-
-    try:
-        channel = await bot.fetch_channel(int(getenv("CHANNEL_A_UPDATE")))
-        await channel.send(f"a~update <@{member.id}>")
-    except Exception as err:
-        logging.error(err)
 
     return True

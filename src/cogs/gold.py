@@ -22,7 +22,7 @@ class GoldCog(commands.Cog, name="Gold"):
             await ctx.send("I can't find the gold role!")
             return
 
-        if await grant(self.bot, member, "codeday-gold"):
+        if await grant(member, "codeday-gold"):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
             await member.add_roles(role)
         else:
