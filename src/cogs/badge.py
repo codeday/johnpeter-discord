@@ -195,15 +195,18 @@ class BadgeCog(commands.Cog, name="Badge"):
             await ctx.send("You haven't linked your CodeDay account.")
             return
         badges = result["account"]["getUser"]["badges"]
-        if any((badge['id'] == 'pizza' or badge['id'] == 'turtle') for badge in badges):
-            await ctx.send("You are already apart of a cult!")
+        if any((badge['id'] == 'pizza') for badge in badges):
+            await ctx.send("You cannot forsake your blood vow to :pizza:")
+            return
+        if any((badge['id'] == 'turtle') for badge in badges):
+            await ctx.send("You cannot forsake your blood vow to :turtle:")
             return
 
-        initiation_message = await ctx.send("Welcome to the CodeDay Badge Cult Initiation.\nChoose your cult: :turtle: "
+        initiation_message = await ctx.send("Welcome to the CodeDay Badge Cult Initiation.\nChoose which cult to which will you pledge your life: :turtle: "
                                             "or :pizza:.")
 
-        await initiation_message.add_reaction('\N{TURTLE}')
-        await initiation_message.add_reaction('\N{Slice of Pizza}')
+        reaction1 = await initiation_message.add_reaction('\N{TURTLE}')
+        reaction2 = await initiation_message.add_reaction('\N{Slice of Pizza}')
 
         def check(reaction, user):
             return user == ctx.author and reaction.message.id == initiation_message.id
@@ -219,7 +222,8 @@ class BadgeCog(commands.Cog, name="Badge"):
             if not response:
                 await initiation_message.delete()
             else:
-                await ctx.send(f"Welcome to the {badge_id} cult!")
+                await initiation_message.clear_reactions()
+                await initiation_message.edit(content=f"Welcome to the :{badge_id}: cult! We accept your blood offering!")
         except asyncio.TimeoutError:
             await initiation_message.delete()
         else:
