@@ -89,6 +89,12 @@ class FunCommands(commands.Cog, name="Fun"):
         """owo"""
         await ctx.send(f"owo what's {ctx.author.mention}?")
 
+    @commands.command(name="uwu")
+    @only_random
+    async def uwu(self, ctx):
+        """uwu"""
+        await ctx.send(f"uwu what's {ctx.author.mention}?")
+
     @commands.command(
         name="up-down-up-down-left-right-left-right-b-a-start",
         hidden=True,
