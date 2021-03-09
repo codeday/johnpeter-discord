@@ -27,9 +27,9 @@ class AdminCommands(commands.Cog, name="Administration"):
                 confirmation="Are you sure you want to kill me in cold blood?",
                 ctx=ctx,
                 bot=self.bot,
-                abort_message="Thank you for sparing my life :)",
-                success_message="goodbye :(",
-                delete_messages=False
+                abort_msg="Thank you for sparing my life :)",
+                success_msg="goodbye :(",
+                delete_msgs=False
         ):
             await self.bot.logout()
             sys.exit()
