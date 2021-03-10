@@ -55,13 +55,23 @@ class BadgeCog(commands.Cog, name="Badge"):
             return badges[0]
         return None
 
-    async def send_list_badges(self, ctx, badges):
+    async def send_list_badges(self, ctx, badges, **kwargs):
+
+        if kwargs.get("filter", "") == "":
+            all_badges = [f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
+                    for b in badges]
+        else:
+            fexpr = kwargs.get("filter", "")
+
+            filter_lambda = lambda fexpr, badge: any([fexpr in badge[attr] for attr in ("emoji", "name", "id")])
+            all_badges = [f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
+                    for b in badges if filter_lambda(fexpr, b)]
+
         # await paginated_send_multiline(
         #     ctx,
         #     "\n".join([f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
         #                for b in badges]))
-        all_badges = [f"{b['emoji']} **{b['name']}** (`{b['id']}`, {b['earnCriteria']}) {b['description']}"
-                      for b in badges]
+        
 
         def generate_badge_page_embed(badgelist, index, numPages, origlist):
             return discord.Embed.from_dict({
@@ -138,6 +148,10 @@ class BadgeCog(commands.Cog, name="Badge"):
     @badge.command(name='list')
     async def list(self, ctx):
         await self.send_list_badges(ctx, self.badges)
+    
+    @badge.command(name='search')
+    async def search(self, ctx, fexpr):
+        await self.send_list_badges(ctx, self.badges, filter=fexpr)
 
     @badge.command(name='info')
     async def info(self, ctx, id):
