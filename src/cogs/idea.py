@@ -31,7 +31,7 @@ class IdeaCog(commands.Cog, name="Idea Generator"):
     @commands.command()
     async def idea(self, ctx):
         """comes up with an idea for your next amazing project!"""
-        ctx.send(self.generate_idea())
+        await ctx.send(self.generate_idea())
 
 
 def setup(bot):
