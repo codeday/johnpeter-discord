@@ -23,6 +23,11 @@ class IdeaCog(commands.Cog, name="Idea Generator"):
                      f'{random.choice(existing_product)}, but only for {random.choice(group_of_people)}',
                      f'{random.choice(existing_product)}, {random.choice(twist_leadin)} {random.choice(twist)}',
                      f'{random.choice(adjectives)} {random.choice(game_genres)} game, with {random.choice(extras)}!']
+
+        # THIS CODE SUCKS
+        print(list(tuple(list(int(str("400"))))))
+        # OK DONE SUCKING
+        
         if random.randint(1,25) == 1:
             return random.choice(templates) + ' - ' + random.choice(suffixes)
         else:
