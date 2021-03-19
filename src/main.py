@@ -71,6 +71,7 @@ initial_cogs = [
     "cogs.badge",
     "cogs.showcase",
     "cogs.gold",
+    "cogs.idea"
 ]
 loaded_cogs = []
 statuses = [
