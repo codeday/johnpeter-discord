@@ -2,12 +2,29 @@ version: 2.1
 workflows:
   build:
     jobs:
+      - test:
+          context: johnpeter-discord
       - build:
+          requires:
+            - test
           filters:
             branches:
               only: master
           context: johnpeter-discord
 jobs:
+  test:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run: pip install -r requirements.txt
+      - run: python -m pytest --junitxml=reports/pytest/pytest-report.xml -o junit_family=xunit1
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: reports
+          destination: test_results
   build:
     docker:
       - image: circleci/python:3.7
