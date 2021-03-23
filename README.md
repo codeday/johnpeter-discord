@@ -1,6 +1,5 @@
 # John Peter Discord
-
-Hey! This will have env vars and project explanations later. 
+Does all kinds of stuff on the [CodeDay Discord server](https://discord.gg/codeday)
 
 # Environment Variables
 
