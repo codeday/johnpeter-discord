@@ -25,7 +25,7 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
     
     @commands.command(name="john", aliases=["John"], hidden=True)
     @only_random
-    async def john(self, ctx: discord.Context, *, message=None):
+    async def john(self, ctx: commands.context.Context, *, message=None):
 
         if message is None:
             await ctx.send("Sorry, what was that?")
