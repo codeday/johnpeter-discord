@@ -1,6 +1,7 @@
 # noinspection PyPackageRequirements
 import json
 import os
+from os import getenv
 
 import discord
 import requests
@@ -24,14 +25,14 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
     
     @commands.command(name="john", aliases=["John"], hidden=True)
     @only_random
-    async def john(self, ctx, *, message=None):
+    async def john(self, ctx: discord.Context, *, message=None):
 
         if message is None:
             await ctx.send("Sorry, what was that?")
 
         if (
-            isinstance(ctx.channel,discord.channel.TextChannel)
-            and ctx.channel.name == "random"
+            isinstance(ctx.channel, discord.channel.TextChannel)
+            and (ctx.channel.name == "random" or ctx.channel.id == int(getenv("CHANNEL_RANDOM", 689534362760642676)))
         ):
             # each channel has unique state
             state_id = ctx.channel.name
