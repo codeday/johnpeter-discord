@@ -193,7 +193,7 @@ class BadgeCog(commands.Cog, name="Badge"):
 
         badges = result["account"]["getUser"]["badges"]
 
-        await self.send_list_badges(ctx, [b['details'] for b in badges])
+        await self.send_list_badges(ctx, [b['details'] for b in badges], title=f"Listing {ctx.author.name}'s badges")
 
     @badge.command()
     @only_random
