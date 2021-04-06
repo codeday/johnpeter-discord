@@ -73,9 +73,9 @@ class BadgeCog(commands.Cog, name="Badge"):
         #                for b in badges]))
         
 
-        def generate_badge_page_embed(badgelist, index, numPages, origlist):
+        def generate_badge_page_embed(badgelist, index, numPages, origlist, title):
             return discord.Embed.from_dict({
-                "title": "Listing all badges",
+                "title": title,
                 "description": "\n".join(badgelist),
                 "footer": {
                     "icon_url": str(ctx.author.avatar_url),
@@ -84,11 +84,15 @@ class BadgeCog(commands.Cog, name="Badge"):
             })
 
         perPage = 15
+        
+        title = kwargs.get("title", "Listing all badges")
+
         pages = [{"content": "", "embed": generate_badge_page_embed(
             badgelist=all_badges[i:i + perPage],
             index=n,
             numPages=ceil(len(all_badges) / perPage),
-            origlist=all_badges)
+            origlist=all_badges,
+            title=title)
                   } for n, i in enumerate(range(0, len(all_badges), perPage))]
 
         await paginate_reaction(pages, ctx)
