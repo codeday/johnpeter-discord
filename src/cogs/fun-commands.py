@@ -82,6 +82,12 @@ class FunCommands(commands.Cog, name="Fun"):
         with urllib.request.urlopen("https://some-random-api.ml/img/birb") as url:
             data = json.loads(url.read().decode())
             await ctx.send(data.get('link'))
+                                           
+    @commands.command(name ="fish", aliases=["cod", "codday", "phish"])
+    @only_random
+    async def fish(self, ctx):
+        fish = ["https://tinyurl.com/s8zadryh", "https://tinyurl.com/v2xsewah", "https://tinyurl.com/hnmdr2we", "https://tinyurl.com/ypbcsa3u"]
+        await ctx.send(random.choice(fish))
 
     @commands.command(name="owo")
     @only_random
