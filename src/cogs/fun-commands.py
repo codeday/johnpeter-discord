@@ -89,6 +89,14 @@ class FunCommands(commands.Cog, name="Fun"):
         fish = ["https://tinyurl.com/s8zadryh", "https://tinyurl.com/v2xsewah", "https://tinyurl.com/hnmdr2we", "https://tinyurl.com/ypbcsa3u"]
         await ctx.send(random.choice(fish))
 
+    @commands.command(name="triggered", aliases=["mad","angry"])
+    @only_random
+    async def triggered(self, ctx, arg):
+    if arg:
+        await ctx.send("https://some-random-api.ml/canvas/triggered?avatar={}".format(arg))
+    else:
+        await ctx.send("<:revoltLola:829824598178529311> Hey you didn't tell me an image URL!")
+
     @commands.command(name="owo")
     @only_random
     async def owo(self, ctx):
