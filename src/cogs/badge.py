@@ -23,6 +23,7 @@ BADGES_QUERY = """
         emoji
         description
         earnCriteria
+        grantPermissionOverrideIDs
       }
     }
   }
