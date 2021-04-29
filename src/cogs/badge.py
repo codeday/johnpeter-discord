@@ -119,7 +119,8 @@ class BadgeCog(commands.Cog, name="Badge"):
     # @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
         b = self.get_badge(id)
-        allowed_ids = json.loads(b.get('grantPermissionOverrideIDs', '[]'))
+        print(b['grantPermissionOverrideIDs'])
+        allowed_ids = b.get('grantPermissionOverrideIDs', [])
         allowed_ids = [str(id) for id in allowed_ids]
         staff_ids = json.loads(
             os.getenv("ROLES_STAFF", '["689215241996730417", "712062910897061979"]'))
