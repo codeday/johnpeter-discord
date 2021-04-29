@@ -1,15 +1,17 @@
 import asyncio
+import json
+import os
+from math import ceil
 
 import discord
-from discord.ext import commands, tasks
-import json
 import requests
-from math import ceil
+from discord.ext import commands, tasks
+
 from utils import checks
 from utils.badges import grant, choose_cult
 from utils.commands import only_random
 from utils.confirmation import confirm
-from utils.paginated_send import paginated_send_multiline, paginate_reaction
+from utils.paginated_send import paginate_reaction
 
 BADGES_QUERY = """
 {
@@ -113,20 +115,25 @@ class BadgeCog(commands.Cog, name="Badge"):
         self.badges = self.gql(BADGES_QUERY)["cms"]["badges"]["items"]
 
     @badge.command(name='give')
-    @checks.requires_staff_role()
+    # @checks.requires_staff_role()
     async def give(self, ctx, member: discord.Member, id):
         b = self.get_badge(id)
-        if not b:
-            await ctx.send("I haven't heard of that one.")
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-        if b["earnCriteria"] != "bestowed":
-            await ctx.send("I'm not giving those away for free!")
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
-        if await grant(member, id):
-            await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
-        else:
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        allowed_ids = json.loads(b.get('grantPermissionOverrideIDs', '[]'))
+        allowed_ids = [str(id) for id in allowed_ids]
+        staff_ids = json.loads(
+            os.getenv("ROLES_STAFF", '["689215241996730417", "712062910897061979"]'))
+        if [i for i in [str(role.id) for role in ctx.author.roles] if i in staff_ids or i in allowed_ids] or str(ctx.author.id) in allowed_ids:
+            if not b:
+                await ctx.send("I haven't heard of that one.")
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+            if b["earnCriteria"] != "bestowed":
+                await ctx.send("I'm not giving those away for free!")
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+                return
+            if await grant(member, id):
+                await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
+            else:
+                await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
 
     @badge.command(name='give_role')
     @checks.requires_staff_role()
