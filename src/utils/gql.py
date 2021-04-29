@@ -30,7 +30,7 @@ class GQLService:
     async def subscribe_ws(query, variable_values=None):
         transport = WebsocketsTransport(
             url='ws://graph.codeday.org/subscriptions')
-        session = Client(transport=transport, fetch_schema_from_transport=True)
+        session = Client(transport=transport)
         async for result in session.subscribe_async(GQLService.make_query(query), variable_values=variable_values):
             yield result
 
