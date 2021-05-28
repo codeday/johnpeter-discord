@@ -123,7 +123,7 @@ class BadgeCog(commands.Cog, name="Badge"):
         allowed_ids = [str(id) for id in allowed_ids]
         staff_ids = json.loads(
             os.getenv("ROLES_STAFF", '["689215241996730417", "712062910897061979"]'))
-        if [i for i in [str(role.id) for role in ctx.author.roles] if i in staff_ids or i in allowed_ids] or str(ctx.author.id) in allowed_ids:
+        if any([i in staff_ids or i in allowed_ids for i in [str(role.id) for role in ctx.author.roles]]) or str(ctx.author.id) in allowed_ids:
             if not b:
                 await ctx.send("I haven't heard of that one.")
                 await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
