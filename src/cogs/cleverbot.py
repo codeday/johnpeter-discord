@@ -29,6 +29,7 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
 
         if message is None:
             await ctx.send("Sorry, what was that?")
+            return
 
         if (
             isinstance(ctx.channel, discord.channel.TextChannel)
