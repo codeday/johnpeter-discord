@@ -41,7 +41,7 @@ class EventsCog(commands.Cog, name="Events"):
         return f"""
             query {{
                 calendar {{
-                    events(after:"{after.isoformat()}", before:"{before.isoformat()}") {{
+                    events(after: "{after.isoformat()}", before: "{before.isoformat()}", format: DISCORD) {{
                         id
                         start
                         title
@@ -78,7 +78,7 @@ class EventsCog(commands.Cog, name="Events"):
         now = datetime.datetime.now(tz=TZ)
         if now.hour == 9 and now.minute == 0:
             event_strs = [
-                f"· {self.format_start(e['start'], True)} — **{e['title']}** {e['location']}"
+                f"· {self.format_start(e['start'], True)} — **{e['title']}** <{e['location']}>"
                 for e in self.events]
             event_list = "\n".join(event_strs)
             if (len(event_strs) > 0):
@@ -95,24 +95,14 @@ class EventsCog(commands.Cog, name="Events"):
                        if event["start"] > now and event["start"] < soon and not(event["id"] in self.already_notified)]
         for event in events_soon:
             self.already_notified.append(event["id"])
-            description = event['description'].replace(
-                "&nbsp;", " ").replace("<br />", "\n").replace(
-                    "<br>", "\n").replace("<ul>","").replace(
-                        "<li>","- ").replace("</li>","\n").replace(
-                            "<b>","**").replace("</b>","**").replace(
-                                '<span>','').replace('</span>','')
+            description = event['description']
 
-            anchor_expr = re.compile(R'<a\s+(?:[^>]*?\s+)?href="([^"]*)">(.+?)<\/a>')
-            for _ in anchor_expr.findall(description):
-                match = anchor_expr.search(description)
-                description = description.replace(match.group(0), f"<{match.group(1)}>")
-            
             msg = f"**Starting soon: {event['title']}** ({self.format_start(event['start'])})"
             if event['location']:
-                msg += f"\n{event['location']}"
+                msg += f"\n<{event['location']}>"
             msg += f"\n<@&{ROLE_NOTIFY_EVENT}>"
             if description and len(description) > 0:
-                msg += f"\n\n{description}"
+                msg += f"\n{description}"
             channel = await self.bot.fetch_channel(CHANNEL_EVENT_ANNOUNCE)
             await channel.send(msg, allowed_mentions=AllowedMentions(roles=True))
 
