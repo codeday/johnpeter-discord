@@ -11,6 +11,7 @@ class ShowcaseCog(commands.Cog, name="Showcase"):
         self.bot = bot
         self._gallery_channel = None
         self._team_log_channel = None
+        self._pod_channels = {}
         self.on_member_added.start(self)
         self.on_member_removed.start(self)
         self.on_project_created.start(self)
@@ -30,6 +31,20 @@ class ShowcaseCog(commands.Cog, name="Showcase"):
             self._team_log_channel = await self.bot.fetch_channel(int(getenv('CHANNEL_TEAM_LOG')))
         return self._team_log_channel
 
+    async def get_pod_channel(self, pod_id):
+        pod_id_to_channel = {
+            '610': '853011526335463484',
+            '611': '853011528634990642',
+            '615': '853011545550225418',
+            '616': '853011550380752977',
+            '617': '853011554625650739',
+            '618': '853011556736040960',
+            '619': '853011558745767936',
+        }
+        if not (pod_id in self._pod_channels):
+            self._pod_channels[pod_id] = await self.bot.fetch_channel(int(pod_id_to_channel[pod_id]))
+        return self._pod_channels[pod_id]
+
     def name(self, project):
         return f"**{project['name']}** ({project['pod']})"
 
@@ -41,6 +56,16 @@ class ShowcaseCog(commands.Cog, name="Showcase"):
         await (await self.get_log_channel()).send(
             f"{self.name(member['project'])} `+` <@{member['account']['discordId']}> {self.link(member['project'])}"
         )
+        if not member['account']['discordId'] or not member['project']['pod']:
+            return
+
+        guild = await self.bot.get_guild('689213562740277361');
+        pod_channel = await self.get_pod_channel(member['project']['pod'])
+        await pod_channel.send(f"<@{member['account']['discordId']}> joined!")
+
+        discord_member = await guild.fetch_member(member['account']['discordId'])
+        if pod_channel:
+            await pod_channel.set_permissions(discord_member, send_messages=True, read_messages=True, add_reactions=True, read_message_history=True)
 
     @subscribe(GQLService.member_removed_listener)
     async def on_member_removed(self, member):
