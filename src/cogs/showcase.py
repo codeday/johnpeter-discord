@@ -59,7 +59,7 @@ class ShowcaseCog(commands.Cog, name="Showcase"):
         if not member['account']['discordId'] or not member['project']['pod']:
             return
 
-        guild = await self.bot.get_guild('689213562740277361');
+        guild = await self.bot.fetch_guild('689213562740277361');
         pod_channel = await self.get_pod_channel(member['project']['pod'])
         await pod_channel.send(f"<@{member['account']['discordId']}> joined!")
 
