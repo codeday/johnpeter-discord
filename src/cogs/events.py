@@ -90,7 +90,7 @@ class EventsCog(commands.Cog, name="Events"):
     async def event_check(self):
         print("checking for event")
         now = datetime.datetime.now(tz=timezone('UTC'))
-        soon = now + datetime.timedelta(minutes=30)
+        soon = now + datetime.timedelta(minutes=10)
         events_soon = [event for event in self.events
                        if event["start"] > now and event["start"] < soon and not(event["id"] in self.already_notified)]
         for event in events_soon:
