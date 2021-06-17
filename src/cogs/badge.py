@@ -121,10 +121,10 @@ class BadgeCog(commands.Cog, name="Badge"):
         if not b:
             await ctx.send("I haven't heard of that one.")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-        if b["earnCriteria"] != "bestowed":
-            await ctx.send("I'm not giving those away for free!")
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-            return
+        # if b["earnCriteria"] != "bestowed":
+        #     await ctx.send("I'm not giving those away for free!")
+        #     await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        #     return
         if await grant(member, id):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
         else:
@@ -139,9 +139,9 @@ class BadgeCog(commands.Cog, name="Badge"):
         if not b:
             await ctx.send("I haven't heard of that one.")
             await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
-        elif b["earnCriteria"] != "bestowed":
-            await ctx.send("I'm not giving those away for free!")
-            await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
+        # elif b["earnCriteria"] != "bestowed":
+        #     await ctx.send("I'm not giving those away for free!")
+        #     await ctx.message.add_reaction('\N{THUMBS DOWN SIGN}')
         elif await confirm(f'Are you sure, this will add a badge to {len(role.members)} person(s)', ctx, self.bot, ):
             await ctx.message.add_reaction('\N{THUMBS UP SIGN}')
             for member in role.members:
