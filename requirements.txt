@@ -59,3 +59,4 @@ PyJWT==1.7.1
 python_dateutil==2.8.1
 gql==3.0.0a5
 gql[all]==3.0.0a5
+slack-webhook==1.0.6

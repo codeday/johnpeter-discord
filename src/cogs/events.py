@@ -11,9 +11,11 @@ from discord import AllowedMentions
 # noinspection PyPackageRequirements
 from discord.ext import commands, tasks
 from pytz import timezone
+from slack_webhook import Slack
 
 ROLE_NOTIFY_EVENT = os.getenv("ROLE_NOTIFY_EVENT")
 CHANNEL_EVENT_ANNOUNCE = int(os.getenv("CHANNEL_EVENT_ANNOUNCE"))
+SLACK_EVENT_ANNOUNCE = os.getenv("SLACK_EVENT_ANNOUNCE")
 TZ = timezone("America/Los_Angeles")
 TZNAME = "Pacific"
 TZ2 = timezone("America/New_York")
@@ -105,6 +107,10 @@ class EventsCog(commands.Cog, name="Events"):
                 msg += f"\n{description}"
             channel = await self.bot.fetch_channel(CHANNEL_EVENT_ANNOUNCE)
             await channel.send(msg, allowed_mentions=AllowedMentions(roles=True))
+            if (SLACK_EVENT_ANNOUNCE):
+                slack = Slack(url=SLACK_EVENT_ANNOUNCE)
+                slack.post(text=msg.replace(f"<@&{ROLE_NOTIFY_EVENT}>", "<!channel>"))
+
 
 
 def setup(bot):
