@@ -23,7 +23,7 @@ class CleverbotCog(commands.Cog, name="Cleverbot"):
 
     
     
-    @commands.command(name="john", aliases=["John"], hidden=True)
+    @commands.command(name="john", aliases=["John", "JOHN"], hidden=True)
     @only_random
     async def john(self, ctx: commands.context.Context, *, message=None):
 
