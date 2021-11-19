@@ -36,6 +36,8 @@ class FunCommands(commands.Cog, name="Fun"):
         for file in glob("./cache/sponsorships/*.mp3"):
             print(file)
             self.sponsorships.append(file)
+            
+        self.fishes = []
     
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -83,11 +85,31 @@ class FunCommands(commands.Cog, name="Fun"):
             data = json.loads(url.read().decode())
             await ctx.send(data.get('link'))
                                            
-    @commands.command(name ="fish", aliases=["cod", "codday", "phish"])
+    @commands.command(name ="fish", aliases=["cod", "phish"])
     @only_random
     async def fish(self, ctx):
         fish = ["https://tinyurl.com/s8zadryh", "https://tinyurl.com/v2xsewah", "https://tinyurl.com/hnmdr2we", "https://tinyurl.com/ypbcsa3u"]
         await ctx.send(random.choice(fish))
+    
+    @commands.command(name ="fishfact", aliases=["codfact", "codday"])
+    @only_random
+    async def fishfact(self, ctx):
+        if not self.fishes:
+            with urllib.request.urlopen("https://www.fishwatch.gov/api/species") as url:
+                data = json.loads(url.read().decode())
+                for fish in data:
+                    entry = {}
+                    entry['name'] = fish['Species Name']
+                    entry['scientific_name'] = fish['Scientific Name']
+                    #entry['image'] = fish['Species Illustration Photo']['src']
+                    entry['biology'] = fish['Biology'].replace('\n', '').replace('<ul>', '').replace('</ul>', '').replace('</li>', '').split('<li>')[1:5]
+                    self.fishes.append(entry)
+        fish = random.choice(self.fishes)
+        fact = ""
+        fact += fish["name"] + " " + f'({fish["scientific_name"]})'
+        for x in fish['biology']:
+            fact += "\n" + "* " + x
+        await ctx.send(fact)
 
     @commands.command(name="owo")
     @only_random
