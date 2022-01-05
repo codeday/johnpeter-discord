@@ -1,0 +1,13 @@
+# fly.toml file generated for codeday-discord-johnpeter on 2022-01-05T11:13:18-05:00
+
+app = "codeday-discord-johnpeter"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
