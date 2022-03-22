@@ -104,6 +104,7 @@ class Reactions(Base):
         session.close()
         return groupmsgs
 
+Base.metadata.create_all(engine)
 
 def session_creator() -> Session:
     session = sessionmaker(bind=engine)
