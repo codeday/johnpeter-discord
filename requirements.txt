@@ -17,7 +17,7 @@ idna-ssl==1.1.0
 mysql-connector-python==8.0.19
   dnspython==1.16.0
   protobuf==3.6.1
-    setuptools==46.3.0
+    setuptools==65.5.1
     six==1.14.0
 pef==1.1.0
   click==7.1.1
