@@ -64,14 +64,14 @@ initial_cogs = [
     "cogs.cleverbot",
     "cogs.admin-commands",
     "cogs.fun-commands",
-    "cogs.reactions",
-    "cogs.events",
+    # "cogs.reactions",
+    # "cogs.events",
     "cogs.guide",
     "cogs.snippet",
     "cogs.badge",
-    "cogs.showcase",
-    "cogs.gold",
-    "cogs.idea"
+    # "cogs.showcase",
+    # "cogs.gold",
+    # "cogs.idea"
 ]
 loaded_cogs = []
 statuses = [
