@@ -84,6 +84,25 @@ statuses = [
     ),
     discord.Game("CodeCup"),
 ]
+names = [
+    "Cleverbot",
+    "Clever bot",
+    "Sally/Florence Megan",
+    "not John Cena",
+    "Marc Cadyn Nova Bob Tierney Lara Laura Zach Beau Roxanne Scrungus Dalton David Ryan Adriana Harry Potter Silence lovely Destiny Clarissa",
+    "Ryan turrittin",
+    "Peter Jent",
+    "Spencer",
+    "Maria",
+    "Dahlia",
+    "Michael",
+    "Ally",
+    "Lucas",
+    "nie hao kylan lol",
+    "CARLA",
+    "Zuri",
+    "Not a Robot"
+]
 
 # Here we load our extensions(cogs) listed above in [initial_extensions].
 failed_cogs = []
@@ -151,6 +170,7 @@ async def on_ready():
     for i in bot.guilds:
         counter += 1
         logging.info(f"We have logged in as {bot.user}")
+        await i.get_member(bot.user.id).edit(nick=(f"John \"{choice(names)}\" Peter"))
     logging.info(f"We are in {counter} server!")
 
 @bot.event
